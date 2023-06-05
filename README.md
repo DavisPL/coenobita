@@ -1,0 +1,2 @@
+# coenobita
+Capabilities for Rust
