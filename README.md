@@ -1,2 +1,3 @@
 # coenobita
-Capabilities for Rust
+
+(Placeholder) A (better?!) capabilities library for Rust
