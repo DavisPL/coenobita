@@ -1,3 +1,4 @@
-# coenobita
+# Coenobita
 
-(Placeholder) A (better?!) capabilities library for Rust
+## Examples
+Run the example snippets in `examples` with `cargo run --example <filename_without_extension>`.
