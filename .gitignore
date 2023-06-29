@@ -1,1 +1,9 @@
+# Rust
 /target
+
+# Vim
+.*.sw*
+
+# MacOS 
+.DS_Store
+
