@@ -8,6 +8,8 @@ description = "(Placeholder) A Capabilities Library for Rust"
 repository = "https://github.com/DavisPL/coenobita"
 readme = "README.md"
 
+[dependencies.macros]
+path = "macros"
+
 [dev-dependencies]
 criterion = "0.5"
-
