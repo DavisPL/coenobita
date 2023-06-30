@@ -1,3 +1,5 @@
+pub use macros::cap;
+
 use std::marker::PhantomData;
 use std::path::PathBuf;
 
