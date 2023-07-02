@@ -1,4 +1,5 @@
 pub use macros::cap;
+pub mod fs;
 
 use std::marker::PhantomData;
 use std::path::PathBuf;
@@ -25,5 +26,10 @@ impl<A, B, C, D, E> Capability<A, B, C, D, E> {
             phantom: PhantomData::<(A, B, C, D, E)>
         }
     }
+
+    // Path must have a getter because it's private - programmers shouldn't be able to change it
+    pub fn get_path(&self) -> &PathBuf {
+        &self.path
+    }   
 }
 
