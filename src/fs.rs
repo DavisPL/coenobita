@@ -22,7 +22,7 @@ pub fn create_dir_all<A, B, C, D, E, F, G, H>
     fs::create_dir_all(cap.get_path())
 }
 
-pub fn hard_link<A, B, C, D, E>
+pub fn hard_link<A, B, C, D, E, F, G, H>
 (original: &Capability<Read, A, B, C, D>, link: &Capability<E, Write, F, G, H>) -> io::Result<()> {
     fs::hard_link(original.get_path(), link.get_path())
 }
