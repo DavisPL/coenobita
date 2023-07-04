@@ -74,37 +74,39 @@ pub fn remove_dir_all<A, B, C, D>
     fs::remove_dir_all(cap.get_path())
 }
 
-pub fn remove_file<A, B, C, D, E>
-(cap: &Capability<A, B, C, D, E>) -> io::Result<()> {
-    unimplemented!();
+// Do we also need an "unlink" permission? For now I'll use 'Delete'
+pub fn remove_file<A, B, C, D>
+(cap: &Capability<A, B, C, D, Delete>) -> io::Result<()> {
+    fs::remove_file(cap.get_path())
 }
 
-pub fn rename<A, B, C, D, E>
-(cap: &Capability<A, B, C, D, E>) -> io::Result<()> {
-    unimplemented!();
+// Should there be a separate "rename" permission? For now I'll use a combination
+// of 'Delete' (because the old file is "deleted") and 'Copy' (because we're making
+// a "copy" of the old file with a new name before deleting it)
+pub fn rename<A, B, C, D, E, F, G, H>
+(from: &Capability<A, B, C, D, Delete>, to: &Capability<E, Write, F, G, H>) -> io::Result<()> {
+    fs::rename(from.get_path(), to.get_path())
 }
 
-pub fn set_permissions<A, B, C, D, E>
-(cap: &Capability<A, B, C, D, E>) -> io::Result<()> {
-    unimplemented!();
+// Must have global permissions
+pub fn set_permissions
+(cap: &Capability<Read, Write, Copy, Move, Delete>, perm: fs::Permissions) -> io::Result<()> {
+    fs::set_permissions(cap.get_path(), perm)
 }
 
-pub fn soft_link<A, B, C, D, E>
-(cap: &Capability<A, B, C, D, E>) -> io::Result<()> {
-    unimplemented!();
+// This is deprecated since 1.1.0 - should it be excluded?
+pub fn soft_link<A, B, C, D, E, F, G, H>
+(original: &Capability<Read, A, B, C, D>, link: &Capability<E, Write, F, G, H>) -> io::Result<()> {
+    fs::soft_link(original.get_path(), link.get_path())
 }
 
-pub fn symlink_metadata<A, B, C, D, E>
-(cap: &Capability<A, B, C, D, E>) -> io::Result<fs::Metadata> {
-    unimplemented!();
+// Again, should there be metadata access permissions?
+pub fn symlink_metadata<A, B, C, D>
+(cap: &Capability<Read, A, B, C, D>) -> io::Result<fs::Metadata> {
+    fs::symlink_metadata(cap.get_path())
 }
 
-pub fn try_exists<A, B, C, D, E>
-(cap: &Capability<A, B, C, D, E>) -> io::Result<bool> {
-    unimplemented!();
-}
-
-pub fn write<A, B, C, D, E>
-(cap: &Capability<A, B, C, D, E>) -> io::Result<()> {
-    unimplemented!();
+pub fn write<A, B, C, D, E: AsRef<[u8]>>
+(cap: &Capability<A, Write, B, C, D>, contents: E) -> io::Result<()> {
+    fs::write(cap.get_path(), contents)
 }
