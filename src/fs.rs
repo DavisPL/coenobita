@@ -24,7 +24,7 @@ pub fn create_dir_all<A, B, C, D, E, F, G, H>
 
 pub fn hard_link<A, B, C, D, E, F, G, H>
 (original: &Capability<Read, A, B, C, D>, link: &Capability<E, Write, F, G, H>) -> io::Result<()> {
-    fs::hard_link(original.get_path(), link.get_path())
+    panic!("[Coenobita] [ERROR] Hard linking is not properly supported yet.");
 }
 
 pub fn metadata<A, B, C, D>
@@ -68,18 +68,13 @@ pub fn remove_file<A, B, C, D>
 }
 
 pub fn rename<A, B, C, D, E, F, G, H>
-(from: &Capability<A, B, C, D, Delete>, to: &Capability<E, Write, F, G, H>) -> io::Result<()> {
+(from: &Capability<A, B, C, Move, D>, to: &Capability<E, F, G, Move, H>) -> io::Result<()> {
     fs::rename(from.get_path(), to.get_path())
 }
 
 pub fn set_permissions
 (cap: &Capability<Read, Write, Copy, Move, Delete>, perm: fs::Permissions) -> io::Result<()> {
     fs::set_permissions(cap.get_path(), perm)
-}
-
-pub fn soft_link<A, B, C, D, E, F, G, H>
-(original: &Capability<Read, A, B, C, D>, link: &Capability<E, Write, F, G, H>) -> io::Result<()> {
-    fs::soft_link(original.get_path(), link.get_path())
 }
 
 pub fn symlink_metadata<A, B, C, D>
