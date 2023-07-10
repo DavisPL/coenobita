@@ -1,6 +1,30 @@
 use crate::{ Capability, Read, Write, Copy, Move, Delete, NotGranted };
 
+use std::marker::PhantomData;
 use std::{ path, fs, io };
+
+pub struct OpenOptions;
+
+pub trait OpenOptionsOverload<A, B, C, D, E> {
+    fn open(&self, cap: &Capability<A, B, C, D, E>);
+}
+
+impl OpenOptionsOverload<Read, NotGranted, NotGranted, NotGranted, NotGranted> for OpenOptions {
+    fn open(&self, cap: &Capability<Read, NotGranted, NotGranted, NotGranted, NotGranted>) {
+        println!("Open for read only");
+    }
+}
+
+impl OpenOptionsOverload<Read, Write, NotGranted, NotGranted, NotGranted> for OpenOptions {
+    fn open(&self, cap: &Capability<Read, Write, NotGranted, NotGranted, NotGranted>) {
+        println!("Open for read and write only");
+    }
+}
+
+pub fn openopts<A, B, C, D, E>(cap: &Capability<A, B, C, D, E>)
+where OpenOptions: OpenOptionsOverload<A, B, C, D, E> {
+    OpenOptionsOverload::open(&OpenOptions, cap)
+}
 
 pub fn canonicalize<A, B, C, D, E>
 (cap: &Capability<A, B, C, D, E>) -> io::Result<path::PathBuf> {
