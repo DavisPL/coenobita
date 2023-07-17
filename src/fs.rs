@@ -1,6 +1,27 @@
 use crate::{ Capability, Read, Write, Copy, Move, Delete, NotGranted };
 
+use std::marker::PhantomData;
 use std::{ path, fs, io };
+
+// File wrapper
+struct File<A, B> {
+    file: fs::File,
+    phantom: PhantomData<(A, B)>
+}
+
+// File methods
+impl File<(), ()> {
+    pub fn create(cap: &Capability<NotGranted, Write, NotGranted, NotGranted, NotGranted>) -> io::Result<File<(), Write>> {
+        match fs::File::create(cap.get_path()) {
+            Ok(file) => Ok(File {
+                file: file,
+                phantom: PhantomData::<((), Write)>
+            }),
+
+            Err(error) => Err(error)
+        }
+    }
+}
 
 pub fn canonicalize<A, B, C, D, E>
 (cap: &Capability<A, B, C, D, E>) -> io::Result<path::PathBuf> {
