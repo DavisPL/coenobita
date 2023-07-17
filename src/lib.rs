@@ -9,6 +9,8 @@ pub struct Write;
 pub struct Copy;
 pub struct Move;
 pub struct Delete;
+
+#[derive(Debug)]
 pub struct NotGranted;
 
 // Provides capability safe wrapper for PathBuf with A, B, C, D, and E representing Read,
