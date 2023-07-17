@@ -4,14 +4,15 @@ use std::marker::PhantomData;
 use std::{ path, fs, io };
 
 // File wrapper
-struct File<A, B> {
+#[derive(Debug)]
+pub struct File<A, B> {
     file: fs::File,
     phantom: PhantomData<(A, B)>
 }
 
 // File methods
 impl File<(), ()> {
-    pub fn create(cap: &Capability<NotGranted, Write, NotGranted, NotGranted, NotGranted>) -> io::Result<File<(), Write>> {
+    pub fn create<A, B, C, D>(cap: &Capability<A, Write, B, C, D>) -> io::Result<File<(), Write>> {
         match fs::File::create(cap.get_path()) {
             Ok(file) => Ok(File {
                 file: file,

@@ -4,7 +4,9 @@ pub mod fs;
 use std::marker::PhantomData;
 use std::path::PathBuf;
 
+
 pub struct Read;
+#[derive(Debug)]
 pub struct Write;
 pub struct Copy;
 pub struct Move;
