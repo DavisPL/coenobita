@@ -4,7 +4,6 @@ pub mod fs;
 use std::marker::PhantomData;
 use std::path::PathBuf;
 
-
 pub struct Read;
 #[derive(Debug)]
 pub struct Write;
@@ -32,6 +31,5 @@ impl<A, B, C, D, E> Capability<A, B, C, D, E> {
     // Path must have a getter because it's private - programmers shouldn't be able to change it
     pub fn get_path(&self) -> &PathBuf {
         &self.path
-    }   
+    }
 }
-
