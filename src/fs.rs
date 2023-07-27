@@ -12,6 +12,7 @@ pub struct File<A, B> {
 
 // File methods
 impl File<(), ()> {
+    // Opens file in write-only mode
     pub fn create<A, B, C, D>(cap: &Capability<A, Write, B, C, D>) -> io::Result<File<(), Write>> {
         match fs::File::create(cap.get_path()) {
             Ok(file) => Ok(File {
@@ -21,6 +22,25 @@ impl File<(), ()> {
 
             Err(error) => Err(error)
         }
+    }
+
+    pub fn open<A, B, C, D>(cap: &Capability<Read, A, B, C, D>) -> io::Result<File<Read, ()>> {
+        match fs::File::open(cap.get_path()) {
+            Ok(file) => Ok(File {
+                file: file,
+                phantom: PhantomData::<(Read, ())>
+            }),
+
+            Err(error) => Err(error)
+        }
+    }
+}
+
+// Implementations for any methods that require at least read permissions
+impl<A> File<Read, A> {
+    // Queries metadata about the underlying file
+    pub fn metadata(&self) -> io::Result<fs::Metadata> {
+        self.file.metadata()
     }
 }
 
