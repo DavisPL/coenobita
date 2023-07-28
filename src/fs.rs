@@ -1,5 +1,6 @@
 use crate::{ Capability, Read, Write, Copy, Move, Delete, NotGranted };
 
+use std::borrow::BorrowMut;
 use std::marker::PhantomData;
 use std::{ path, fs };
 use std::io;
@@ -45,12 +46,47 @@ impl<A> File<Read, A> {
     }
 }
 
-// TRAIT IMPLEMENTATION | Read
+/* ------ ADDED 07/27/23 ------ */
+
 impl<A> io::Read for File<Read, A> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         self.file.read(buf)
     }
+
+    fn read_vectored(&mut self, bufs: &mut [io::IoSliceMut<'_>]) -> io::Result<usize> {
+        self.file.read_vectored(bufs)
+    }
+
+    fn read_to_end(&mut self, buf: &mut Vec<u8>) -> io::Result<usize> {
+        self.file.read_to_end(buf)
+    }
+
+    fn read_to_string(&mut self, buf: &mut String) -> io::Result<usize> {
+        self.file.read_to_string(buf)
+    }
 }
+
+impl<A> io::Write for File<A, Write> {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        self.file.write(buf)
+    }
+
+    fn write_vectored(&mut self, bufs: &[io::IoSlice<'_>]) -> io::Result<usize> {
+        self.file.write_vectored(bufs)
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        self.file.flush()
+    }
+}
+
+impl<A> io::Seek for File<Read, A> {
+    fn seek(&mut self, pos: io::SeekFrom) -> io::Result<u64> {
+        self.file.seek(pos)
+    }
+}
+
+/* ------ END ADDED 07/27/23 ------ */
 
 pub fn canonicalize<A, B, C, D, E>
 (cap: &Capability<A, B, C, D, E>) -> io::Result<path::PathBuf> {
