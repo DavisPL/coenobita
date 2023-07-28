@@ -1,7 +1,8 @@
 use crate::{ Capability, Read, Write, Copy, Move, Delete, NotGranted };
 
 use std::marker::PhantomData;
-use std::{ path, fs, io };
+use std::{ path, fs };
+use std::io;
 
 // File wrapper
 #[derive(Debug)]
@@ -41,6 +42,13 @@ impl<A> File<Read, A> {
     // Queries metadata about the underlying file
     pub fn metadata(&self) -> io::Result<fs::Metadata> {
         self.file.metadata()
+    }
+}
+
+// TRAIT IMPLEMENTATION | Read
+impl<A> io::Read for File<Read, A> {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        self.file.read(buf)
     }
 }
 
