@@ -3,6 +3,74 @@ use crate::{ Capability, Read, Write, Copy, Move, Delete, NotGranted };
 use std::marker::PhantomData;
 use std::{ path, fs, io };
 
+#[derive(Clone, Debug)]
+pub struct RE;
+pub struct WR;
+pub struct AP;
+pub struct TR;
+pub struct CR;
+pub struct CRN;
+
+pub struct OpenOptions<A, B, C, D, E, F>(&mut fs::OpenOptions, PhantomData::<(A, B, C, D, E, F)>);
+
+pub trait OpenOptionsTrait {}
+impl<A, B, C, D, E, F> OpenOptionsTrait for OpenOptions<A, B, C, D, E, F> {}
+
+impl OpenOptions<(), (), (), (), (), ()> {
+    pub fn new() -> Self {
+        OpenOptions(&mut fs::OpenOptions::new(), PhantomData::<((), (), (), (), (), ())>)
+    }
+}
+
+impl<A, B, C, D, E, F> OpenOptions<A, B, C, D, E, F> {
+    pub fn read(&mut self, read: bool) -> Box<dyn OpenOptionsTrait> {
+        if read {
+            return Box::new(
+                OpenOptions::<RE, B, C, D, E, F>(
+                    self.0.read(true),
+                    PhantomData::<(RE, B, C, D, E, F)>
+                )
+            );
+        }
+
+        return Box::new(
+            OpenOptions::<(), B, C, D, E, F>(
+                self.0.read(false),
+                PhantomData::<((), B, C, D, E, F)>
+            )
+        );
+    }
+
+    pub fn write(&mut self, write: bool) -> &mut Self {
+        self.0.write(write);
+        self
+    }
+
+    pub fn append(&mut self, append: bool) -> &mut Self {
+        self.0.append(append);
+        self
+    }
+
+    pub fn truncate(&mut self, truncate: bool) -> &mut Self {
+        self.0.truncate(truncate);
+        self
+    }
+
+    pub fn create(&mut self, create: bool) -> &mut Self {
+        self.0.create(create);
+        self
+    }
+
+    pub fn create_new(&mut self, create_new: bool) -> &mut Self {
+        self.0.create_new(create_new);
+        self
+    }
+
+    pub fn open<G, H, I, J, K>(&self, cap: &Capability<G, H, I, J, K>) -> io::Result<fs::File> {
+        self.0.open(cap.get_path())
+    }
+}
+
 pub fn canonicalize<A, B, C, D, E>
 (cap: &Capability<A, B, C, D, E>) -> io::Result<path::PathBuf> {
     fs::canonicalize(cap.get_path())
