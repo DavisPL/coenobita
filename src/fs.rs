@@ -14,27 +14,15 @@ pub struct File<A, B> {
 
 // File methods
 impl File<(), ()> {
-    // Opens file in write-only mode
-    pub fn create<A, B, C, D>(cap: &Capability<A, Write, B, C, D>) -> io::Result<File<(), Write>> {
-        match fs::File::create(cap.get_path()) {
-            Ok(file) => Ok(File {
+    pub fn open<A, B, C, D, E>(cap: &Capability<A, B, C, D, E>) -> io::Result<File<A, B>> {
+        fs::OpenOptions::new()
+            .read(true)
+            .write(true)
+            .open(cap.get_path())
+            .map(|file| File::<A, B> {
                 file: file,
-                phantom: PhantomData::<((), Write)>
-            }),
-
-            Err(error) => Err(error)
-        }
-    }
-
-    pub fn open<A, B, C, D>(cap: &Capability<Read, A, B, C, D>) -> io::Result<File<Read, ()>> {
-        match fs::File::open(cap.get_path()) {
-            Ok(file) => Ok(File {
-                file: file,
-                phantom: PhantomData::<(Read, ())>
-            }),
-
-            Err(error) => Err(error)
-        }
+                phantom: PhantomData::<(A, B)>
+            })
     }
 }
 

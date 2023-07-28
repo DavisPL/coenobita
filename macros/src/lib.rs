@@ -1,6 +1,6 @@
 use proc_macro2::{ Span };
 use proc_macro::{ TokenStream, TokenTree };
-use syn::{ LitStr, TypeParam, Ident };
+use syn::{ LitStr, TypeParam, Ident, Path, Type };
 use quote::quote;
 
 fn token_code_to_string(code: i32) -> &'static str {
@@ -20,6 +20,8 @@ pub fn cap(input: TokenStream) -> TokenStream {
     let mut copy_type = TypeParam::from(Ident::new("NotGranted", Span::call_site()));
     let mut move_type = TypeParam::from(Ident::new("NotGranted", Span::call_site()));
     let mut delete_type = TypeParam::from(Ident::new("NotGranted", Span::call_site()));
+
+    let mut rtypepath: syn::TypePath;
 
     let mut expected_token = 0; // 0 = Literal | 1 = Punct | 2 = Ident
     let mut expected_value = "";
@@ -93,6 +95,16 @@ pub fn cap(input: TokenStream) -> TokenStream {
                         "Move"   => move_type   = TypeParam::from(Ident::new("Move", Span::call_site())),
                         "Delete" => delete_type = TypeParam::from(Ident::new("Delete", Span::call_site())),
                                _ => panic!("[Coenobita] ERROR - Unexpected permission \"{}\"", identifier)
+                        /*"Read" => {
+                            let path_str = "coenobita::Read"; // The fully qualified path as a string
+                            let path: Path = syn::parse_str(path_str).unwrap();
+                            let type_path = syn::TypePath {
+                                qself: None,
+                                path,
+                            };
+                        },
+
+                        _ => println!("DEBUG - Do nothing")*/
                     }
 
                     // Now expecting punctuation token with value ','
@@ -108,7 +120,7 @@ pub fn cap(input: TokenStream) -> TokenStream {
     }
 
     quote! {{
-        let capability: Capability<#read_type, #write_type, #copy_type, #move_type, #delete_type> = Capability::new(#file_path);
+        let capability: Capability<coenobita::#read_type, coenobita::#write_type, coenobita::#copy_type, coenobita::#move_type, coenobita::#delete_type> = Capability::new(#file_path);
         capability
     }}.into()
 }

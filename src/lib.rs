@@ -4,12 +4,18 @@ pub mod fs;
 use std::marker::PhantomData;
 use std::path::PathBuf;
 
+
+#[derive(Debug)]
 pub struct Read;
 #[derive(Debug)]
 pub struct Write;
+#[derive(Debug)]
 pub struct Copy;
+#[derive(Debug)]
 pub struct Move;
+#[derive(Debug)]
 pub struct Delete;
+#[derive(Debug)]
 pub struct NotGranted;
 
 // Provides capability safe wrapper for PathBuf with A, B, C, D, and E representing Read,
