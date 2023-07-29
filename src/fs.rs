@@ -68,7 +68,7 @@ impl<A> io::Write for File<A, Write> {
     }
 }
 
-impl<A> io::Seek for File<Read, A> {
+impl<A, B> io::Seek for File<A, B> {
     fn seek(&mut self, pos: io::SeekFrom) -> io::Result<u64> {
         self.file.seek(pos)
     }
