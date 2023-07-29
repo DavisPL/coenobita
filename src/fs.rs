@@ -1,20 +1,19 @@
-use crate::{ Capability, Read, Write, Copy, Move, Delete, NotGranted };
+use crate::{ Capability, Read, Write, Copy, Move, Delete };
 
 use std::borrow::BorrowMut;
 use std::marker::PhantomData;
 use std::{ path, fs };
 use std::io;
 
-// File wrapper
 #[derive(Debug)]
 pub struct File<A, B> {
     file: fs::File,
     phantom: PhantomData<(A, B)>
 }
 
-// File methods
 impl File<(), ()> {
-    pub fn open<A, B, C, D, E>(cap: &Capability<A, B, C, D, E>) -> io::Result<File<A, B>> {
+    pub fn open<A, B, C, D, E>
+    (cap: &Capability<A, B, C, D, E>) -> io::Result<File<A, B>> {
         fs::OpenOptions::new()
             .read(true)
             .write(true)
@@ -26,15 +25,12 @@ impl File<(), ()> {
     }
 }
 
-// Implementations for any methods that require at least read permissions
 impl<A> File<Read, A> {
     // Queries metadata about the underlying file
     pub fn metadata(&self) -> io::Result<fs::Metadata> {
         self.file.metadata()
     }
 }
-
-/* ------ ADDED 07/27/23 ------ */
 
 impl<A> io::Read for File<Read, A> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
@@ -73,8 +69,6 @@ impl<A, B> io::Seek for File<A, B> {
         self.file.seek(pos)
     }
 }
-
-/* ------ END ADDED 07/27/23 ------ */
 
 pub fn canonicalize<A, B, C, D, E>
 (cap: &Capability<A, B, C, D, E>) -> io::Result<path::PathBuf> {
