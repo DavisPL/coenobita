@@ -4,15 +4,18 @@ pub mod fs;
 use std::marker::PhantomData;
 use std::path::PathBuf;
 
-
 #[derive(Debug)]
 pub struct Read;
+
 #[derive(Debug)]
 pub struct Write;
+
 #[derive(Debug)]
 pub struct Copy;
+
 #[derive(Debug)]
 pub struct Move;
+
 #[derive(Debug)]
 pub struct Delete;
 

@@ -1,6 +1,6 @@
 use proc_macro2::{ Span };
 use proc_macro::{ TokenStream, TokenTree };
-use syn::{ LitStr, TypeParam, Ident, Path, Type, parse_str };
+use syn::{ LitStr, Type, parse_str };
 use quote::quote;
 
 fn token_code_to_string(code: i32) -> &'static str {
@@ -20,8 +20,6 @@ pub fn cap(input: TokenStream) -> TokenStream {
     let mut copy_type: Type = parse_str("()").unwrap();
     let mut move_type: Type = parse_str("()").unwrap();
     let mut delete_type: Type = parse_str("()").unwrap();
-
-    let mut rtypepath: syn::TypePath;
 
     let mut expected_token = 0; // 0 = Literal | 1 = Punct | 2 = Ident
     let mut expected_value = "";

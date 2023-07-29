@@ -1,9 +1,7 @@
 use crate::{ Capability, Read, Write, Copy, Move, Delete };
 
-use std::borrow::BorrowMut;
 use std::marker::PhantomData;
-use std::{ path, fs };
-use std::io;
+use std::{ path, fs, io };
 
 #[derive(Debug)]
 pub struct File<A, B> {
@@ -19,7 +17,7 @@ impl File<(), ()> {
             .write(true)
             .open(cap.get_path())
             .map(|file| File::<A, B> {
-                file: file,
+                file,
                 phantom: PhantomData::<(A, B)>
             })
     }
@@ -92,7 +90,7 @@ pub fn create_dir_all<A, B, C, D, E, F, G, H>
 
 pub fn hard_link<A, B, C, D, E, F, G, H>
 (original: &Capability<Read, A, B, C, D>, link: &Capability<E, Write, F, G, H>) -> io::Result<()> {
-    panic!("[Coenobita] [ERROR] Hard linking is not properly supported yet.");
+    panic!("[Coenobita] [ERROR] Hard linking is not supported yet.");
 }
 
 pub fn metadata<A, B, C, D>
