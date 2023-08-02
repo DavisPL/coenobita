@@ -1,6 +1,72 @@
-use crate::{ Capability, Read, Write, Copy, Move, Delete, NotGranted };
+use crate::{ Capability, Read, Write, Copy, Move, Delete };
 
+use std::marker::PhantomData;
 use std::{ path, fs, io };
+
+#[derive(Debug)]
+pub struct File<A, B> {
+    file: fs::File,
+    phantom: PhantomData<(A, B)>
+}
+
+impl File<(), ()> {
+    pub fn open<A, B, C, D, E>
+    (cap: &Capability<A, B, C, D, E>) -> io::Result<File<A, B>> {
+        fs::OpenOptions::new()
+            .read(true)
+            .write(true)
+            .open(cap.get_path())
+            .map(|file| File::<A, B> {
+                file,
+                phantom: PhantomData::<(A, B)>
+            })
+    }
+}
+
+impl<A> File<Read, A> {
+    // Queries metadata about the underlying file
+    pub fn metadata(&self) -> io::Result<fs::Metadata> {
+        self.file.metadata()
+    }
+}
+
+impl<A> io::Read for File<Read, A> {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        self.file.read(buf)
+    }
+
+    fn read_vectored(&mut self, bufs: &mut [io::IoSliceMut<'_>]) -> io::Result<usize> {
+        self.file.read_vectored(bufs)
+    }
+
+    fn read_to_end(&mut self, buf: &mut Vec<u8>) -> io::Result<usize> {
+        self.file.read_to_end(buf)
+    }
+
+    fn read_to_string(&mut self, buf: &mut String) -> io::Result<usize> {
+        self.file.read_to_string(buf)
+    }
+}
+
+impl<A> io::Write for File<A, Write> {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        self.file.write(buf)
+    }
+
+    fn write_vectored(&mut self, bufs: &[io::IoSlice<'_>]) -> io::Result<usize> {
+        self.file.write_vectored(bufs)
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        self.file.flush()
+    }
+}
+
+impl<A, B> io::Seek for File<A, B> {
+    fn seek(&mut self, pos: io::SeekFrom) -> io::Result<u64> {
+        self.file.seek(pos)
+    }
+}
 
 pub fn canonicalize<A, B, C, D, E>
 (cap: &Capability<A, B, C, D, E>) -> io::Result<path::PathBuf> {
@@ -24,7 +90,7 @@ pub fn create_dir_all<A, B, C, D, E, F, G, H>
 
 pub fn hard_link<A, B, C, D, E, F, G, H>
 (original: &Capability<Read, A, B, C, D>, link: &Capability<E, Write, F, G, H>) -> io::Result<()> {
-    panic!("[Coenobita] [ERROR] Hard linking is not properly supported yet.");
+    panic!("[Coenobita] [ERROR] Hard linking is not supported yet.");
 }
 
 pub fn metadata<A, B, C, D>

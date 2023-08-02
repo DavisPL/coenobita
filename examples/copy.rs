@@ -1,4 +1,4 @@
-use coenobita::{ cap, Capability, Read, Write, Copy, Move, Delete, NotGranted };
+use coenobita::{ cap, Capability, Read, Write, Copy, Move, Delete };
 use coenobita::fs;
 
 fn main() {

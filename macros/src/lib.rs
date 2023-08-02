@@ -1,6 +1,6 @@
 use proc_macro2::{ Span };
 use proc_macro::{ TokenStream, TokenTree };
-use syn::{ LitStr, TypeParam, Ident };
+use syn::{ LitStr, Type, parse_str };
 use quote::quote;
 
 fn token_code_to_string(code: i32) -> &'static str {
@@ -15,11 +15,11 @@ fn token_code_to_string(code: i32) -> &'static str {
 #[proc_macro]
 pub fn cap(input: TokenStream) -> TokenStream {
     let mut file_path = LitStr::new("", Span::call_site());
-    let mut read_type = TypeParam::from(Ident::new("NotGranted", Span::call_site()));
-    let mut write_type = TypeParam::from(Ident::new("NotGranted", Span::call_site()));
-    let mut copy_type = TypeParam::from(Ident::new("NotGranted", Span::call_site()));
-    let mut move_type = TypeParam::from(Ident::new("NotGranted", Span::call_site()));
-    let mut delete_type = TypeParam::from(Ident::new("NotGranted", Span::call_site()));
+    let mut read_type: Type = parse_str("()").unwrap();
+    let mut write_type: Type = parse_str("()").unwrap();
+    let mut copy_type: Type = parse_str("()").unwrap();
+    let mut move_type: Type = parse_str("()").unwrap();
+    let mut delete_type: Type = parse_str("()").unwrap();
 
     let mut expected_token = 0; // 0 = Literal | 1 = Punct | 2 = Ident
     let mut expected_value = "";
@@ -87,11 +87,11 @@ pub fn cap(input: TokenStream) -> TokenStream {
                     expected_value = "";
                 } else {
                     match identifier.as_ref() {
-                        "Read"   => read_type   = TypeParam::from(Ident::new("Read", Span::call_site())),
-                        "Write"  => write_type  = TypeParam::from(Ident::new("Write", Span::call_site())),
-                        "Copy"   => copy_type   = TypeParam::from(Ident::new("Copy", Span::call_site())),
-                        "Move"   => move_type   = TypeParam::from(Ident::new("Move", Span::call_site())),
-                        "Delete" => delete_type = TypeParam::from(Ident::new("Delete", Span::call_site())),
+                        "Read"   => read_type   = parse_str("coenobita::Read").unwrap(),
+                        "Write"  => write_type  = parse_str("coenobita::Write").unwrap(),
+                        "Copy"   => copy_type   = parse_str("coenobita::Copy").unwrap(),
+                        "Move"   => move_type   = parse_str("coenobita::Move").unwrap(),
+                        "Delete" => delete_type = parse_str("coenobita::Delete").unwrap(),
                                _ => panic!("[Coenobita] ERROR - Unexpected permission \"{}\"", identifier)
                     }
 

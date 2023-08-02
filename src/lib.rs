@@ -4,12 +4,20 @@ pub mod fs;
 use std::marker::PhantomData;
 use std::path::PathBuf;
 
+#[derive(Debug)]
 pub struct Read;
+
+#[derive(Debug)]
 pub struct Write;
+
+#[derive(Debug)]
 pub struct Copy;
+
+#[derive(Debug)]
 pub struct Move;
+
+#[derive(Debug)]
 pub struct Delete;
-pub struct NotGranted;
 
 // Provides capability safe wrapper for PathBuf with A, B, C, D, and E representing Read,
 // Write, Copy, Move, and Delete respectively.
@@ -30,6 +38,5 @@ impl<A, B, C, D, E> Capability<A, B, C, D, E> {
     // Path must have a getter because it's private - programmers shouldn't be able to change it
     pub fn get_path(&self) -> &PathBuf {
         &self.path
-    }   
+    }
 }
-
