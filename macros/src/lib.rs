@@ -13,6 +13,90 @@ fn token_code_to_string(code: i32) -> &'static str {
 }
 
 #[proc_macro]
+pub fn dir(input: TokenStream) -> TokenStream {
+    let mut sub_cap = syn::Ident::new("CAPABILITY", Span::call_site());
+    let mut read_type: Type = parse_str("()").unwrap();
+    let mut write_type: Type = parse_str("()").unwrap();
+    let mut copy_type: Type = parse_str("()").unwrap();
+    let mut move_type: Type = parse_str("()").unwrap();
+    let mut delete_type: Type = parse_str("()").unwrap();
+
+    let mut expected_token = 2; // 0 = Literal | 1 = Punct | 2 = Ident
+    let mut expected_value = "";
+
+    for node in input.into_iter() {
+        match node {
+            TokenTree::Punct(content) => {
+                if expected_token != 1 {
+                    panic!(
+                        "[Coenobita] ERROR - Expected {}, found punctuation with value '{}'",
+                        token_code_to_string(expected_token),
+                        content.as_char()
+                    );
+                }
+
+                if content.as_char() == ',' {
+                    // Punctuation is valid, expect permission identifier
+                    expected_token = 2;
+                    expected_value = "";
+                } else {
+                    panic!(
+                        "[Coenobita] ERROR - Incorrect punctuation. Expected ',', found '{}'",
+                        content.as_char()
+                    );
+                }
+            },
+
+            TokenTree::Ident(content) => {
+                let identifier = content.to_string();
+                
+                // Make sure we were expecting an identifier
+                if expected_token != 2 {
+                    panic!(
+                        "[Coenobita] ERROR - Expected {}, found identifier with value {}",
+                        token_code_to_string(expected_token),
+                        identifier
+                    );
+                }
+                
+                // Check whether the identifier is "with"
+                if identifier == "with" && expected_value == "with" {
+                    // Now expecting an identifier representing a permission
+                    expected_token = 2;
+                    expected_value = "";
+                } else {
+                    // Now expecting punctuation token with value ','
+                    expected_token = 1;
+                    expected_value = ",";
+                    
+                    match identifier.as_ref() {
+                        "Read"   => read_type   = parse_str("coenobita::Read").unwrap(),
+                        "Write"  => write_type  = parse_str("coenobita::Write").unwrap(),
+                        "Copy"   => copy_type   = parse_str("coenobita::Copy").unwrap(),
+                        "Move"   => move_type   = parse_str("coenobita::Move").unwrap(),
+                        "Delete" => delete_type = parse_str("coenobita::Delete").unwrap(),
+                               _ => {
+                            sub_cap = syn::Ident::new(identifier.as_ref(), Span::call_site());
+                            expected_token = 2;
+                            expected_value = "with";
+                        }
+                    }
+                }
+            }
+
+            _ => {
+                panic!("[Coenobita] ERROR - Unexpected token type in capability creation");
+            }
+        }
+    }
+
+    quote! {{
+        let directory = Directory::<Capability<#read_type, #write_type, #copy_type, #move_type, #delete_type>, ()>::from(#sub_cap);
+        directory
+    }}.into()
+}
+
+#[proc_macro]
 pub fn cap(input: TokenStream) -> TokenStream {
     let mut file_path = LitStr::new("", Span::call_site());
     let mut read_type: Type = parse_str("()").unwrap();

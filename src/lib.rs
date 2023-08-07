@@ -1,4 +1,4 @@
-pub use macros::cap;
+pub use macros::{ cap, dir };
 pub mod fs;
 
 use std::marker::PhantomData;
@@ -53,11 +53,11 @@ impl<A, B, C, D, E, F, G, H, I, J> Directory<Capability<A, B, C, D, E>, Capabili
     }
 }
 
-impl From<Capability<A, B, C, D, E>> for Directory<F, G> {
+impl<A, B, C, D, E, F> From<Capability<A, B, C, D, E>> for Directory<F, Capability<A, B, C, D, E>> {
     fn from(value: Capability<A, B, C, D, E>) -> Directory<F, Capability<A, B, C, D, E>> {
-        Directory::<F, Capability<A, B, C, D, E>> {
-            path: value.get_path(),
-            phantom: PhantomData<F, Capability<A, B, C, D, E>>
+        Directory::<F, Capability::<A, B, C, D, E>> {
+            path: value.get_path().to_path_buf(),
+            phantom: PhantomData::<(F, Capability<A, B, C, D, E>)>
         }
     }
 }
