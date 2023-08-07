@@ -26,6 +26,11 @@ pub struct Capability<A, B, C, D, E> {
     phantom: PhantomData<(A, B, C, D, E)>,
 }
 
+pub struct Directory<A, B> {
+    path: PathBuf,
+    phantom: PhantomData<(A, B)>
+}
+
 // Implements methods for Capabilities with any permissions
 impl<A, B, C, D, E> Capability<A, B, C, D, E> {
     pub fn new(path_string: &str) -> Capability<A, B, C, D, E> {
@@ -38,5 +43,21 @@ impl<A, B, C, D, E> Capability<A, B, C, D, E> {
     // Path must have a getter because it's private - programmers shouldn't be able to change it
     pub fn get_path(&self) -> &PathBuf {
         &self.path
+    }
+}
+
+impl<A, B, C, D, E, F, G, H, I, J> Directory<Capability<A, B, C, D, E>, Capability<F, G, H, I, J>> {
+    // Path must have a getter because it's private - programmers shouldn't be able to change it
+    pub fn get_path(&self) -> &PathBuf {
+        &self.path
+    }
+}
+
+impl From<Capability<A, B, C, D, E>> for Directory<F, G> {
+    fn from(value: Capability<A, B, C, D, E>) -> Directory<F, Capability<A, B, C, D, E>> {
+        Directory::<F, Capability<A, B, C, D, E>> {
+            path: value.get_path(),
+            phantom: PhantomData<F, Capability<A, B, C, D, E>>
+        }
     }
 }
