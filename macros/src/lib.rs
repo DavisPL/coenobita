@@ -98,7 +98,10 @@ pub fn dir(input: TokenStream) -> TokenStream {
 
 #[proc_macro]
 pub fn cap(input: TokenStream) -> TokenStream {
+    let mut using_literal = true;
     let mut file_path = LitStr::new("", Span::call_site());
+    let mut file_identifier = syn::Ident::new("FILE", Span::call_site());
+
     let mut read_type: Type = parse_str("()").unwrap();
     let mut write_type: Type = parse_str("()").unwrap();
     let mut copy_type: Type = parse_str("()").unwrap();
@@ -153,6 +156,19 @@ pub fn cap(input: TokenStream) -> TokenStream {
             },
 
             TokenTree::Ident(content) => {
+                if expected_token == 0 {
+                    // User must be using an identifier for a path or string instead of a literal
+                    let identifier = content.to_string();
+                    file_identifier = syn::Ident::new(&&&&&identifier, Span::call_site());
+                    using_literal = false;
+
+                    // Now we expect identifier with value "with"
+                    expected_token = 2; 
+                    expected_value = "with";
+
+                    continue;
+                }
+
                 let identifier = content.to_string();
                 
                 // Make sure we were expecting an identifier
@@ -191,8 +207,15 @@ pub fn cap(input: TokenStream) -> TokenStream {
         }
     }
 
+    if using_literal {
+        return quote! {{
+            let capability: Capability<#read_type, #write_type, #copy_type, #move_type, #delete_type> = Capability::new(#file_path);
+            capability
+        }}.into();
+    }
+
     quote! {{
-        let capability: Capability<#read_type, #write_type, #copy_type, #move_type, #delete_type> = Capability::new(#file_path);
+        let capability: Capability<#read_type, #write_type, #copy_type, #move_type, #delete_type> = Capability::new(#file_identifier);
         capability
     }}.into()
 }

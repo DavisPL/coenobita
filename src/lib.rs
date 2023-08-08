@@ -2,7 +2,7 @@ pub use macros::{ cap, dir };
 pub mod fs;
 
 use std::marker::PhantomData;
-use std::path::PathBuf;
+use std::path::{ Path, PathBuf };
 
 #[derive(Debug)]
 pub struct Read;
@@ -35,9 +35,9 @@ pub struct Directory<A, B> {
 
 // Implements methods for Capabilities with any permissions
 impl<A, B, C, D, E> Capability<A, B, C, D, E> {
-    pub fn new(path_string: &str) -> Capability<A, B, C, D, E> {
+    pub fn new<P: AsRef<Path>>(path: P) -> Capability<A, B, C, D, E> {
         Capability {
-            path: PathBuf::from(path_string),
+            path: path.as_ref().to_path_buf(),
             phantom: PhantomData::<(A, B, C, D, E)>
         }
     }
