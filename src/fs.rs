@@ -1,20 +1,28 @@
-use crate::{ Capability, Read, Write, Copy, Move, Delete };
+use crate::{ FileCapability, DirectoryCapability, Create, View, Read, Write, Append, Copy, Move, Delete };
 
 use std::marker::PhantomData;
 use std::{ path, fs, io };
 
+// Provides capability-safe wrapper for file paths with permissions...
+// A -> Create
+// B -> View
+// C -> Read
+// D -> Write
+
 #[derive(Debug)]
-pub struct File<A, B> {
+pub struct File<A, B, C, D> {
     file: fs::File,
-    phantom: PhantomData<(A, B)>
+    phantom: PhantomData<(A, B, C, D)>
 }
 
 impl File<(), ()> {
-    pub fn open<A, B, C, D, E>
-    (cap: &Capability<A, B, C, D, E>) -> io::Result<File<A, B>> {
+    pub fn open<A, B, C, D, E, F, G, H>
+    (cap: &FileCapability<A, B, C, D, E, F, G, H>) -> io::Result<File<A, B, C, D>> {
         fs::OpenOptions::new()
             .read(true)
             .write(true)
+            .append(true)
+            .create(true)
             .open(cap.get_path())
             .map(|file| File::<A, B> {
                 file,
@@ -23,14 +31,14 @@ impl File<(), ()> {
     }
 }
 
-impl<A> File<Read, A> {
+impl<A, B, C> File<A, View, B, C> {
     // Queries metadata about the underlying file
     pub fn metadata(&self) -> io::Result<fs::Metadata> {
         self.file.metadata()
     }
 }
 
-impl<A> io::Read for File<Read, A> {
+impl<A, B, C> io::Read for File<A, B, Read, C> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         self.file.read(buf)
     }
@@ -48,7 +56,7 @@ impl<A> io::Read for File<Read, A> {
     }
 }
 
-impl<A> io::Write for File<A, Write> {
+impl<A, B, C> io::Write for File<A, B, C, Write> {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         self.file.write(buf)
     }
@@ -62,7 +70,7 @@ impl<A> io::Write for File<A, Write> {
     }
 }
 
-impl<A, B> io::Seek for File<A, B> {
+impl<A, B, C, D> io::Seek for File<A, B, C, D> {
     fn seek(&mut self, pos: io::SeekFrom) -> io::Result<u64> {
         self.file.seek(pos)
     }

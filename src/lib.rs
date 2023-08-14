@@ -28,7 +28,7 @@ pub struct Move;
 #[derive(Debug)]
 pub struct Delete;
 
-// Provides capability safe wrapper for file paths with permissions...
+// Provides capability-safe wrapper for file paths with permissions...
 // A -> Create
 // B -> View
 // C -> Read
