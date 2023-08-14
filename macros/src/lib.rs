@@ -91,7 +91,7 @@ pub fn dir(input: TokenStream) -> TokenStream {
     }
 
     quote! {{
-        let directory = Directory::<Capability<#read_type, #write_type, #copy_type, #move_type, #delete_type>, ()>::from(#sub_cap);
+        let directory = Directory::<Capability<#read_type, #write_type, #copy_type, #move_type, #delete_type>, ()>::from(&#sub_cap);
         directory
     }}.into()
 }
