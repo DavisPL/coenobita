@@ -24,11 +24,38 @@ impl File<(), (), (), ()> {
             .read(true)
             .write(true)
             .append(true)
-            .create(true)
             .open(cap.get_path())
             .map(|file| File::<A, B, C, D> {
                 file,
                 phantom: PhantomData::<(A, B, C, D)>
+            })
+    }
+
+    pub fn create<Create, B, C, D, E, F, G, H>
+    (cap: &Capability<(Create, B, C, D, E, F, G, H), (), ()>) -> io::Result<File<Create, B, C, D>> {
+        fs::OpenOptions::new()
+            .read(true)
+            .write(true)
+            .append(true)
+            .create(true)
+            .open(cap.get_path())
+            .map(|file| File::<Create, B, C, D> {
+                file,
+                phantom: PhantomData::<(Create, B, C, D)>
+            })
+    }
+
+    pub fn create_new<Create, B, C, D, E, F, G, H>
+    (cap: &Capability<(Create, B, C, D, E, F, G, H), (), ()>) -> io::Result<File<Create, B, C, D>> {
+        fs::OpenOptions::new()
+            .read(true)
+            .write(true)
+            .append(true)
+            .create_new(true)
+            .open(cap.get_path())
+            .map(|file| File::<Create, B, C, D> {
+                file,
+                phantom: PhantomData::<(Create, B, C, D)>
             })
     }
 }
