@@ -1,9 +1,9 @@
-use coenobita::{ cap, Capability, Read, Write, Copy, Move, Delete };
+use coenobita::{ cap, Capability, View, Read, Write, Copy, Move, Delete };
 use coenobita::fs::File;
 
 fn main() -> std::io::Result<()> {
     // Creates an instance of Capability with read, copy, and move permissions
-    let rcm_cap = cap!("examples/files/example.txt" with Read, Copy, Move);
+    let rcm_cap = cap!("examples/files/example.txt" with Read, View, Copy, Move);
     let wd_cap = cap!("examples/files/example_copied.txt" with Delete, Write);
 
     // The line below fails because it expects a Write permission
