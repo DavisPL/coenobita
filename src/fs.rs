@@ -1,9 +1,11 @@
-use crate::{ FileCapability, DirectoryCapability, Create, View, Read, Write, Append, Copy, Move, Delete };
+use crate::{ Capability, Create, View, Read, Write, Append, Copy, Move, Delete };
 
 use std::marker::PhantomData;
 use std::{ path, fs, io };
 
-// Provides capability-safe wrapper for file paths with permissions...
+// Provides capability-safe wrapper for files with permissions passed as generic type arguments
+// As before, permissions that aren't granted should be represented as the unit type ()
+
 // A -> Create
 // B -> View
 // C -> Read
@@ -15,18 +17,18 @@ pub struct File<A, B, C, D> {
     phantom: PhantomData<(A, B, C, D)>
 }
 
-impl File<(), ()> {
+impl File<(), (), (), ()> {
     pub fn open<A, B, C, D, E, F, G, H>
-    (cap: &FileCapability<A, B, C, D, E, F, G, H>) -> io::Result<File<A, B, C, D>> {
+    (cap: &Capability<(A, B, C, D, E, F, G, H), (), ()>) -> io::Result<File<A, B, C, D>> {
         fs::OpenOptions::new()
             .read(true)
             .write(true)
             .append(true)
             .create(true)
             .open(cap.get_path())
-            .map(|file| File::<A, B> {
+            .map(|file| File::<A, B, C, D> {
                 file,
-                phantom: PhantomData::<(A, B)>
+                phantom: PhantomData::<(A, B, C, D)>
             })
     }
 }
@@ -76,87 +78,87 @@ impl<A, B, C, D> io::Seek for File<A, B, C, D> {
     }
 }
 
-pub fn canonicalize<A, B, C, D, E>
-(cap: &Capability<A, B, C, D, E>) -> io::Result<path::PathBuf> {
+pub fn canonicalize<A, B, C>
+(cap: &Capability<A, B, C>) -> io::Result<path::PathBuf> {
     fs::canonicalize(cap.get_path())
 }
 
-pub fn copy<A, B, C, D, E, F, G, H>
-(from: &Capability<A, B, Copy, C, D>, to: &Capability<E, Write, F, G, H>) -> io::Result<u64> {
+pub fn copy<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>
+(from: &Capability<(A, B, Copy, C, D, E, F, G), H, I>, to: &Capability<(Create, J, K, L, M, N, O, P), Q, R>) -> io::Result<u64> {
     fs::copy(from.get_path(), to.get_path())
 }
 
-pub fn create_dir<A, B, C, D>
-(cap: &Capability<A, Write, B, C, D>) -> io::Result<()> {
+pub fn create_dir<A, B, C, D, E, F, G, H, I>
+(cap: &Capability<(Create, A, B, C, D, E, F, G), H, I>) -> io::Result<()> {
     fs::create_dir(cap.get_path())
 }
 
-pub fn create_dir_all<A, B, C, D, E, F, G, H>
-(cap: &Capability<A, Write, B, C, D>) -> io::Result<()> {
+pub fn create_dir_all<A, B, C, D, E, F, G, H, I>
+(cap: &Capability<(Create, A, B, C, D, E, F, G), H, I>) -> io::Result<()> {
     fs::create_dir_all(cap.get_path())
 }
 
-pub fn hard_link<A, B, C, D, E, F, G, H>
-(original: &Capability<Read, A, B, C, D>, link: &Capability<E, Write, F, G, H>) -> io::Result<()> {
+pub fn hard_link<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>
+(original: &Capability<(A, View, B, C, D, E, F, G), H, I>, link: &Capability<(Create, J, K, L, M, N, O, P), Q, R>) -> io::Result<()> {
     panic!("[Coenobita] [ERROR] Hard linking is not supported yet.");
 }
 
-pub fn metadata<A, B, C, D>
-(cap: &Capability<Read, A, B, C, D>) -> io::Result<fs::Metadata> {
+pub fn metadata<A, B, C, D, E, F, G, H, I>
+(cap: &Capability<(A, View, B, C, D, E, F, G), H, I>) -> io::Result<fs::Metadata> {
     fs::metadata(cap.get_path())
 }
 
-pub fn read<A, B, C, D>
-(cap: &Capability<Read, A, B, C, D>) -> io::Result<Vec<u8>> {
+pub fn read<A, B, C, D, E, F, G, H, I>
+(cap: &Capability<(A, B, Read, C, D, E, F, G), H, I>) -> io::Result<Vec<u8>> {
     fs::read(cap.get_path())
 }
 
-pub fn read_dir<A, B, C, D>
-(cap: &Capability<Read, A, B, C, D>) -> io::Result<fs::ReadDir> {
+pub fn read_dir<A, B, C, D, E, F, G, H, I>
+(cap: &Capability<(A, B, Read, C, D, E, F, G), H, I>) -> io::Result<fs::ReadDir> {
     fs::read_dir(cap.get_path())
 }
 
-pub fn read_link<A, B, C, D>
-(cap: &Capability<Read, A, B, C, D>) -> io::Result<path::PathBuf> {
+pub fn read_link<A, B, C, D, E, F, G, H, I>
+(cap: &Capability<(A, B, Read, C, D, E, F, G), H, I>) -> io::Result<path::PathBuf> {
     fs::read_link(cap.get_path())
 }
 
-pub fn read_to_string<A, B, C, D>
-(cap: &Capability<Read, A, B, C, D>) -> io::Result<String> {
+pub fn read_to_string<A, B, C, D, E, F, G, H, I>
+(cap: &Capability<(A, B, Read, C, D, E, F, G), H, I>) -> io::Result<String> {
     fs::read_to_string(cap.get_path())
 }
 
-pub fn remove_dir<A, B, C, D>
-(cap: &Capability<A, B, C, D, Delete>) -> io::Result<()> {
+pub fn remove_dir<A, B, C, D, E, F, G, H, I>
+(cap: &Capability<(A, B, C, D, E, F, G, Delete), H, I>) -> io::Result<()> {
     fs::remove_dir(cap.get_path())
 }
 
-pub fn remove_dir_all<A, B, C, D>
-(cap: &Capability<A, B, C, D, Delete>) -> io::Result<()> {
+pub fn remove_dir_all<A, B, C, D, E, F, G, H, I>
+(cap: &Capability<(A, B, C, D, E, F, G, Delete), H, I>) -> io::Result<()> {
     fs::remove_dir_all(cap.get_path())
 }
 
-pub fn remove_file<A, B, C, D>
-(cap: &Capability<A, B, C, D, Delete>) -> io::Result<()> {
+pub fn remove_file<A, B, C, D, E, F, G, H, I>
+(cap: &Capability<(A, B, C, D, E, F, G, Delete), H, I>) -> io::Result<()> {
     fs::remove_file(cap.get_path())
 }
 
-pub fn rename<A, B, C, D, E, F, G, H>
-(from: &Capability<A, B, C, Move, D>, to: &Capability<E, F, G, Move, H>) -> io::Result<()> {
+pub fn rename<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>
+(from: &Capability<(A, B, C, D, E, Copy, F, Delete), F, H>, to: &Capability<(Create, I, J, K, L, M, N, O), P, Q>) -> io::Result<()> {
     fs::rename(from.get_path(), to.get_path())
 }
 
-pub fn set_permissions
-(cap: &Capability<Read, Write, Copy, Move, Delete>, perm: fs::Permissions) -> io::Result<()> {
+pub fn set_permissions<A, B>
+(cap: &Capability<(Create, View, Read, Write, Append, Copy, Move, Delete), A, B>, perm: fs::Permissions) -> io::Result<()> {
     fs::set_permissions(cap.get_path(), perm)
 }
 
-pub fn symlink_metadata<A, B, C, D>
-(cap: &Capability<Read, A, B, C, D>) -> io::Result<fs::Metadata> {
+pub fn symlink_metadata<A, B, C, D, E, F, G, H, I>
+(cap: &Capability<(A, View, B, C, D, E, F, G), H, I>) -> io::Result<fs::Metadata> {
     fs::symlink_metadata(cap.get_path())
 }
 
-pub fn write<A, B, C, D, E: AsRef<[u8]>>
-(cap: &Capability<A, Write, B, C, D>, contents: E) -> io::Result<()> {
+pub fn write<A, B, C, D, E, F, G, H, I, J: AsRef<[u8]>>
+(cap: &Capability<(A, B, C, Write, D, E, F, G), H, I>, contents: J) -> io::Result<()> {
     fs::write(cap.get_path(), contents)
 }
