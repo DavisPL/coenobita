@@ -84,7 +84,7 @@ pub fn canonicalize<A, B, C>
 }
 
 pub fn copy<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>
-(from: &Capability<(A, B, Copy, C, D, E, F, G), H, I>, to: &Capability<(Create, J, K, L, M, N, O, P), Q, R>) -> io::Result<u64> {
+(from: &Capability<(A, B, C, D, E, Copy, F, G), H, I>, to: &Capability<(Create, J, K, L, M, N, O, P), Q, R>) -> io::Result<u64> {
     fs::copy(from.get_path(), to.get_path())
 }
 

@@ -1,5 +1,5 @@
 pub mod fs;
-pub use macros::{ cap, dir };
+pub use macros::{ cap };
 
 use std::marker::PhantomData;
 use std::path::{ Path, PathBuf };
