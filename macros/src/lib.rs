@@ -14,9 +14,15 @@ fn token_code_to_string(code: i32) -> &'static str {
 
 #[proc_macro]
 pub fn cap(input: TokenStream) -> TokenStream {
+    let mut using_literal = true;
     let mut file_path = LitStr::new("", Span::call_site());
+    let mut file_identifier = syn::Ident::new("FILE", Span::call_site());
+
+    let mut create_type: Type = parse_str("()").unwrap();
+    let mut view_type: Type = parse_str("()").unwrap();
     let mut read_type: Type = parse_str("()").unwrap();
     let mut write_type: Type = parse_str("()").unwrap();
+    let mut append_type: Type = parse_str("()").unwrap();
     let mut copy_type: Type = parse_str("()").unwrap();
     let mut move_type: Type = parse_str("()").unwrap();
     let mut delete_type: Type = parse_str("()").unwrap();
@@ -69,6 +75,19 @@ pub fn cap(input: TokenStream) -> TokenStream {
             },
 
             TokenTree::Ident(content) => {
+                if expected_token == 0 {
+                    // User must be using an identifier for a path or string instead of a literal
+                    let identifier = content.to_string();
+                    file_identifier = syn::Ident::new(&identifier, Span::call_site());
+                    using_literal = false;
+
+                    // Now we expect identifier with value "with"
+                    expected_token = 2; 
+                    expected_value = "with";
+
+                    continue;
+                }
+
                 let identifier = content.to_string();
                 
                 // Make sure we were expecting an identifier
@@ -87,8 +106,11 @@ pub fn cap(input: TokenStream) -> TokenStream {
                     expected_value = "";
                 } else {
                     match identifier.as_ref() {
+                        "Create" => create_type = parse_str("coenobita::Create").unwrap(),
+                        "View"   => view_type   = parse_str("coenobita::View").unwrap(),
                         "Read"   => read_type   = parse_str("coenobita::Read").unwrap(),
                         "Write"  => write_type  = parse_str("coenobita::Write").unwrap(),
+                        "Append" => append_type  = parse_str("coenobita::Append").unwrap(),
                         "Copy"   => copy_type   = parse_str("coenobita::Copy").unwrap(),
                         "Move"   => move_type   = parse_str("coenobita::Move").unwrap(),
                         "Delete" => delete_type = parse_str("coenobita::Delete").unwrap(),
@@ -107,8 +129,15 @@ pub fn cap(input: TokenStream) -> TokenStream {
         }
     }
 
+    if using_literal {
+        return quote! {{
+            let capability: Capability<(#create_type, #view_type, #read_type, #write_type, #append_type, #copy_type, #move_type, #delete_type), (), ()> = Capability::new(#file_path);
+            capability
+        }}.into();
+    }
+
     quote! {{
-        let capability: Capability<#read_type, #write_type, #copy_type, #move_type, #delete_type> = Capability::new(#file_path);
+        let capability: Capability<(#create_type, #view_type, #read_type, #write_type, #append_type, #copy_type, #move_type, #delete_type), (), ()> = Capability::new(#file_identifier);
         capability
     }}.into()
 }
