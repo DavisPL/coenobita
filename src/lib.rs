@@ -68,3 +68,37 @@ impl<A, B, C> Capability<A, B, C> {
         &self.path
     }
 }
+
+pub mod traits {
+    use std::path::PathBuf;
+
+    pub trait Capability {
+        fn get_path(&self) -> &PathBuf;
+    }
+
+    pub trait Create {}
+    pub trait View {}
+    pub trait Read {}
+    pub trait Write {}
+    pub trait Append {}
+    pub trait Copy {}
+    pub trait Move {}
+    pub trait Delete {}
+}
+
+impl<A, B, C> traits::Capability for Capability<A, B, C> {
+    fn get_path(&self) -> &PathBuf {
+        &self.path
+    }
+}
+
+// Implement each trait for its corresponding Capability<A, B, C>
+impl<A2, A3, A4, A5, A6, A7, A8, B, C>
+   traits::Create for Capability<(Create, A2, A3, A4, A5, A6, A7, A8), B, C> {}
+
+impl<A1, A2, A3, A4, A5, A7, A8, B, C>
+    traits::Copy for Capability<(A1, A2, A3, A4, A5, Copy, A7, A8), B, C> {}
+
+impl<A1, A2, A3, A4, A5, A6, A7, B, C>
+    traits::Delete for Capability<(A1, A2, A3, A4, A5, A6, A7, Delete), B, C> {}
+

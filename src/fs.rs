@@ -1,7 +1,19 @@
 use crate::{ Capability, Create, View, Read, Write, Append, Copy, Move, Delete };
+use crate::{ traits };
 
 use std::marker::PhantomData;
 use std::{ path, fs, io };
+
+// Implement each trait for its corresponding Capability<A, B, C>
+/*impl<A2, A3, A4, A5, A6, A7, A8, B, C> 
+   traits::Create for Capability<(Create, A2, A3, A4, A5, A6, A7, A8), B, C> {}
+
+impl<A1, A2, A3, A4, A5, A7, A8, B, C> 
+    traits::Copy for Capability<(A1, A2, A3, A4, A5, Copy, A7, A8), B, C> {}
+
+impl<A1, A2, A3, A4, A5, A6, A7, B, C> 
+    traits::Delete for Capability<(A1, A2, A3, A4, A5, A6, A7, Delete), B, C> {}
+*/
 
 // Provides capability-safe wrapper for files with permissions passed as generic type arguments
 // As before, permissions that aren't granted should be represented as the unit type ()
@@ -170,8 +182,14 @@ pub fn remove_file<A, B, C, D, E, F, G, H, I>
     fs::remove_file(cap.get_path())
 }
 
-pub fn rename<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>
+/*pub fn rename<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>
 (from: &Capability<(A, B, C, D, E, Copy, F, Delete), F, H>, to: &Capability<(Create, I, J, K, L, M, N, O), P, Q>) -> io::Result<()> {
+    fs::rename(from.get_path(), to.get_path())
+}*/
+
+
+pub fn rename<C1: traits::Capability + traits::Copy + traits::Delete, C2: traits::Capability + traits::Create>
+(from: &C1, to: &C2) -> io::Result<()> {
     fs::rename(from.get_path(), to.get_path())
 }
 
