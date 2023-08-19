@@ -4,17 +4,6 @@ use crate::{ traits };
 use std::marker::PhantomData;
 use std::{ path, fs, io };
 
-// Implement each trait for its corresponding Capability<A, B, C>
-/*impl<A2, A3, A4, A5, A6, A7, A8, B, C> 
-   traits::Create for Capability<(Create, A2, A3, A4, A5, A6, A7, A8), B, C> {}
-
-impl<A1, A2, A3, A4, A5, A7, A8, B, C> 
-    traits::Copy for Capability<(A1, A2, A3, A4, A5, Copy, A7, A8), B, C> {}
-
-impl<A1, A2, A3, A4, A5, A6, A7, B, C> 
-    traits::Delete for Capability<(A1, A2, A3, A4, A5, A6, A7, Delete), B, C> {}
-*/
-
 // Provides capability-safe wrapper for files with permissions passed as generic type arguments
 // As before, permissions that aren't granted should be represented as the unit type ()
 
@@ -117,93 +106,75 @@ impl<A, B, C, D> io::Seek for File<A, B, C, D> {
     }
 }
 
-pub fn canonicalize<A, B, C>
-(cap: &Capability<A, B, C>) -> io::Result<path::PathBuf> {
+pub fn canonicalize<C: traits::Capability> (cap: &C) -> io::Result<path::PathBuf> {
     fs::canonicalize(cap.get_path())
 }
 
-pub fn copy<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>
-(from: &Capability<(A, B, C, D, E, Copy, F, G), H, I>, to: &Capability<(Create, J, K, L, M, N, O, P), Q, R>) -> io::Result<u64> {
+pub fn copy<C1: traits::Copy, C2: traits::Create> (from: &C1, to: &C2) -> io::Result<u64> {
     fs::copy(from.get_path(), to.get_path())
 }
 
-pub fn create_dir<A, B, C, D, E, F, G, H, I>
-(cap: &Capability<(Create, A, B, C, D, E, F, G), H, I>) -> io::Result<()> {
+pub fn create_dir<C: traits::Create> (cap: &C) -> io::Result<()> {
     fs::create_dir(cap.get_path())
 }
 
-pub fn create_dir_all<A, B, C, D, E, F, G, H, I>
-(cap: &Capability<(Create, A, B, C, D, E, F, G), H, I>) -> io::Result<()> {
+pub fn create_dir_all<C: traits::Create> (cap: &C) -> io::Result<()> {
     fs::create_dir_all(cap.get_path())
 }
 
-pub fn hard_link<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>
-(original: &Capability<(A, View, B, C, D, E, F, G), H, I>, link: &Capability<(Create, J, K, L, M, N, O, P), Q, R>) -> io::Result<()> {
+pub fn hard_link<C1: traits::View, C2: traits::Create> (original: &C1, link: &C2) -> io::Result<()> {
     panic!("[Coenobita] [ERROR] Hard linking is not supported yet.");
 }
 
-pub fn metadata<A, B, C, D, E, F, G, H, I>
-(cap: &Capability<(A, View, B, C, D, E, F, G), H, I>) -> io::Result<fs::Metadata> {
+pub fn metadata<C: traits::View> (cap: &C) -> io::Result<fs::Metadata> {
     fs::metadata(cap.get_path())
 }
 
-pub fn read<A, B, C, D, E, F, G, H, I>
-(cap: &Capability<(A, B, Read, C, D, E, F, G), H, I>) -> io::Result<Vec<u8>> {
+pub fn read<C: traits::Read> (cap: &C) -> io::Result<Vec<u8>> {
     fs::read(cap.get_path())
 }
 
-pub fn read_dir<A, B, C, D, E, F, G, H, I>
-(cap: &Capability<(A, B, Read, C, D, E, F, G), H, I>) -> io::Result<fs::ReadDir> {
+pub fn read_dir<C: traits::Read> (cap: &C) -> io::Result<fs::ReadDir> {
     fs::read_dir(cap.get_path())
 }
 
-pub fn read_link<A, B, C, D, E, F, G, H, I>
-(cap: &Capability<(A, B, Read, C, D, E, F, G), H, I>) -> io::Result<path::PathBuf> {
+pub fn read_link<C: traits::Read> (cap: &C) -> io::Result<path::PathBuf> {
     fs::read_link(cap.get_path())
 }
 
-pub fn read_to_string<A, B, C, D, E, F, G, H, I>
-(cap: &Capability<(A, B, Read, C, D, E, F, G), H, I>) -> io::Result<String> {
+pub fn read_to_string<C: traits::Read> (cap: &C) -> io::Result<String> {
     fs::read_to_string(cap.get_path())
 }
 
-pub fn remove_dir<A, B, C, D, E, F, G, H, I>
-(cap: &Capability<(A, B, C, D, E, F, G, Delete), H, I>) -> io::Result<()> {
+pub fn remove_dir<C: traits::Delete> (cap: &C) -> io::Result<()> {
     fs::remove_dir(cap.get_path())
 }
 
+// TODO - Create trait for deleting children (transitive and intransitive)
 pub fn remove_dir_all<A, B, C, D, E, F, G, H, I>
 (cap: &Capability<(A, B, C, D, E, F, G, Delete), H, I>) -> io::Result<()> {
     fs::remove_dir_all(cap.get_path())
 }
 
-pub fn remove_file<A, B, C, D, E, F, G, H, I>
-(cap: &Capability<(A, B, C, D, E, F, G, Delete), H, I>) -> io::Result<()> {
+pub fn remove_file<C: traits::Delete> (cap: &C) -> io::Result<()> {
     fs::remove_file(cap.get_path())
 }
 
-/*pub fn rename<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>
-(from: &Capability<(A, B, C, D, E, Copy, F, Delete), F, H>, to: &Capability<(Create, I, J, K, L, M, N, O), P, Q>) -> io::Result<()> {
-    fs::rename(from.get_path(), to.get_path())
-}*/
-
-
-pub fn rename<C1: traits::Capability + traits::Copy + traits::Delete, C2: traits::Capability + traits::Create>
+pub fn rename<C1: traits::Copy + traits::Delete, C2: traits::Create>
 (from: &C1, to: &C2) -> io::Result<()> {
     fs::rename(from.get_path(), to.get_path())
 }
 
+// NOTE - Reconsider this functon and the permissions required
 pub fn set_permissions<A, B>
 (cap: &Capability<(Create, View, Read, Write, Append, Copy, Move, Delete), A, B>, perm: fs::Permissions) -> io::Result<()> {
     fs::set_permissions(cap.get_path(), perm)
 }
 
-pub fn symlink_metadata<A, B, C, D, E, F, G, H, I>
-(cap: &Capability<(A, View, B, C, D, E, F, G), H, I>) -> io::Result<fs::Metadata> {
+pub fn symlink_metadata<C: traits::View> (cap: &C) -> io::Result<fs::Metadata> {
     fs::symlink_metadata(cap.get_path())
 }
 
-pub fn write<A, B, C, D, E, F, G, H, I, J: AsRef<[u8]>>
-(cap: &Capability<(A, B, C, Write, D, E, F, G), H, I>, contents: J) -> io::Result<()> {
+pub fn write<C: traits::Write, J: AsRef<[u8]>> (cap: &C) -> io::Result<()> {
     fs::write(cap.get_path(), contents)
 }
