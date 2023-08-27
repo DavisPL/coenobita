@@ -69,6 +69,15 @@ impl<A, B, C> Capability<A, B, C> {
     }
 }
 
+// Helper function used by the cap! macro
+pub fn capability<A, B, C, P: AsRef<Path>>
+(path: P, _direct: A, _immediate_child: B, _any_child: C) -> Capability<A, B, C> {
+    Capability {
+        path: path.as_ref().to_path_buf(),
+        phantom: PhantomData::<(A, B, C)>
+    }
+}
+
 pub mod traits {
     use std::path::PathBuf;
 
@@ -116,4 +125,3 @@ impl<A1, A2, A3, A4, A5, A6, A8, B, C>
 
 impl<A1, A2, A3, A4, A5, A6, A7, B, C>
     traits::Delete for Capability<(A1, A2, A3, A4, A5, A6, A7, Delete), B, C> {}
-

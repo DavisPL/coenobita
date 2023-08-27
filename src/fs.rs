@@ -175,6 +175,6 @@ pub fn symlink_metadata<C: traits::View> (cap: &C) -> io::Result<fs::Metadata> {
     fs::symlink_metadata(cap.get_path())
 }
 
-pub fn write<C: traits::Write, J: AsRef<[u8]>> (cap: &C) -> io::Result<()> {
+pub fn write<C: traits::Write, J: AsRef<[u8]>> (cap: &C, contents: J) -> io::Result<()> {
     fs::write(cap.get_path(), contents)
 }

@@ -1,143 +1,85 @@
 use proc_macro2::{ Span };
 use proc_macro::{ TokenStream, TokenTree };
-use syn::{ LitStr, Type, parse_str };
+use syn::{ LitStr, Ident };
 use quote::quote;
-
-fn token_code_to_string(code: i32) -> &'static str {
-    match code {
-        0 => "literal",
-        1 => "punctuation",
-        2 => "identifier",
-        _ => "unknown"
-    }
-}
 
 #[proc_macro]
 pub fn cap(input: TokenStream) -> TokenStream {
-    let mut using_literal = true;
-    let mut file_path = LitStr::new("", Span::call_site());
-    let mut file_identifier = syn::Ident::new("FILE", Span::call_site());
+    // Initialize file variable (literal, identifier)
+    let mut file = (None, None);
 
-    let mut create_type: Type = parse_str("()").unwrap();
-    let mut view_type: Type = parse_str("()").unwrap();
-    let mut read_type: Type = parse_str("()").unwrap();
-    let mut write_type: Type = parse_str("()").unwrap();
-    let mut append_type: Type = parse_str("()").unwrap();
-    let mut copy_type: Type = parse_str("()").unwrap();
-    let mut move_type: Type = parse_str("()").unwrap();
-    let mut delete_type: Type = parse_str("()").unwrap();
-
-    let mut expected_token = 0; // 0 = Literal | 1 = Punct | 2 = Ident
-    let mut expected_value = "";
+    // Initialize strings for direct, direct child, and any child permission tuples
+    let mut direct_stream = None;
+    let mut direct_child_stream = None;
+    let mut any_child_stream = None;
 
     for node in input.into_iter() {
         match node {
             TokenTree::Literal(content) => {
-                if expected_token != 0 {
-                    panic!(
-                        "[Coenobita] ERROR - Expected {}, found literal with value {}",
-                        token_code_to_string(expected_token),
-                        content.to_string()
-                    );
-                }
+                let raw = content.to_string();
 
-                let undoctored_filepath: &str = &content.to_string();
-
-                file_path = LitStr::new(
-                    &(undoctored_filepath)[1..undoctored_filepath.len() - 1], 
-                    Span::call_site()
-                );
-
-                // Now we expect identifier with value "with"
-                expected_token = 2; 
-                expected_value = "with";
-            },
-
-            TokenTree::Punct(content) => {
-                if expected_token != 1 {
-                    panic!(
-                        "[Coenobita] ERROR - Expected {}, found punctuation with value '{}'",
-                        token_code_to_string(expected_token),
-                        content.as_char()
-                    );
-                }
-
-                if content.as_char() == ',' {
-                    // Punctuation is valid, expect permission identifier
-                    expected_token = 2;
-                    expected_value = "";
-                } else {
-                    panic!(
-                        "[Coenobita] ERROR - Incorrect punctuation. Expected ',', found '{}'",
-                        content.as_char()
-                    );
-                }
-            },
-
-            TokenTree::Ident(content) => {
-                if expected_token == 0 {
-                    // User must be using an identifier for a path or string instead of a literal
-                    let identifier = content.to_string();
-                    file_identifier = syn::Ident::new(&identifier, Span::call_site());
-                    using_literal = false;
-
-                    // Now we expect identifier with value "with"
-                    expected_token = 2; 
-                    expected_value = "with";
-
+                if raw == "with" {
                     continue;
                 }
 
-                let identifier = content.to_string();
-                
-                // Make sure we were expecting an identifier
-                if expected_token != 2 {
-                    panic!(
-                        "[Coenobita] ERROR - Expected {}, found identifier with value {}",
-                        token_code_to_string(expected_token),
-                        identifier
-                    );
+                if file.0.is_none() && file.1.is_none() {
+                    file.0 = Some(LitStr::new(&raw[1..raw.len() - 1], Span::call_site()));
+                    continue;
                 }
-                
-                // Check whether the identifier is "with"
-                if identifier == "with" && expected_value == "with" {
-                    // Now expecting an identifier representing a permission
-                    expected_token = 2;
-                    expected_value = "";
+
+                panic!("[Coenobita] [Error] Unexpected literal \"{}\"", raw);
+            },
+
+            TokenTree::Ident(content) => {
+                let raw = content.to_string();
+
+                if raw == "with" {
+                    continue;
+                }
+
+                if file.0.is_none() && file.1.is_none() {
+                    file.1 = Some(Ident::new(&raw,  Span::call_site()));
+                    continue;
+                }
+
+                panic!("[Coenobita] [Error] Unexpected identifier \"{}\"", raw);
+            },
+
+            TokenTree::Group(content) => {
+                if direct_stream.is_none() {
+                    direct_stream = Some(content.stream());
+                    continue;
+                } else if direct_child_stream.is_none() {
+                    direct_child_stream = Some(content.stream());
+                    continue;
                 } else {
-                    match identifier.as_ref() {
-                        "Create" => create_type = parse_str("coenobita::Create").unwrap(),
-                        "View"   => view_type   = parse_str("coenobita::View").unwrap(),
-                        "Read"   => read_type   = parse_str("coenobita::Read").unwrap(),
-                        "Write"  => write_type  = parse_str("coenobita::Write").unwrap(),
-                        "Append" => append_type  = parse_str("coenobita::Append").unwrap(),
-                        "Copy"   => copy_type   = parse_str("coenobita::Copy").unwrap(),
-                        "Move"   => move_type   = parse_str("coenobita::Move").unwrap(),
-                        "Delete" => delete_type = parse_str("coenobita::Delete").unwrap(),
-                               _ => panic!("[Coenobita] ERROR - Unexpected permission \"{}\"", identifier)
-                    }
-
-                    // Now expecting punctuation token with value ','
-                    expected_token = 1;
-                    expected_value = ",";
+                    any_child_stream = Some(content.stream());
+                    continue;
                 }
-            }
+            },
 
-            _ => {
-                panic!("[Coenobita] ERROR - Unexpected token type in capability creation");
-            }
+            _ => continue
         }
     }
 
-    if using_literal {
-        return quote! {{
-            let capability: Capability<(#create_type, #view_type, #read_type, #write_type, #append_type, #copy_type, #move_type, #delete_type), (), ()> = Capability::new(#file_path);
-            capability
-        }}.into();
+    // Must convert streams because quote! doesn't accept proc_macro::TokenStream
+    let direct_stream = proc_macro2::TokenStream::from(direct_stream.unwrap());
+    let direct_child_stream = proc_macro2::TokenStream::from(direct_child_stream.unwrap());
+    let any_child_stream = proc_macro2::TokenStream::from(any_child_stream.unwrap());
+
+    // Return with file path as string literal
+    if file.0.is_some() {
+        let final_file = file.0.unwrap();
+
+        return quote! {
+            coenobita::capability(#final_file, (#direct_stream), (#direct_child_stream), (#any_child_stream))
+        }.into();
     }
 
-    quote! {{
-        let capability: Capability<(#create_type, #view_type, #read_type, #write_type, #append_type, #copy_type, #move_type, #delete_type), (), ()> = Capability::new(#file_identifier);
-        capability
-    }}.into()
+    // Return with file path as identifier
+    let final_file = file.1.unwrap();
+
+    return quote! {
+        coenobita::capability(#final_file, (#direct_stream), (#direct_child_stream), (#any_child_stream))
+    }.into();
 }
