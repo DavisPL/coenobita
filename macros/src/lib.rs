@@ -1,17 +1,35 @@
-use proc_macro2::{ Span };
+use proc_macro2::{ Group };
 use proc_macro::{ TokenStream, TokenTree };
-use syn::{ LitStr, Ident };
+use syn::{ parse_str };
 use quote::quote;
+
+#[derive(PartialEq)]
+enum PermissionType {
+    DirectObject,
+    DirectChild,
+    AnyChild,
+    None
+}
+
+fn permission_group_string(list: [&str; 8]) -> String {
+    let mut output = String::from("(");
+
+    for perm in list.iter() {
+        output = output + perm + ",";
+    }
+
+    output + ")"
+}
 
 #[proc_macro]
 pub fn cap(input: TokenStream) -> TokenStream {
-    // Initialize file variable (literal, identifier)
-    let mut file = (None, None);
-
-    // Initialize strings for direct, direct child, and any child permission tuples
-    let mut direct_stream = None;
-    let mut direct_child_stream = None;
-    let mut any_child_stream = None;
+    let mut file = String::from("");
+    let mut pending_perms = PermissionType::DirectObject;
+    
+    // Create, View, Read, Write, Append, Copy, Move, Delete
+    let mut direct_object = ["()", "()", "()", "()", "()", "()", "()", "()"];
+    let mut direct_child = ["()", "()", "()", "()", "()", "()", "()", "()"];
+    let mut any_child = ["()", "()", "()", "()", "()", "()", "()", "()"];
 
     for node in input.into_iter() {
         match node {
@@ -22,8 +40,8 @@ pub fn cap(input: TokenStream) -> TokenStream {
                     continue;
                 }
 
-                if file.0.is_none() && file.1.is_none() {
-                    file.0 = Some(LitStr::new(&raw[1..raw.len() - 1], Span::call_site()));
+                if file == "" {
+                    file = String::from(&raw[1..raw.len() - 1]);
                     continue;
                 }
 
@@ -37,24 +55,80 @@ pub fn cap(input: TokenStream) -> TokenStream {
                     continue;
                 }
 
-                if file.0.is_none() && file.1.is_none() {
-                    file.1 = Some(Ident::new(&raw,  Span::call_site()));
+                if file == "" {
+                    file = String::from(raw);
                     continue;
                 }
 
                 panic!("[Coenobita] [Error] Unexpected identifier \"{}\"", raw);
             },
-
+            
             TokenTree::Group(content) => {
-                if direct_stream.is_none() {
-                    direct_stream = Some(content.stream());
-                    continue;
-                } else if direct_child_stream.is_none() {
-                    direct_child_stream = Some(content.stream());
-                    continue;
-                } else {
-                    any_child_stream = Some(content.stream());
-                    continue;
+                for subnode in content.stream().into_iter() {
+                    match subnode {
+                        TokenTree::Ident(content) => {
+                            let raw = content.to_string();
+
+                            match pending_perms {
+                                PermissionType::DirectObject => {
+                                    match raw.as_ref() {
+                                        "Create" => direct_object[0] = "coenobita::Create",
+                                        "View"   => direct_object[1] = "coenobita::View",
+                                        "Read"   => direct_object[2] = "coenobita::Read",
+                                        "Write"  => direct_object[3] = "coenobita::Write",
+                                        "Append" => direct_object[4] = "coenobita::Append",
+                                        "Copy"   => direct_object[5] = "coenobita::Copy",
+                                        "Move"   => direct_object[6] = "coenobita::Move",
+                                        "Delete" => direct_object[7] = "coenobita::Delete",
+                                               _ => {
+                                            panic!("[Coenobita] [Error] Unexpected permission identifier \"{}\" != \"{}\" != \"{}\"", content.to_string(), raw, "Delete")
+                                        }
+                                    }
+                                },
+
+                                PermissionType::DirectChild => {
+                                    match raw.as_ref() {
+                                        "Create" => direct_child[0] = "coenobita::Create",
+                                        "View"   => direct_child[1] = "coenobita::View",
+                                        "Read"   => direct_child[2] = "coenobita::Read",
+                                        "Write"  => direct_child[3] = "coenobita::Write",
+                                        "Append" => direct_child[4] = "coenobita::Append",
+                                        "Copy"   => direct_child[5] = "coenobita::Copy",
+                                        "Move"   => direct_child[6] = "coenobita::Move",
+                                        "Delete" => direct_child[7] = "coenobita::Delete",
+                                               _ => panic!("[Coenobita] [Error] Unexpected permission identifier \"{}\" 2", raw)
+                                    }
+                                },
+
+                                PermissionType::AnyChild => {
+                                    match raw.as_ref() {
+                                        "Create" => any_child[0] = "coenobita::Create",
+                                        "View"   => any_child[1] = "coenobita::View",
+                                        "Read"   => any_child[2] = "coenobita::Read",
+                                        "Write"  => any_child[3] = "coenobita::Write",
+                                        "Append" => any_child[4] = "coenobita::Append",
+                                        "Copy"   => any_child[5] = "coenobita::Copy",
+                                        "Move"   => any_child[6] = "coenobita::Move",
+                                        "Delete" => any_child[7] = "coenobita::Delete",
+                                               _ => panic!("[Coenobita] [Error] Unexpected permission identifier \"{}\" 3", raw)
+                                    }
+                                },
+
+                                PermissionType::None => panic!("[Coenobita] [Error] Unexpected group after permission tuple for any child")
+                            }
+
+
+                        },
+
+                        _ => panic!("[Coenobita] [Error] Unexpected token in permission tuple")
+                    }
+                }
+
+                match pending_perms {
+                    PermissionType::DirectObject => pending_perms = PermissionType::DirectChild,
+                    PermissionType::DirectChild  => pending_perms = PermissionType::AnyChild,
+                    PermissionType::AnyChild     => pending_perms = PermissionType::None,
+                                                _ => break
                 }
             },
 
@@ -62,24 +136,12 @@ pub fn cap(input: TokenStream) -> TokenStream {
         }
     }
 
-    // Must convert streams because quote! doesn't accept proc_macro::TokenStream
-    let direct_stream = proc_macro2::TokenStream::from(direct_stream.unwrap());
-    let direct_child_stream = proc_macro2::TokenStream::from(direct_child_stream.unwrap());
-    let any_child_stream = proc_macro2::TokenStream::from(any_child_stream.unwrap());
+    let direct_object_string: Group = parse_str(&permission_group_string(direct_object)).unwrap();
+    let direct_child_string: Group = parse_str(&permission_group_string(direct_child)).unwrap();
+    let any_child_string: Group = parse_str(&permission_group_string(any_child)).unwrap();
 
-    // Return with file path as string literal
-    if file.0.is_some() {
-        let final_file = file.0.unwrap();
-
-        return quote! {
-            coenobita::capability(#final_file, (#direct_stream), (#direct_child_stream), (#any_child_stream))
-        }.into();
-    }
-
-    // Return with file path as identifier
-    let final_file = file.1.unwrap();
-
-    return quote! {
-        coenobita::capability(#final_file, (#direct_stream), (#direct_child_stream), (#any_child_stream))
-    }.into();
+    quote! {
+        coenobita::capability(#file, #direct_object_string, #direct_child_string, #any_child_string)
+    }.into()
 }
+
