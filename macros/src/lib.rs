@@ -43,7 +43,7 @@ pub fn cap(input: TokenStream) -> TokenStream {
                 }
 
                 if file == "" {
-                    file = String::from(&raw[1..raw.len() - 1]);
+                    file = String::from(&raw);
                     continue;
                 }
 
@@ -69,6 +69,14 @@ pub fn cap(input: TokenStream) -> TokenStream {
             TokenTree::Group(content) => {
                 for subnode in content.stream().into_iter() {
                     match subnode {
+                        TokenTree::Punct(content) => {
+                            if content.as_char() == ',' {
+                                continue;
+                            }
+
+                            panic!("[Coenobita] [Error] Unexpected punctuation \"{}\" in permission tuple", content.as_char());
+                        }
+
                         TokenTree::Ident(content) => {
                             let raw = content.to_string();
 

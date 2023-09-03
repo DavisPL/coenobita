@@ -20,7 +20,11 @@ pub struct File<A, B, C, D> {
 
 impl File<(), (), (), ()> {
     pub fn open<A, B, C, D, E, F, G, H>
-    (cap: &Capability<(A, B, C, D, E, F, G, H), (), ()>) -> io::Result<File<A, B, C, D>> {
+    (cap: &Capability<
+        (A, B, C, D, E, F, G, H),
+        ((), (), (), (), (), (), (), ()),
+        ((), (), (), (), (), (), (), ())
+    >) -> io::Result<File<A, B, C, D>> {
         fs::OpenOptions::new()
             .read(true)
             .write(true)
@@ -32,8 +36,13 @@ impl File<(), (), (), ()> {
             })
     }
 
+    // NOTE - Should we be able to create directories this way?
     pub fn create<B, C, D, E, F, G, H>
-    (cap: &Capability<(Create, B, C, D, E, F, G, H), (), ()>) -> io::Result<File<Create, B, C, D>> {
+    (cap: &Capability<
+        (Create, B, C, D, E, F, G, H),
+        ((), (), (), (), (), (), (), ()),
+        ((), (), (), (), (), (), (), ())
+    >) -> io::Result<File<Create, B, C, D>> {
         fs::OpenOptions::new()
             .read(true)
             .write(true)
@@ -46,8 +55,13 @@ impl File<(), (), (), ()> {
             })
     }
 
+    // NOTE - Should we be able to create directories this way?
     pub fn create_new<B, C, D, E, F, G, H>
-    (cap: &Capability<(Create, B, C, D, E, F, G, H), (), ()>) -> io::Result<File<Create, B, C, D>> {
+    (cap: &Capability<
+        (Create, B, C, D, E, F, G, H),
+        ((), (), (), (), (), (), (), ()),
+        ((), (), (), (), (), (), (), ())
+    >) -> io::Result<File<Create, B, C, D>> {
         fs::OpenOptions::new()
             .read(true)
             .write(true)
