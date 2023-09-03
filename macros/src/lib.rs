@@ -1,4 +1,4 @@
-use proc_macro2::{ Group };
+use proc_macro2::{ Group, Literal, Ident };
 use proc_macro::{ TokenStream, TokenTree };
 use syn::{ parse_str };
 use quote::quote;
@@ -24,6 +24,8 @@ fn permission_group_string(list: [&str; 8]) -> String {
 #[proc_macro]
 pub fn cap(input: TokenStream) -> TokenStream {
     let mut file = String::from("");
+    let mut file_is_literal = true;
+
     let mut pending_perms = PermissionType::DirectObject;
     
     // Create, View, Read, Write, Append, Copy, Move, Delete
@@ -57,6 +59,7 @@ pub fn cap(input: TokenStream) -> TokenStream {
 
                 if file == "" {
                     file = String::from(raw);
+                    file_is_literal = false;
                     continue;
                 }
 
@@ -117,7 +120,6 @@ pub fn cap(input: TokenStream) -> TokenStream {
                                 PermissionType::None => panic!("[Coenobita] [Error] Unexpected group after permission tuple for any child")
                             }
 
-
                         },
 
                         _ => panic!("[Coenobita] [Error] Unexpected token in permission tuple")
@@ -140,8 +142,20 @@ pub fn cap(input: TokenStream) -> TokenStream {
     let direct_child_string: Group = parse_str(&permission_group_string(direct_child)).unwrap();
     let any_child_string: Group = parse_str(&permission_group_string(any_child)).unwrap();
 
+    // The file should be a string literal
+    if file_is_literal {
+        let file_literal: Literal = parse_str(&file).unwrap();
+    
+        return quote! {
+            coenobita::capability(#file_literal, #direct_object_string, #direct_child_string, #any_child_string)
+        }.into();
+    }
+
+    // The file should be an identifier
+    let file_ident: Ident = parse_str(&file).unwrap();
+
     quote! {
-        coenobita::capability(#file, #direct_object_string, #direct_child_string, #any_child_string)
+        coenobita::capability(#file_ident, #direct_object_string, #direct_child_string, #any_child_string)
     }.into()
 }
 
