@@ -1,9 +1,9 @@
-use coenobita::{ cap, Capability, Read, Write, Copy, Move, Delete };
+use coenobita::{ cap };
 use coenobita::fs;
 
 fn main() {
-    let rcm_cap = cap!("examples/files/example.txt" with Read, Copy, Move);
-    let wd_cap = cap!("examples/files/example_copied.txt" with Create, Delete, Write);
+    let rcm_cap = cap!("examples/files/example.txt" with (Read, Copy, Move));
+    let wd_cap = cap!("examples/files/example_copied.txt" with (Create, Delete, Write));
 
     match fs::copy(&rcm_cap, &wd_cap) {
         Ok(bytes) => {

@@ -1,9 +1,11 @@
-use coenobita::{ cap, Capability, Read, Write, Copy, Move, Delete };
-use coenobita::fs;
+use coenobita::{ cap };
 use std::path::PathBuf;
 
 fn main() {
     let file_path = PathBuf::from(r"C:\windows\system32.dll");
 
-    let file_cap = cap!(file_path with Delete);
+    // We create a capability for the above path with direct delete permissions
+    let file_cap = cap!(file_path with (Delete));
+
+    println!("{:?}", file_cap);
 }

@@ -68,3 +68,60 @@ impl<A, B, C> Capability<A, B, C> {
         &self.path
     }
 }
+
+// Helper function used by the cap! macro
+pub fn capability<A, B, C, P: AsRef<Path>>
+(path: P, _direct: A, _immediate_child: B, _any_child: C) -> Capability<A, B, C> {
+    Capability {
+        path: path.as_ref().to_path_buf(),
+        phantom: PhantomData::<(A, B, C)>
+    }
+}
+
+pub mod traits {
+    use std::path::PathBuf;
+
+    pub trait Capability {
+        fn get_path(&self) -> &PathBuf;
+    }
+
+    pub trait Create: Capability {}
+    pub trait View: Capability {}
+    pub trait Read: Capability {}
+    pub trait Write: Capability {}
+    pub trait Append: Capability {}
+    pub trait Copy: Capability {}
+    pub trait Move: Capability {}
+    pub trait Delete: Capability {}
+}
+
+impl<A, B, C> traits::Capability for Capability<A, B, C> {
+    fn get_path(&self) -> &PathBuf {
+        &self.path
+    }
+}
+
+// Implement each trait for its corresponding Capability<A, B, C>
+impl<A2, A3, A4, A5, A6, A7, A8, B, C>
+   traits::Create for Capability<(Create, A2, A3, A4, A5, A6, A7, A8), B, C> {}
+
+impl<A1, A3, A4, A5, A6, A7, A8, B, C>
+    traits::View for Capability<(A1, View, A3, A4, A5, A6, A7, A8), B, C> {}
+
+impl<A1, A2, A4, A5, A6, A7, A8, B, C>
+    traits::Read for Capability<(A1, A2, Read, A4, A5, A6, A7, A8), B, C> {}
+
+impl<A1, A2, A3, Write, A5, A6, A7, A8, B, C>
+    traits::Write for Capability<(A1, A2, A3, Write, A5, A6, A7, A8), B, C> {}
+
+impl<A1, A2, A3, A4, A6, A7, A8, B, C>
+    traits::Append for Capability<(A1, A2, A3, A4, Append, A6, A7, A8), B, C> {}
+
+impl<A1, A2, A3, A4, A5, A7, A8, B, C>
+    traits::Copy for Capability<(A1, A2, A3, A4, A5, Copy, A7, A8), B, C> {}
+
+impl<A1, A2, A3, A4, A5, A6, A8, B, C>
+    traits::Move for Capability<(A1, A2, A3, A4, A5, A6, Move, A8), B, C> {}
+
+impl<A1, A2, A3, A4, A5, A6, A7, B, C>
+    traits::Delete for Capability<(A1, A2, A3, A4, A5, A6, A7, Delete), B, C> {}
