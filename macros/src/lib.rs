@@ -3,6 +3,9 @@ use proc_macro::{ TokenStream, TokenTree };
 use syn::{ parse_str };
 use quote::quote;
 
+use std::fs::{ OpenOptions, File };
+use std::io::{ Seek, Write };
+
 #[derive(PartialEq)]
 enum PermissionType {
     DirectObject,
@@ -23,6 +26,12 @@ fn permission_group_string(list: [&str; 8]) -> String {
 
 #[proc_macro]
 pub fn cap(input: TokenStream) -> TokenStream {
+    // Open contract file in truncate mode to clear
+    let mut contract = OpenOptions::new()
+        .append(true)
+        .open("contract.toml")
+        .unwrap();
+
     let mut file = String::from("");
     let mut file_is_literal = true;
 
@@ -32,6 +41,9 @@ pub fn cap(input: TokenStream) -> TokenStream {
     let mut direct_object = ["()", "()", "()", "()", "()", "()", "()", "()"];
     let mut direct_child = ["()", "()", "()", "()", "()", "()", "()", "()"];
     let mut any_child = ["()", "()", "()", "()", "()", "()", "()", "()"];
+
+    // Used for the contract file
+    let mut permissions_string = String::from("");
 
     for node in input.into_iter() {
         match node {
@@ -44,6 +56,12 @@ pub fn cap(input: TokenStream) -> TokenStream {
 
                 if file == "" {
                     file = String::from(&raw);
+
+                    // Begin writing this path to the contract
+                    contract.write_all(b"[[requests]]\npath = ");
+                    contract.write_all(file.as_bytes());
+                    contract.write_all(b"\npermissions = [");
+
                     continue;
                 }
 
@@ -95,6 +113,8 @@ pub fn cap(input: TokenStream) -> TokenStream {
                                             panic!("[Coenobita] [Error] Unexpected permission identifier \"{}\" != \"{}\" != \"{}\"", content.to_string(), raw, "Delete")
                                         }
                                     }
+
+                                    permissions_string = permissions_string + "\"" + raw.as_ref() + "\", ";
                                 },
 
                                 PermissionType::DirectChild => {
@@ -150,6 +170,11 @@ pub fn cap(input: TokenStream) -> TokenStream {
     let direct_child_string: Group = parse_str(&permission_group_string(direct_child)).unwrap();
     let any_child_string: Group = parse_str(&permission_group_string(any_child)).unwrap();
 
+    // Close the contract file
+    contract.write_all(permissions_string[0..permissions_string.len() - 2].as_bytes());
+    contract.write_all(b"]\n\n");
+    contract.flush();
+
     // The file should be a string literal
     if file_is_literal {
         let file_literal: Literal = parse_str(&file).unwrap();
@@ -163,7 +188,7 @@ pub fn cap(input: TokenStream) -> TokenStream {
     let file_ident: Ident = parse_str(&file).unwrap();
 
     quote! {
-        coenobita::capability(#file_ident, #direct_object_string, #direct_child_string, #any_child_string)
+        coenobita::capability(&#file_ident, #direct_object_string, #direct_child_string, #any_child_string)
     }.into()
 }
 
