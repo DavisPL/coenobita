@@ -164,9 +164,7 @@ pub fn remove_dir<C: traits::Delete> (cap: &C) -> io::Result<()> {
     fs::remove_dir(cap.get_path())
 }
 
-// TODO - Create trait for deleting children (transitive and intransitive)
-pub fn remove_dir_all<A, B, C, D, E, F, G, H, I>
-(cap: &Capability<(A, B, C, D, E, F, G, Delete), H, I>) -> io::Result<()> {
+pub fn remove_dir_all<C: traits::Delete + traits::DeleteAnyChild> (cap: &C) -> io::Result<()> {
     fs::remove_dir_all(cap.get_path())
 }
 

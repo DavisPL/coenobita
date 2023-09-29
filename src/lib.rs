@@ -95,6 +95,8 @@ pub mod traits {
     pub trait Delete: Capability {}
 
     pub trait DeleteAnyChild: Capability {}
+    pub trait ViewAnyChild: Capability {}
+    pub trait ReadAnyChild: Capability {}
 }
 
 impl<A, B, C> traits::Capability for Capability<A, B, C> {
@@ -128,7 +130,12 @@ impl<A1, A2, A3, A4, A5, A6, A8, B, C>
 impl<A1, A2, A3, A4, A5, A6, A7, B, C>
     traits::Delete for Capability<(A1, A2, A3, A4, A5, A6, A7, Delete), B, C> {}
 
-impl<A, B, C1, C2, C3, C4, C5, C6, C7, C8>
-    traits::DeleteAnyChild for Capability<A, B, (C1, C2, C3, C4, C5, C6, C7, C8)> {}
+impl<A, B, C1, C2, C3, C4, C5, C6, C7>
+    traits::DeleteAnyChild for Capability<A, B, (C1, C2, C3, C4, C5, C6, C7, Delete)> {}
 
+impl<A, B, C1, C3, C4, C5, C6, C7, C8>
+    traits::ViewAnyChild for Capability<A, B, (C1, View, C3, C4, C5, C6, C7, C8)> {}
+
+impl<A, B, C1, C2, C4, C5, C6, C7, C8>
+    traits::ReadAnyChild for Capability<A, B, (C1, C2, Read, C4, C5, C6, C7, C8)> {}
 
