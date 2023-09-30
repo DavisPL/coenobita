@@ -3,6 +3,8 @@ use crate::{ traits };
 
 use std::marker::PhantomData;
 use std::{ path, fs, io };
+use std::time::SystemTime;
+use std::fmt;
 
 // Provides capability-safe wrapper for files with permissions passed as generic type arguments
 // As before, permissions that aren't granted should be represented as the unit type ()
@@ -190,3 +192,60 @@ pub fn symlink_metadata<C: traits::View> (cap: &C) -> io::Result<fs::Metadata> {
 pub fn write<C: traits::Write, J: AsRef<[u8]>> (cap: &C, contents: J) -> io::Result<()> {
     fs::write(cap.get_path(), contents)
 }
+
+pub struct Metadata(fs::Metadata);
+
+impl Metadata {
+    // TODO - Create a Coenobita version of FileType
+    pub fn file_type(&self) -> fs::FileType {
+        self.0.file_type()
+    }
+
+    pub fn is_dir(&self) -> bool {
+        self.0.is_dir()
+    }
+
+    pub fn is_file(&self) -> bool {
+        self.0.is_file()
+    }
+
+    pub fn is_symlink(&self) -> bool {
+        self.0.is_symlink()
+    }
+
+    pub fn len(&self) -> u64 {
+        self.0.len()
+    }
+
+    // TODO - Create a Coenobita version of Permissions
+    pub fn permissions(&self) -> fs::Permissions {
+        self.0.permissions()
+    }
+
+    pub fn modified(&self) -> io::Result<SystemTime> {
+        self.0.modified()
+    }
+
+    pub fn accessed(&self) -> io::Result<SystemTime> {
+        self.0.accessed()
+    }
+
+    pub fn created(&self) -> io::Result<SystemTime> {
+        self.0.created()
+    }
+}
+
+impl fmt::Debug for Metadata {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Metadata")
+            .field("file_type", &self.file_type())
+            .field("is_dir", &self.is_dir())
+            .field("is_file", &self.is_file())
+            .field("permissions", &self.permissions())
+            .field("modified", &self.modified())
+            .field("accessed", &self.accessed())
+            .field("created", &self.created())
+            .finish_non_exhaustive()
+    }
+}
+
