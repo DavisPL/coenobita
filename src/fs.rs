@@ -142,8 +142,8 @@ pub fn hard_link<C1: traits::View, C2: traits::Create> (original: &C1, link: &C2
     panic!("[Coenobita] [ERROR] Hard linking is not supported yet.");
 }
 
-pub fn metadata<C: traits::View> (cap: &C) -> io::Result<fs::Metadata> {
-    fs::metadata(cap.get_path())
+pub fn metadata<C: traits::View> (cap: &C) -> io::Result<Metadata> {
+    Ok(Metadata(fs::metadata(cap.get_path())?))
 }
 
 pub fn read<C: traits::Read> (cap: &C) -> io::Result<Vec<u8>> {
@@ -185,8 +185,8 @@ pub fn set_permissions<A, B>
     fs::set_permissions(cap.get_path(), perm)
 }
 
-pub fn symlink_metadata<C: traits::View> (cap: &C) -> io::Result<fs::Metadata> {
-    fs::symlink_metadata(cap.get_path())
+pub fn symlink_metadata<C: traits::View> (cap: &C) -> io::Result<Metadata> {
+    Ok(Metadata(fs::symlink_metadata(cap.get_path())?))
 }
 
 pub fn write<C: traits::Write, J: AsRef<[u8]>> (cap: &C, contents: J) -> io::Result<()> {
