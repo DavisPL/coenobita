@@ -3,6 +3,7 @@ pub use macros::{ cap };
 
 use std::marker::PhantomData;
 use std::path::{ Path, PathBuf };
+use std::ffi::OsStr;
 
 #[derive(Debug)]
 pub struct Create;
@@ -80,13 +81,18 @@ pub fn capability<A, B, C, P: AsRef<Path>>
 
 pub mod traits {
     use std::path::PathBuf;
-
+    use std::ffi::OsStr;
+    
     pub trait Capability {
         fn get_path(&self) -> &PathBuf;
     }
 
     pub trait Create: Capability {}
-    pub trait View: Capability {}
+    pub trait View: Capability {
+        // NOTE - The following are originally included for Path (slice) but not PathBuf
+        fn file_name(&self) -> Option<&OsStr>;
+        fn as_os_str(&self) -> &OsStr;
+    }
     pub trait Read: Capability {}
     pub trait Write: Capability {}
     pub trait Append: Capability {}
@@ -109,8 +115,15 @@ impl<A, B, C> traits::Capability for Capability<A, B, C> {
 impl<A2, A3, A4, A5, A6, A7, A8, B, C>
    traits::Create for Capability<(Create, A2, A3, A4, A5, A6, A7, A8), B, C> {}
 
-impl<A1, A3, A4, A5, A6, A7, A8, B, C>
-    traits::View for Capability<(A1, View, A3, A4, A5, A6, A7, A8), B, C> {}
+impl<A1, A3, A4, A5, A6, A7, A8, B, C> traits::View for Capability<(A1, View, A3, A4, A5, A6, A7, A8), B, C> {
+    fn file_name(&self) -> Option<&OsStr> {
+        self.path.file_name()
+    }
+
+    fn as_os_str(&self) -> &OsStr {
+        self.path.as_os_str()
+    }
+}
 
 impl<A1, A2, A4, A5, A6, A7, A8, B, C>
     traits::Read for Capability<(A1, A2, Read, A4, A5, A6, A7, A8), B, C> {}

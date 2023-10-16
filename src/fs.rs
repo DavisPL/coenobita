@@ -1,6 +1,7 @@
 use crate::{ Capability, Create, View, Read, Write, Append, Copy, Move, Delete };
 use crate::{ traits };
 
+use std::os::unix::fs::MetadataExt;
 use std::marker::PhantomData;
 use std::{ path, fs, io };
 use std::time::SystemTime;
@@ -232,6 +233,11 @@ impl Metadata {
 
     pub fn created(&self) -> io::Result<SystemTime> {
         self.0.created()
+    }
+
+    // NOTE - Unix only
+    pub fn ino(&self) -> u64 {
+        self.0.ino()
     }
 }
 
