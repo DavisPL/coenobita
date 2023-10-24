@@ -56,6 +56,12 @@ pub struct Capability<A, B, C> {
     phantom: PhantomData<(A, B, C)>,
 }
 
+impl<A, B, C> Clone for Capability<A, B, C> {
+    fn clone(&self) -> Capability<A, B, C> {
+        Capability { path: self.get_path().to_path_buf(), phantom: PhantomData::<(A, B, C)> }
+    }
+}
+
 // Implements methods for Capabilities with any permissions
 impl<A, B, C> Capability<A, B, C> {
     pub fn new<P: AsRef<Path>>(path: P) -> Capability<A, B, C> {
@@ -121,6 +127,17 @@ impl<A1, A3, A4, A5, A6, A7, A8, B, C> traits::View for Capability<(A1, View, A3
     }
 
     fn as_os_str(&self) -> &OsStr {
+        self.path.as_os_str()
+    }
+}
+
+// TODO - Remove either the upper or lower implementation
+impl<A1, A3, A4, A5, A6, A7, A8, B, C> Capability<(A1, View, A3, A4, A5, A6, A7, A8), B, C> {
+	pub fn file_name(&self) -> Option<&OsStr> {
+        self.path.file_name()
+    }
+
+    pub fn as_os_str(&self) -> &OsStr {
         self.path.as_os_str()
     }
 }

@@ -1,5 +1,5 @@
 use crate::{ Capability, Create, View, Read, Write, Append, Copy, Move, Delete };
-use crate::{ traits };
+use crate::{ traits, capability };
 
 use std::os::unix::fs::MetadataExt;
 use std::marker::PhantomData;
@@ -151,8 +151,9 @@ pub fn read<C: traits::Read> (cap: &C) -> io::Result<Vec<u8>> {
     fs::read(cap.get_path())
 }
 
-pub fn read_dir<C: traits::Read> (cap: &C) -> io::Result<fs::ReadDir> {
+pub fn read_dir<C: traits::Read + traits::View + traits::ViewAnyChild + traits::ReadAnyChild> (cap: &C) -> io::Result<std::fs::ReadDir> {
     fs::read_dir(cap.get_path())
+    //panic!("NOT IMPLEMENTED");
 }
 
 pub fn read_link<C: traits::Read> (cap: &C) -> io::Result<path::PathBuf> {
@@ -255,3 +256,27 @@ impl fmt::Debug for Metadata {
     }
 }
 
+/*pub struct ReadDir<C>(fs::ReadDir, PhantomData<C>);
+
+// pub struct DirEntry
+pub struct DirEntry<C> {
+	cap: C
+}
+
+impl<C: traits::View + traits::Read + traits::ViewAnyChild + traits::ReadAnyChild> Iterator for ReadDir<C> {
+    type Item = io::Result<DirEntry<C>>;
+
+    fn next(&mut self) -> Option<io::Result<DirEntry<C>>> {
+        let next = self.0.next();
+
+		if next.is_some() {
+			let unwrapped = next.unwrap();
+
+			match unwrapped {
+				Ok(something) => Ok(DirEntry { cap: Capability { path: something.path(), phantom: PhantomData::<A> } }),
+				Err(something) => something
+			}
+		}
+    }
+}
+*/
