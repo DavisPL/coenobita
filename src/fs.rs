@@ -123,7 +123,16 @@ impl<A, B, C, D> io::Seek for File<A, B, C, D> {
     }
 }
 
-pub fn canonicalize<C: traits::Capability> (cap: &C) -> io::Result<path::PathBuf> {
+pub fn canonicalize<A1, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<path::PathBuf> {
+    fs::canonicalize(cap.get_path())
+}
+
+pub fn copy<A1, A2, A3, B1, B2, B3> (from: &Capability<A1, A2, A3>, to: &Capability<B1, B2, B3>) -> io::Result<u64>
+where A1: traits::Copy, B1: traits::Create {
+    fs::copy(from.get_path(), to.get_path())
+}
+
+/*pub fn canonicalize<C: traits::Capability> (cap: &C) -> io::Result<path::PathBuf> {
     fs::canonicalize(cap.get_path())
 }
 
@@ -254,4 +263,4 @@ impl fmt::Debug for Metadata {
             .finish_non_exhaustive()
     }
 }
-
+*/

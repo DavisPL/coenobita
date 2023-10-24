@@ -80,7 +80,28 @@ pub fn capability<A, B, C, P: AsRef<Path>>
 }
 
 pub mod traits {
-    use std::path::PathBuf;
+    pub trait Create {}
+    pub trait View {}
+    pub trait Read {}
+    pub trait Write {}
+    pub trait Append {}
+    pub trait Copy {}
+    pub trait Move {}
+    pub trait Delete {}
+}
+
+impl<P2, P3, P4, P5, P6, P7, P8> traits::Create for (Create, P2, P3, P4, P5, P6, P7, P8) {}
+impl<P1, P3, P4, P5, P6, P7, P8> traits::View for (P2, View, P3, P4, P5, P6, P7, P8) {}
+impl<P1, P2, P4, P5, P6, P7, P8> traits::Read for (P2, P3, Read, P4, P5, P6, P7, P8) {}
+impl<P1, P2, P3, P5, P6, P7, P8> traits::Write for (P2, P3, P4, Write, P5, P6, P7, P8) {}
+impl<P1, P2, P3, P4, P6, P7, P8> traits::Append for (P2, P3, P4, P5, Append, P6, P7, P8) {}
+impl<P1, P2, P3, P4, P5, P7, P8> traits::Copy for (P2, P3, P4, P5, P6, Copy, P7, P8) {}
+impl<P1, P2, P3, P4, P5, P7, P8> traits::Move for (P2, P3, P4, P5, P6, P7, Move, P8) {}
+impl<P1, P2, P3, P4, P5, P6, P7> traits::Delete for (P2, P3, P4, P5, P6, P7, P8, Delete) {}
+
+/*pub mod traits {
+
+  use std::path::PathBuf;
     use std::ffi::OsStr;
     
     pub trait Capability {
@@ -151,4 +172,4 @@ impl<A, B, C1, C3, C4, C5, C6, C7, C8>
 
 impl<A, B, C1, C2, C4, C5, C6, C7, C8>
     traits::ReadAnyChild for Capability<A, B, (C1, C2, Read, C4, C5, C6, C7, C8)> {}
-
+*/
