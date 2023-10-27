@@ -1,7 +1,7 @@
 use crate::{ Capability, Create, View, Read, Write, Append, Copy, Move, Delete };
 use crate::{ traits };
 
-use std::os::unix::fs::MetadataExt;
+use std::os::unix::fs::{ MetadataExt, DirEntryExt };
 use std::marker::PhantomData;
 use std::{ path, fs, io };
 use std::time::SystemTime;
@@ -132,60 +132,52 @@ where A1: traits::Copy, B1: traits::Create {
     fs::copy(from.get_path(), to.get_path())
 }
 
-/*pub fn canonicalize<C: traits::Capability> (cap: &C) -> io::Result<path::PathBuf> {
-    fs::canonicalize(cap.get_path())
-}
-
-pub fn copy<C1: traits::Copy, C2: traits::Create> (from: &C1, to: &C2) -> io::Result<u64> {
-    fs::copy(from.get_path(), to.get_path())
-}
-
-pub fn create_dir<C: traits::Create> (cap: &C) -> io::Result<()> {
+pub fn create_dir<A1: traits::Create, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<()> {
     fs::create_dir(cap.get_path())
 }
 
-pub fn create_dir_all<C: traits::Create> (cap: &C) -> io::Result<()> {
+pub fn create_dir_all<A1: traits::Create, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<()> {
     fs::create_dir_all(cap.get_path())
 }
 
-pub fn hard_link<C1: traits::View, C2: traits::Create> (original: &C1, link: &C2) -> io::Result<()> {
+pub fn hard_link<A1: traits::View, A2, A3, B1: traits::Create, B2, B3> (original: &Capability<A1, A2, A3>, link: &Capability<B1, B2, B3>) -> io::Result<()> {
     panic!("[Coenobita] [ERROR] Hard linking is not supported yet.");
 }
 
-pub fn metadata<C: traits::View> (cap: &C) -> io::Result<Metadata> {
+pub fn metadata<A1: traits::View, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<Metadata> {
     Ok(Metadata(fs::metadata(cap.get_path())?))
 }
 
-pub fn read<C: traits::Read> (cap: &C) -> io::Result<Vec<u8>> {
+pub fn read<A1: traits::Read, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<Vec<u8>> {
     fs::read(cap.get_path())
 }
 
-pub fn read_dir<C: traits::Read> (cap: &C) -> io::Result<fs::ReadDir> {
+pub fn read_dir<A1: traits::Read, A2, A3> (cap: &Capability<A1, A1, A3>) -> io::Result<fs::ReadDir> {
     fs::read_dir(cap.get_path())
 }
 
-pub fn read_link<C: traits::Read> (cap: &C) -> io::Result<path::PathBuf> {
+pub fn read_link<A1: traits::Read, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<path::PathBuf> {
     fs::read_link(cap.get_path())
 }
 
-pub fn read_to_string<C: traits::Read> (cap: &C) -> io::Result<String> {
+pub fn read_to_string<A1: traits::Read, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<String> {
     fs::read_to_string(cap.get_path())
 }
 
-pub fn remove_dir<C: traits::Delete> (cap: &C) -> io::Result<()> {
+pub fn remove_dir<A1: traits::Delete, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<()> {
     fs::remove_dir(cap.get_path())
 }
 
-pub fn remove_dir_all<C: traits::Delete + traits::DeleteAnyChild> (cap: &C) -> io::Result<()> {
+pub fn remove_dir_all<A1: traits::Delete, A2, A3: traits::Delete> (cap: &Capability<A1, A2, A3>) -> io::Result<()> {
     fs::remove_dir_all(cap.get_path())
 }
 
-pub fn remove_file<C: traits::Delete> (cap: &C) -> io::Result<()> {
+pub fn remove_file<A1: traits::Delete, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<()> {
     fs::remove_file(cap.get_path())
 }
 
-pub fn rename<C1: traits::Copy + traits::Delete, C2: traits::Create>
-(from: &C1, to: &C2) -> io::Result<()> {
+pub fn rename<A1, A2, A3, B1, B2, B3> (from: &Capability<A1, A2, A3>, to: &Capability<B1, B2, B3>) -> io::Result<()>
+where A1: traits::Move, B1: traits::Create {
     fs::rename(from.get_path(), to.get_path())
 }
 
@@ -195,11 +187,11 @@ pub fn set_permissions<A, B>
     fs::set_permissions(cap.get_path(), perm)
 }
 
-pub fn symlink_metadata<C: traits::View> (cap: &C) -> io::Result<Metadata> {
+pub fn symlink_metadata<A1: traits::View, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<Metadata> {
     Ok(Metadata(fs::symlink_metadata(cap.get_path())?))
 }
 
-pub fn write<C: traits::Write, J: AsRef<[u8]>> (cap: &C, contents: J) -> io::Result<()> {
+pub fn write<A1: traits::Write, A2, A3, J: AsRef<[u8]>> (cap: &Capability<A1, A2, A3>, contents: J) -> io::Result<()> {
     fs::write(cap.get_path(), contents)
 }
 
@@ -263,4 +255,28 @@ impl fmt::Debug for Metadata {
             .finish_non_exhaustive()
     }
 }
-*/
+
+pub struct DirEntry<A, B, C> {
+    _entry: fs::DirEntry,
+    phantom: PhantomData<(A, B, C)>
+}
+
+impl<A, B, C> DirEntry<A, B, C> {
+    pub fn path(&self) -> Capability<A, B, C> {
+        Capability {
+            path: self._entry.path().to_path_buf(),
+            phantom: PhantomData::<(A, B, C)>
+        }
+    }
+}
+
+impl<A: traits::View, B, C> DirEntry<A, B, C> {
+    pub fn file_type(&self) -> io::Result<fs::FileType> {
+        self._entry.file_type()
+    }
+
+    pub fn ino(&self) -> u64 {
+        self._entry.ino()
+    }
+}
+

@@ -91,13 +91,33 @@ pub mod traits {
 }
 
 impl<P2, P3, P4, P5, P6, P7, P8> traits::Create for (Create, P2, P3, P4, P5, P6, P7, P8) {}
-impl<P1, P3, P4, P5, P6, P7, P8> traits::View for (P2, View, P3, P4, P5, P6, P7, P8) {}
-impl<P1, P2, P4, P5, P6, P7, P8> traits::Read for (P2, P3, Read, P4, P5, P6, P7, P8) {}
-impl<P1, P2, P3, P5, P6, P7, P8> traits::Write for (P2, P3, P4, Write, P5, P6, P7, P8) {}
-impl<P1, P2, P3, P4, P6, P7, P8> traits::Append for (P2, P3, P4, P5, Append, P6, P7, P8) {}
-impl<P1, P2, P3, P4, P5, P7, P8> traits::Copy for (P2, P3, P4, P5, P6, Copy, P7, P8) {}
-impl<P1, P2, P3, P4, P5, P7, P8> traits::Move for (P2, P3, P4, P5, P6, P7, Move, P8) {}
-impl<P1, P2, P3, P4, P5, P6, P7> traits::Delete for (P2, P3, P4, P5, P6, P7, P8, Delete) {}
+impl<P1, P3, P4, P5, P6, P7, P8> traits::View for (P1, View, P3, P4, P5, P6, P7, P8) {}
+impl<P1, P2, P4, P5, P6, P7, P8> traits::Read for (P1, P2, Read, P4, P5, P6, P7, P8) {}
+impl<P1, P2, P3, P5, P6, P7, P8> traits::Write for (P1, P2, P3, Write, P5, P6, P7, P8) {}
+impl<P1, P2, P3, P4, P6, P7, P8> traits::Append for (P1, P2, P3, P4, Append, P6, P7, P8) {}
+impl<P1, P2, P3, P4, P5, P7, P8> traits::Copy for (P1, P2, P3, P4, P5, Copy, P7, P8) {}
+impl<P1, P2, P3, P4, P5, P6, P8> traits::Move for (P1, P2, P3, P4, P5, P6, Move, P8) {}
+impl<P1, P2, P3, P4, P5, P6, P7> traits::Delete for (P1, P2, P3, P4, P5, P6, P7, Delete) {}
+
+
+impl<A1: traits::View, A2, A3> Capability<A1, A2, A3> {
+    pub fn file_name(&self) -> Option<&OsStr> {
+        self.path.file_name()
+    }
+
+    pub fn as_os_str(&self) -> &OsStr {
+        self.path.as_os_str()
+    }
+}
+
+impl<A1, A2, A3> Clone for Capability<A1, A2, A3> {
+    fn clone(&self) -> Capability<A1, A2, A3> {
+        Capability {
+            path: self.get_path().to_path_buf(),
+            phantom: PhantomData::<(A1, A2, A3)>
+        }
+    }
+}
 
 /*pub mod traits {
 
