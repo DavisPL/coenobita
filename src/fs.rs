@@ -152,8 +152,11 @@ pub fn read<A1: traits::Read, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Resu
     fs::read(cap.get_path())
 }
 
-pub fn read_dir<A1: traits::Read, A2, A3> (cap: &Capability<A1, A1, A3>) -> io::Result<fs::ReadDir> {
-    fs::read_dir(cap.get_path())
+pub fn read_dir<A1: traits::Read, A2, A3> (cap: &Capability<A1, A1, A3>) -> io::Result<ReadDir<A1, A2, A3>> {
+    fs::read_dir(cap.get_path()).map(|r| ReadDir {
+        _read_dir: r,
+        phantom: PhantomData::<(A1, A2, A3)>
+    })
 }
 
 pub fn read_link<A1: traits::Read, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<path::PathBuf> {
@@ -280,3 +283,19 @@ impl<A: traits::View, B, C> DirEntry<A, B, C> {
     }
 }
 
+#[derive(Debug)]
+pub struct ReadDir<A, B, C> {
+    _read_dir: fs::ReadDir,
+    phantom: PhantomData<(A, B, C)>
+}
+
+impl<A, B, C> Iterator for ReadDir<A, B, C> {
+    type Item = io::Result<DirEntry<A, B, C>>;
+
+    fn next(&mut self) -> Option<io::Result<DirEntry<A, B, C>>> {
+        self._read_dir.next().map(|entry| entry.map(|r| DirEntry { 
+            _entry: r, 
+            phantom: PhantomData::<(A, B, C)> 
+        }))
+    }
+}
