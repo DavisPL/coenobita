@@ -1,9 +1,9 @@
 pub mod fs;
-pub use macros::{ cap };
+pub use macros::cap;
 
-use std::marker::PhantomData;
-use std::path::{ Path, PathBuf };
 use std::ffi::OsStr;
+use std::marker::PhantomData;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug)]
 pub struct Create;
@@ -61,7 +61,7 @@ impl<A, B, C> Capability<A, B, C> {
     pub fn new<P: AsRef<Path>>(path: P) -> Capability<A, B, C> {
         Capability {
             path: path.as_ref().to_path_buf(),
-            phantom: PhantomData::<(A, B, C)>
+            phantom: PhantomData::<(A, B, C)>,
         }
     }
 
@@ -71,11 +71,15 @@ impl<A, B, C> Capability<A, B, C> {
 }
 
 // Helper function used by the cap! macro
-pub fn capability<A, B, C, P: AsRef<Path>>
-(path: P, _direct: A, _immediate_child: B, _any_child: C) -> Capability<A, B, C> {
+pub fn capability<A, B, C, P: AsRef<Path>>(
+    path: P,
+    _direct: A,
+    _immediate_child: B,
+    _any_child: C,
+) -> Capability<A, B, C> {
     Capability {
         path: path.as_ref().to_path_buf(),
-        phantom: PhantomData::<(A, B, C)>
+        phantom: PhantomData::<(A, B, C)>,
     }
 }
 
@@ -99,7 +103,6 @@ impl<P1, P2, P3, P4, P5, P7, P8> traits::Copy for (P1, P2, P3, P4, P5, Copy, P7,
 impl<P1, P2, P3, P4, P5, P6, P8> traits::Move for (P1, P2, P3, P4, P5, P6, Move, P8) {}
 impl<P1, P2, P3, P4, P5, P6, P7> traits::Delete for (P1, P2, P3, P4, P5, P6, P7, Delete) {}
 
-
 impl<A1: traits::View, A2, A3> Capability<A1, A2, A3> {
     pub fn file_name(&self) -> Option<&OsStr> {
         self.path.file_name()
@@ -114,7 +117,7 @@ impl<A1, A2, A3> Clone for Capability<A1, A2, A3> {
     fn clone(&self) -> Capability<A1, A2, A3> {
         Capability {
             path: self.get_path().to_path_buf(),
-            phantom: PhantomData::<(A1, A2, A3)>
+            phantom: PhantomData::<(A1, A2, A3)>,
         }
     }
 }
@@ -123,7 +126,7 @@ impl<A1, A2, A3> Clone for Capability<A1, A2, A3> {
 
   use std::path::PathBuf;
     use std::ffi::OsStr;
-    
+
     pub trait Capability {
         fn get_path(&self) -> &PathBuf;
     }

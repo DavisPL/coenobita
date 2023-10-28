@@ -1,11 +1,13 @@
-use crate::{ Capability, Create, View, Read, Write, Append, Copy, Move, Delete };
-use crate::{ traits };
+#![allow(clippy::type_complexity)]
 
-use std::os::unix::fs::{ MetadataExt, DirEntryExt };
-use std::marker::PhantomData;
-use std::{ path, fs, io };
-use std::time::SystemTime;
+use crate::traits;
+use crate::{Append, Capability, Copy, Create, Delete, Move, Read, View, Write};
+
 use std::fmt;
+use std::marker::PhantomData;
+use std::os::unix::fs::{DirEntryExt, MetadataExt};
+use std::time::SystemTime;
+use std::{fs, io, path};
 
 // Provides capability-safe wrapper for files with permissions passed as generic type arguments
 // As before, permissions that aren't granted should be represented as the unit type ()
@@ -18,16 +20,17 @@ use std::fmt;
 #[derive(Debug)]
 pub struct File<A, B, C, D> {
     file: fs::File,
-    phantom: PhantomData<(A, B, C, D)>
+    phantom: PhantomData<(A, B, C, D)>,
 }
 
 impl File<(), (), (), ()> {
-    pub fn open<A, B, C, D, E, F, G, H>
-    (cap: &Capability<
-        (A, B, C, D, E, F, G, H),
-        ((), (), (), (), (), (), (), ()),
-        ((), (), (), (), (), (), (), ())
-    >) -> io::Result<File<A, B, C, D>> {
+    pub fn open<A, B, C, D, E, F, G, H>(
+        cap: &Capability<
+            (A, B, C, D, E, F, G, H),
+            ((), (), (), (), (), (), (), ()),
+            ((), (), (), (), (), (), (), ()),
+        >,
+    ) -> io::Result<File<A, B, C, D>> {
         fs::OpenOptions::new()
             .read(true)
             .write(true)
@@ -35,17 +38,18 @@ impl File<(), (), (), ()> {
             .open(cap.get_path())
             .map(|file| File::<A, B, C, D> {
                 file,
-                phantom: PhantomData::<(A, B, C, D)>
+                phantom: PhantomData::<(A, B, C, D)>,
             })
     }
 
     // NOTE - Should we be able to create directories this way?
-    pub fn create<B, C, D, E, F, G, H>
-    (cap: &Capability<
-        (Create, B, C, D, E, F, G, H),
-        ((), (), (), (), (), (), (), ()),
-        ((), (), (), (), (), (), (), ())
-    >) -> io::Result<File<Create, B, C, D>> {
+    pub fn create<B, C, D, E, F, G, H>(
+        cap: &Capability<
+            (Create, B, C, D, E, F, G, H),
+            ((), (), (), (), (), (), (), ()),
+            ((), (), (), (), (), (), (), ()),
+        >,
+    ) -> io::Result<File<Create, B, C, D>> {
         fs::OpenOptions::new()
             .read(true)
             .write(true)
@@ -54,17 +58,18 @@ impl File<(), (), (), ()> {
             .open(cap.get_path())
             .map(|file| File::<Create, B, C, D> {
                 file,
-                phantom: PhantomData::<(Create, B, C, D)>
+                phantom: PhantomData::<(Create, B, C, D)>,
             })
     }
 
     // NOTE - Should we be able to create directories this way?
-    pub fn create_new<B, C, D, E, F, G, H>
-    (cap: &Capability<
-        (Create, B, C, D, E, F, G, H),
-        ((), (), (), (), (), (), (), ()),
-        ((), (), (), (), (), (), (), ())
-    >) -> io::Result<File<Create, B, C, D>> {
+    pub fn create_new<B, C, D, E, F, G, H>(
+        cap: &Capability<
+            (Create, B, C, D, E, F, G, H),
+            ((), (), (), (), (), (), (), ()),
+            ((), (), (), (), (), (), (), ()),
+        >,
+    ) -> io::Result<File<Create, B, C, D>> {
         fs::OpenOptions::new()
             .read(true)
             .write(true)
@@ -73,7 +78,7 @@ impl File<(), (), (), ()> {
             .open(cap.get_path())
             .map(|file| File::<Create, B, C, D> {
                 file,
-                phantom: PhantomData::<(Create, B, C, D)>
+                phantom: PhantomData::<(Create, B, C, D)>,
             })
     }
 }
@@ -123,78 +128,108 @@ impl<A, B, C, D> io::Seek for File<A, B, C, D> {
     }
 }
 
-pub fn canonicalize<A1, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<path::PathBuf> {
+pub fn canonicalize<A1, A2, A3>(cap: &Capability<A1, A2, A3>) -> io::Result<path::PathBuf> {
     fs::canonicalize(cap.get_path())
 }
 
-pub fn copy<A1, A2, A3, B1, B2, B3> (from: &Capability<A1, A2, A3>, to: &Capability<B1, B2, B3>) -> io::Result<u64>
-where A1: traits::Copy, B1: traits::Create {
+pub fn copy<A1, A2, A3, B1, B2, B3>(
+    from: &Capability<A1, A2, A3>,
+    to: &Capability<B1, B2, B3>,
+) -> io::Result<u64>
+where
+    A1: traits::Copy,
+    B1: traits::Create,
+{
     fs::copy(from.get_path(), to.get_path())
 }
 
-pub fn create_dir<A1: traits::Create, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<()> {
+pub fn create_dir<A1: traits::Create, A2, A3>(cap: &Capability<A1, A2, A3>) -> io::Result<()> {
     fs::create_dir(cap.get_path())
 }
 
-pub fn create_dir_all<A1: traits::Create, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<()> {
+pub fn create_dir_all<A1: traits::Create, A2, A3>(cap: &Capability<A1, A2, A3>) -> io::Result<()> {
     fs::create_dir_all(cap.get_path())
 }
 
-pub fn hard_link<A1: traits::View, A2, A3, B1: traits::Create, B2, B3> (original: &Capability<A1, A2, A3>, link: &Capability<B1, B2, B3>) -> io::Result<()> {
+pub fn hard_link<A1: traits::View, A2, A3, B1: traits::Create, B2, B3>(
+    _original: &Capability<A1, A2, A3>,
+    _link: &Capability<B1, B2, B3>,
+) -> io::Result<()> {
     panic!("[Coenobita] [ERROR] Hard linking is not supported yet.");
 }
 
-pub fn metadata<A1: traits::View, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<Metadata> {
+pub fn metadata<A1: traits::View, A2, A3>(cap: &Capability<A1, A2, A3>) -> io::Result<Metadata> {
     Ok(Metadata(fs::metadata(cap.get_path())?))
 }
 
-pub fn read<A1: traits::Read, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<Vec<u8>> {
+pub fn read<A1: traits::Read, A2, A3>(cap: &Capability<A1, A2, A3>) -> io::Result<Vec<u8>> {
     fs::read(cap.get_path())
 }
 
-pub fn read_dir<A1: traits::Read, A2, A3> (cap: &Capability<A1, A1, A3>) -> io::Result<ReadDir<A1, A2, A3>> {
+pub fn read_dir<A1: traits::Read, A2, A3>(
+    cap: &Capability<A1, A1, A3>,
+) -> io::Result<ReadDir<A1, A2, A3>> {
     fs::read_dir(cap.get_path()).map(|r| ReadDir {
         _read_dir: r,
-        phantom: PhantomData::<(A1, A2, A3)>
+        phantom: PhantomData::<(A1, A2, A3)>,
     })
 }
 
-pub fn read_link<A1: traits::Read, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<path::PathBuf> {
+pub fn read_link<A1: traits::Read, A2, A3>(
+    cap: &Capability<A1, A2, A3>,
+) -> io::Result<path::PathBuf> {
     fs::read_link(cap.get_path())
 }
 
-pub fn read_to_string<A1: traits::Read, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<String> {
+pub fn read_to_string<A1: traits::Read, A2, A3>(
+    cap: &Capability<A1, A2, A3>,
+) -> io::Result<String> {
     fs::read_to_string(cap.get_path())
 }
 
-pub fn remove_dir<A1: traits::Delete, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<()> {
+pub fn remove_dir<A1: traits::Delete, A2, A3>(cap: &Capability<A1, A2, A3>) -> io::Result<()> {
     fs::remove_dir(cap.get_path())
 }
 
-pub fn remove_dir_all<A1: traits::Delete, A2, A3: traits::Delete> (cap: &Capability<A1, A2, A3>) -> io::Result<()> {
+pub fn remove_dir_all<A1: traits::Delete, A2, A3: traits::Delete>(
+    cap: &Capability<A1, A2, A3>,
+) -> io::Result<()> {
     fs::remove_dir_all(cap.get_path())
 }
 
-pub fn remove_file<A1: traits::Delete, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<()> {
+pub fn remove_file<A1: traits::Delete, A2, A3>(cap: &Capability<A1, A2, A3>) -> io::Result<()> {
     fs::remove_file(cap.get_path())
 }
 
-pub fn rename<A1, A2, A3, B1, B2, B3> (from: &Capability<A1, A2, A3>, to: &Capability<B1, B2, B3>) -> io::Result<()>
-where A1: traits::Move, B1: traits::Create {
+pub fn rename<A1, A2, A3, B1, B2, B3>(
+    from: &Capability<A1, A2, A3>,
+    to: &Capability<B1, B2, B3>,
+) -> io::Result<()>
+where
+    A1: traits::Move,
+    B1: traits::Create,
+{
     fs::rename(from.get_path(), to.get_path())
 }
 
 // NOTE - Reconsider this functon and the permissions required
-pub fn set_permissions<A, B>
-(cap: &Capability<(Create, View, Read, Write, Append, Copy, Move, Delete), A, B>, perm: fs::Permissions) -> io::Result<()> {
+pub fn set_permissions<A, B>(
+    cap: &Capability<(Create, View, Read, Write, Append, Copy, Move, Delete), A, B>,
+    perm: fs::Permissions,
+) -> io::Result<()> {
     fs::set_permissions(cap.get_path(), perm)
 }
 
-pub fn symlink_metadata<A1: traits::View, A2, A3> (cap: &Capability<A1, A2, A3>) -> io::Result<Metadata> {
+pub fn symlink_metadata<A1: traits::View, A2, A3>(
+    cap: &Capability<A1, A2, A3>,
+) -> io::Result<Metadata> {
     Ok(Metadata(fs::symlink_metadata(cap.get_path())?))
 }
 
-pub fn write<A1: traits::Write, A2, A3, J: AsRef<[u8]>> (cap: &Capability<A1, A2, A3>, contents: J) -> io::Result<()> {
+pub fn write<A1: traits::Write, A2, A3, J: AsRef<[u8]>>(
+    cap: &Capability<A1, A2, A3>,
+    contents: J,
+) -> io::Result<()> {
     fs::write(cap.get_path(), contents)
 }
 
@@ -220,6 +255,10 @@ impl Metadata {
 
     pub fn len(&self) -> u64 {
         self.0.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() > 0
     }
 
     // TODO - Create a Coenobita version of Permissions
@@ -261,14 +300,14 @@ impl fmt::Debug for Metadata {
 
 pub struct DirEntry<A, B, C> {
     _entry: fs::DirEntry,
-    phantom: PhantomData<(A, B, C)>
+    phantom: PhantomData<(A, B, C)>,
 }
 
 impl<A, B, C> DirEntry<A, B, C> {
     pub fn path(&self) -> Capability<A, B, C> {
         Capability {
             path: self._entry.path().to_path_buf(),
-            phantom: PhantomData::<(A, B, C)>
+            phantom: PhantomData::<(A, B, C)>,
         }
     }
 }
@@ -286,16 +325,18 @@ impl<A: traits::View, B, C> DirEntry<A, B, C> {
 #[derive(Debug)]
 pub struct ReadDir<A, B, C> {
     _read_dir: fs::ReadDir,
-    phantom: PhantomData<(A, B, C)>
+    phantom: PhantomData<(A, B, C)>,
 }
 
 impl<A, B, C> Iterator for ReadDir<A, B, C> {
     type Item = io::Result<DirEntry<A, B, C>>;
 
     fn next(&mut self) -> Option<io::Result<DirEntry<A, B, C>>> {
-        self._read_dir.next().map(|entry| entry.map(|r| DirEntry { 
-            _entry: r, 
-            phantom: PhantomData::<(A, B, C)> 
-        }))
+        self._read_dir.next().map(|entry| {
+            entry.map(|r| DirEntry {
+                _entry: r,
+                phantom: PhantomData::<(A, B, C)>,
+            })
+        })
     }
 }
