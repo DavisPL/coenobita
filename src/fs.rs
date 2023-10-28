@@ -167,7 +167,7 @@ pub fn read<A1: traits::Read, A2, A3>(cap: &Capability<A1, A2, A3>) -> io::Resul
 }
 
 pub fn read_dir<A1: traits::Read, A2, A3>(
-    cap: &Capability<A1, A1, A3>,
+    cap: &Capability<A1, A2, A3>,
 ) -> io::Result<ReadDir<A1, A2, A3>> {
     fs::read_dir(cap.get_path()).map(|r| ReadDir {
         _read_dir: r,
