@@ -3,7 +3,7 @@ pub use macros::cap;
 
 use std::ffi::OsStr;
 use std::marker::PhantomData;
-use std::path::{Path, PathBuf, Display};
+use std::path::{Display, Path, PathBuf};
 
 #[derive(Debug)]
 pub struct Create;
@@ -69,7 +69,7 @@ impl<A, B, C> Capability<A, B, C> {
         &self.path
     }
 
-	pub fn display(&self) -> Display<'_> {
+    pub fn display(&self) -> Display<'_> {
         self.get_path().display()
     }
 }

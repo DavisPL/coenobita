@@ -18,79 +18,63 @@ use std::{fs, io, path};
 // D -> Write
 
 #[derive(Debug)]
-pub struct File<A, B, C, D> {
+pub struct File<A, B, C> {
     file: fs::File,
-    phantom: PhantomData<(A, B, C, D)>,
+    phantom: PhantomData<(A, B, C)>,
 }
 
-impl File<(), (), (), ()> {
-    pub fn open<A, B, C, D, E, F, G, H>(
-        cap: &Capability<
-            (A, B, C, D, E, F, G, H),
-            ((), (), (), (), (), (), (), ()),
-            ((), (), (), (), (), (), (), ()),
-        >,
-    ) -> io::Result<File<A, B, C, D>> {
+impl File<(), (), ()> {
+    pub fn open<A1, A2, A3>(cap: &Capability<A1, A2, A3>) -> io::Result<File<A1, A2, A3>> {
         fs::OpenOptions::new()
             .read(true)
             .write(true)
             .append(true)
             .open(cap.get_path())
-            .map(|file| File::<A, B, C, D> {
+            .map(|file| File::<A1, A2, A3> {
                 file,
-                phantom: PhantomData::<(A, B, C, D)>,
+                phantom: PhantomData::<(A1, A2, A3)>,
             })
     }
 
-    // NOTE - Should we be able to create directories this way?
-    pub fn create<B, C, D, E, F, G, H>(
-        cap: &Capability<
-            (Create, B, C, D, E, F, G, H),
-            ((), (), (), (), (), (), (), ()),
-            ((), (), (), (), (), (), (), ()),
-        >,
-    ) -> io::Result<File<Create, B, C, D>> {
+    pub fn create<A1: traits::Create, A2, A3>(
+        cap: &Capability<A1, A2, A3>,
+    ) -> io::Result<File<A1, A2, A3>> {
         fs::OpenOptions::new()
             .read(true)
             .write(true)
             .append(true)
             .create(true)
             .open(cap.get_path())
-            .map(|file| File::<Create, B, C, D> {
+            .map(|file| File::<A1, A2, A3> {
                 file,
-                phantom: PhantomData::<(Create, B, C, D)>,
+                phantom: PhantomData::<(A1, A2, A3)>,
             })
     }
 
-    // NOTE - Should we be able to create directories this way?
-    pub fn create_new<B, C, D, E, F, G, H>(
-        cap: &Capability<
-            (Create, B, C, D, E, F, G, H),
-            ((), (), (), (), (), (), (), ()),
-            ((), (), (), (), (), (), (), ()),
-        >,
-    ) -> io::Result<File<Create, B, C, D>> {
+    pub fn create_new<A1: traits::Create, A2, A3>(
+        cap: &Capability<A1, A2, A3>,
+    ) -> io::Result<File<A1, A2, A3>> {
         fs::OpenOptions::new()
             .read(true)
             .write(true)
             .append(true)
             .create_new(true)
             .open(cap.get_path())
-            .map(|file| File::<Create, B, C, D> {
+            .map(|file| File::<A1, A2, A3> {
                 file,
-                phantom: PhantomData::<(Create, B, C, D)>,
+                phantom: PhantomData::<(A1, A2, A3)>,
             })
     }
 }
 
-impl<A, B, C> File<A, View, B, C> {
+impl<A: traits::View, B, C> File<A, B, C> {
     // Queries metadata about the underlying file
     pub fn metadata(&self) -> io::Result<fs::Metadata> {
         self.file.metadata()
     }
 }
 
-impl<A, B, C> io::Read for File<A, B, Read, C> {
+impl<A: traits::Read, B, C> io::Read for File<A, B, C> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         self.file.read(buf)
     }
@@ -108,7 +92,7 @@ impl<A, B, C> io::Read for File<A, B, Read, C> {
     }
 }
 
-impl<A, B, C> io::Write for File<A, B, C, Write> {
+impl<A: traits::Write, B, C> io::Write for File<A, B, C> {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         self.file.write(buf)
     }
@@ -122,7 +106,7 @@ impl<A, B, C> io::Write for File<A, B, C, Write> {
     }
 }
 
-impl<A, B, C, D> io::Seek for File<A, B, C, D> {
+impl<A, B, C> io::Seek for File<A, B, C> {
     fn seek(&mut self, pos: io::SeekFrom) -> io::Result<u64> {
         self.file.seek(pos)
     }
@@ -306,7 +290,7 @@ pub struct DirEntry<A, B, C> {
 impl<A, B, C> DirEntry<A, B, C> {
     pub fn path(&self) -> Capability<A, B, C> {
         Capability {
-            path: self._entry.path().to_path_buf(),
+            path: self._entry.path(),
             phantom: PhantomData::<(A, B, C)>,
         }
     }
