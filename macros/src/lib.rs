@@ -1,15 +1,12 @@
-use proc_macro2::{ Group, Literal, Ident };
-use proc_macro::{ TokenStream, TokenTree };
-use syn::{ parse_str };
+use proc_macro::TokenStream;
+use proc_macro2::Group;
 use quote::quote;
-
-#[derive(PartialEq)]
-enum PermissionType {
-    DirectObject,
-    DirectChild,
-    AnyChild,
-    None
-}
+use syn::{parse_macro_input, Expr, Path, Token, token, parse_str};
+use syn::parse::{Parse, ParseStream};
+use syn::punctuated::Punctuated;
+use syn::token::Comma;
+use syn::parenthesized;
+use syn::Ident;
 
 fn permission_group_string(list: [&str; 8]) -> String {
     let mut output = String::from("(");
@@ -21,149 +18,93 @@ fn permission_group_string(list: [&str; 8]) -> String {
     output + ")"
 }
 
-#[proc_macro]
-pub fn cap(input: TokenStream) -> TokenStream {
-    let mut file = String::from("");
-    let mut file_is_literal = true;
+// Define a custom struct to hold the path and permissions
+struct PathAndPermissions<'a> {
+    path: Expr,
+    permissions: [[&'a str; 8]; 3],
+}
 
-    let mut pending_perms = PermissionType::DirectObject;
-    
-    // Create, View, Read, Write, Append, Copy, Move, Delete
-    let mut direct_object = ["()", "()", "()", "()", "()", "()", "()", "()"];
-    let mut direct_child = ["()", "()", "()", "()", "()", "()", "()", "()"];
-    let mut any_child = ["()", "()", "()", "()", "()", "()", "()", "()"];
+// Implement the Parse trait for your custom struct
+impl<'a> Parse for PathAndPermissions<'a> {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        // Parse the path as a string literal or expression
+        let path: Expr = input.parse()?;
 
-    for node in input.into_iter() {
-        match node {
-            TokenTree::Literal(content) => {
-                let raw = content.to_string();
+        // Parse the optional "with" identifier and ignore it
+        let _with: Option<Ident> = input.parse().ok();
 
-                if raw == "with" {
-                    continue;
+        // Create, View, Read, Write, Append, Copy, Move, Delete
+        let mut permission_index = 0;
+        let mut permissions = [
+            ["()", "()", "()", "()", "()", "()", "()", "()"],
+            ["()", "()", "()", "()", "()", "()", "()", "()"],
+            ["()", "()", "()", "()", "()", "()", "()", "()"]
+        ];
+
+        while permission_index < 3 {
+            if input.cursor().eof() {
+                if permission_index == 0 {
+                    panic!("[Coenobita] [Error] At least one permission set required.");
                 }
 
-                if file == "" {
-                    file = String::from(&raw);
-                    continue;
-                }
+                break;
+            }
 
-                panic!("[Coenobita] [Error] Unexpected literal \"{}\"", raw);
-            },
+            if input.peek(token::Comma) {
+                let _ = input.parse::<Comma>();
+                continue;
+            }
 
-            TokenTree::Ident(content) => {
-                let raw = content.to_string();
+            if !input.peek(token::Paren) {
+                panic!("[Coenobita] [Error] Expected parenthesis, found another token.");
+            }
 
-                if raw == "with" {
-                    continue;
-                }
-
-                if file == "" {
-                    file = String::from(raw);
-                    file_is_literal = false;
-                    continue;
-                }
-
-                panic!("[Coenobita] [Error] Unexpected identifier \"{}\"", raw);
-            },
+            let content;
+            parenthesized!(content in input);
+            let permission_list: Punctuated<Path, Comma> = content.parse_terminated(Path::parse, Token!(,))?;
             
-            TokenTree::Group(content) => {
-                for subnode in content.stream().into_iter() {
-                    match subnode {
-                        TokenTree::Punct(content) => {
-                            if content.as_char() == ',' {
-                                continue;
-                            }
+            for item in permission_list.iter() {
+                let perm_string = item.segments[0].ident.to_string();
 
-                            panic!("[Coenobita] [Error] Unexpected punctuation \"{}\" in permission tuple", content.as_char());
-                        }
-
-                        TokenTree::Ident(content) => {
-                            let raw = content.to_string();
-
-                            match pending_perms {
-                                PermissionType::DirectObject => {
-                                    match raw.as_ref() {
-                                        "Create" => direct_object[0] = "coenobita::Create",
-                                        "View"   => direct_object[1] = "coenobita::View",
-                                        "Read"   => direct_object[2] = "coenobita::Read",
-                                        "Write"  => direct_object[3] = "coenobita::Write",
-                                        "Append" => direct_object[4] = "coenobita::Append",
-                                        "Copy"   => direct_object[5] = "coenobita::Copy",
-                                        "Move"   => direct_object[6] = "coenobita::Move",
-                                        "Delete" => direct_object[7] = "coenobita::Delete",
-                                               _ => {
-                                            panic!("[Coenobita] [Error] Unexpected permission identifier \"{}\" != \"{}\" != \"{}\"", content.to_string(), raw, "Delete")
-                                        }
-                                    }
-                                },
-
-                                PermissionType::DirectChild => {
-                                    match raw.as_ref() {
-                                        "Create" => direct_child[0] = "coenobita::Create",
-                                        "View"   => direct_child[1] = "coenobita::View",
-                                        "Read"   => direct_child[2] = "coenobita::Read",
-                                        "Write"  => direct_child[3] = "coenobita::Write",
-                                        "Append" => direct_child[4] = "coenobita::Append",
-                                        "Copy"   => direct_child[5] = "coenobita::Copy",
-                                        "Move"   => direct_child[6] = "coenobita::Move",
-                                        "Delete" => direct_child[7] = "coenobita::Delete",
-                                               _ => panic!("[Coenobita] [Error] Unexpected permission identifier \"{}\" 2", raw)
-                                    }
-                                },
-
-                                PermissionType::AnyChild => {
-                                    match raw.as_ref() {
-                                        "Create" => any_child[0] = "coenobita::Create",
-                                        "View"   => any_child[1] = "coenobita::View",
-                                        "Read"   => any_child[2] = "coenobita::Read",
-                                        "Write"  => any_child[3] = "coenobita::Write",
-                                        "Append" => any_child[4] = "coenobita::Append",
-                                        "Copy"   => any_child[5] = "coenobita::Copy",
-                                        "Move"   => any_child[6] = "coenobita::Move",
-                                        "Delete" => any_child[7] = "coenobita::Delete",
-                                               _ => panic!("[Coenobita] [Error] Unexpected permission identifier \"{}\" 3", raw)
-                                    }
-                                },
-
-                                PermissionType::None => panic!("[Coenobita] [Error] Unexpected group after permission tuple for any child")
-                            }
-
-                        },
-
-                        _ => panic!("[Coenobita] [Error] Unexpected token in permission tuple")
+                match perm_string.as_str() {
+                    "Create" => permissions[permission_index][0] = "coenobita::Create",
+                    "View"   => permissions[permission_index][1] = "coenobita::View",
+                    "Read"   => permissions[permission_index][2] = "coenobita::Read",
+                    "Write"  => permissions[permission_index][3] = "coenobita::Write",
+                    "Append" => permissions[permission_index][4] = "coenobita::Append",
+                    "Copy"   => permissions[permission_index][5] = "coenobita::Copy",
+                    "Move"   => permissions[permission_index][6] = "coenobita::Move",
+                    "Delete" => permissions[permission_index][7] = "coenobita::Delete",
+                            _ => {
+                        panic!("[Coenobita] [Error] Unexpected permission identifier \"{}\" != \"{}\" != \"{}\"", content.to_string(), perm_string, "Delete")
                     }
                 }
+            }
 
-                match pending_perms {
-                    PermissionType::DirectObject => pending_perms = PermissionType::DirectChild,
-                    PermissionType::DirectChild  => pending_perms = PermissionType::AnyChild,
-                    PermissionType::AnyChild     => pending_perms = PermissionType::None,
-                                                _ => break
-                }
-            },
-
-            _ => continue
+            permission_index += 1;
         }
+
+        Ok(PathAndPermissions { path, permissions })
     }
+}
 
-    let direct_object_string: Group = parse_str(&permission_group_string(direct_object)).unwrap();
-    let direct_child_string: Group = parse_str(&permission_group_string(direct_child)).unwrap();
-    let any_child_string: Group = parse_str(&permission_group_string(any_child)).unwrap();
+// Define your macro
+#[proc_macro]
+pub fn cap(input: TokenStream) -> TokenStream {
+    // Parse the input using the custom struct
+    let path_and_permissions: PathAndPermissions = parse_macro_input!(input);
 
-    // The file should be a string literal
-    if file_is_literal {
-        let file_literal: Literal = parse_str(&file).unwrap();
-    
-        return quote! {
-            coenobita::capability(#file_literal, #direct_object_string, #direct_child_string, #any_child_string)
-        }.into();
-    }
+    // Extract the path and permissions
+    let path = path_and_permissions.path;
+    let permissions = path_and_permissions.permissions;
 
-    // The file should be an identifier
-    let file_ident: Ident = parse_str(&file).unwrap();
+    let direct: Group = parse_str(&permission_group_string(permissions[0])).unwrap();
+    let imm_child: Group = parse_str(&permission_group_string(permissions[1])).unwrap();
+    let any_child: Group = parse_str(&permission_group_string(permissions[2])).unwrap();
 
+    // Generate the output struct using the extracted values
     quote! {
-        coenobita::capability(#file_ident, #direct_object_string, #direct_child_string, #any_child_string)
+        coenobita::capability(#path, #direct, #imm_child, #any_child)
     }.into()
 }
 
