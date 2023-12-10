@@ -1,4 +1,4 @@
-use coenobita::{ cap };
+use coenobita::cap;
 use coenobita::fs;
 
 fn main() {

@@ -4,7 +4,7 @@ use coenobita::fs;
 use std::io;
 
 fn main() -> io::Result<()> {
-    let orig_cap = cap!("examples/files/afternoon_miracle.txt" with (Copy, Delete));
+    let orig_cap = cap!("examples/files/afternoon_miracle.txt" with (Move));
     let renamed_cap = cap!("examples/files/evening_miracle.txt" with (Read, Create));
 
     fs::rename(&orig_cap, &renamed_cap)?;

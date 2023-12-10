@@ -43,10 +43,6 @@ impl<'a> Parse for PathAndPermissions<'a> {
 
         while permission_index < 3 {
             if input.cursor().eof() {
-                if permission_index == 0 {
-                    panic!("[Coenobita] [Error] At least one permission set required.");
-                }
-
                 break;
             }
 

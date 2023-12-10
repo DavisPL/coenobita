@@ -1,5 +1,5 @@
 use coenobita::{ self, cap };
-use coenobita::fs::{ File };
+use coenobita::fs::File;
 
 use std::io::{ self, Read, Write, Seek, SeekFrom };
 
@@ -41,7 +41,7 @@ fn main() -> io::Result<()> {
     println!("{}", rw_buf);
 
     // Now let's see if we can read from a non-readable file or write to a non-writeable file
-    let mut w_buffer = [0; 10];
+    let mut _w_buffer = [0; 10];
     
     // The line below will cause a compiler error because 'Read' isn't implemented
     // for File<NotGranted, Write>

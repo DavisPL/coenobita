@@ -1,4 +1,4 @@
-use coenobita::{ cap };
+use coenobita::cap;
 use std::path::PathBuf;
 
 fn main() {
