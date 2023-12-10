@@ -1,7 +1,7 @@
 pub mod fs;
 pub use macros::cap;
 
-use std::ffi::OsStr;
+use std::ffi::{OsStr, OsString};
 use std::marker::PhantomData;
 use std::path::{Display, Path, PathBuf};
 
@@ -106,6 +106,28 @@ impl<P1, P2, P3, P4, P6, P7, P8> traits::Append for (P1, P2, P3, P4, Append, P6,
 impl<P1, P2, P3, P4, P5, P7, P8> traits::Copy for (P1, P2, P3, P4, P5, Copy, P7, P8) {}
 impl<P1, P2, P3, P4, P5, P6, P8> traits::Move for (P1, P2, P3, P4, P5, P6, Move, P8) {}
 impl<P1, P2, P3, P4, P5, P6, P7> traits::Delete for (P1, P2, P3, P4, P5, P6, P7, Delete) {}
+
+// TODO - Decide where each of these should go, and if it's compatable
+// with the object-capability model
+impl<A1, A2, A3> Capability<A1, A2, A3> {
+    // NOTE - This function cannot exist anymore as path is a private field and
+    // the getter 'get_path' only returns an immutable reference to the path
+    pub fn as_mut_os_string(&mut self) -> &mut OsString {
+        panic!("Unimplemented");
+    }
+
+    // NOTE - Should this coerce to a Capability slice? Something to consider...
+    pub fn as_path(&self) -> &Path {
+        panic!("Unimplemented");
+    }
+
+    // This one is okay though
+    pub fn into_os_string(self) -> OsString {
+        self.path.into_os_string()
+    }
+
+
+}
 
 impl<A1: traits::View, A2, A3> Capability<A1, A2, A3> {
     pub fn file_name(&self) -> Option<&OsStr> {
