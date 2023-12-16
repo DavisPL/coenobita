@@ -1,6 +1,7 @@
 pub mod fs;
 pub use macros::cap;
 
+use std::borrow::Cow;
 use std::ffi::{OsStr, OsString};
 use std::marker::PhantomData;
 use std::path::{Display, Path, PathBuf};
@@ -54,6 +55,55 @@ pub struct Delete;
 pub struct Capability<A, B, C> {
     path: PathBuf,
     phantom: PhantomData<(A, B, C)>,
+}
+
+#[derive(Debug)]
+pub struct CapabilitySlice<A, B, C> {
+    phantom: PhantomData<(A, B, C)>,
+    path: Path
+}
+
+// These are all implemented for Path
+impl<A, B, C> CapabilitySlice<A, B, C> {
+    pub fn new<S: AsRef<OsStr> + ?Sized>(s: &S) -> &CapabilitySlice<A, B, C> {
+        unsafe { &*(s.as_ref() as *const OsStr as *const CapabilitySlice<A, B, C>) }
+    }
+
+    pub fn as_os_str(&self) -> &OsStr {
+        self.path.as_os_str()
+    }
+
+    pub fn to_str(&self) -> Option<&str> {
+        self.path.to_str()
+    }
+
+    pub fn to_string_lossy(&self) -> Cow<'_, str> {
+        self.path.to_string_lossy()
+    }
+
+    // NOTE - This is equivalent to 'to_path_buf'
+    pub fn to_cap(&self) -> Capability<A, B, C> {
+        Capability {
+            path: self.path.to_path_buf(),
+            phantom: PhantomData::<(A, B, C)>
+        }
+    }
+
+    pub fn is_absolute(&self) -> bool {
+        self.path.is_absolute()
+    }
+
+    pub fn is_relative(&self) -> bool {
+        self.path.is_relative()
+    }
+
+    pub fn has_root(&self) -> bool {
+        self.path.has_root()
+    }
+
+    pub fn parent(&self) -> Option<&CapabilitySlice<A, B, C>> {
+        self.path.parent().and_then(|path| Some(CapabilitySlice::new(path)))
+    }
 }
 
 // Implements methods for Capabilities with any permissions
