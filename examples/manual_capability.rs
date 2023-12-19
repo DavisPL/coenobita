@@ -1,10 +1,10 @@
-use coenobita::{ Capability, Read, Copy, Move };
+use coenobita::{ CapBuf, Read, Copy, Move };
 
 fn main() {
-    // Manually creates an instance of Capability with read, copy, and move permissions
-    let _rcm_cap: Capability<
+    // Manually creates an instance of CapBuf with read, copy, and move permissions
+    let _rcm_cap: CapBuf<
         ((), (), Read, (), (), Copy, Move, ()),
         ((), (), (), (), (), (), (), ()),
         ((), (), (), (), (), (), (), ())
-    > = Capability::new("example.txt");
+    > = CapBuf::new("example.txt");
 }

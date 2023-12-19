@@ -2,7 +2,7 @@ use coenobita::cap;
 use coenobita::fs::File;
 
 fn main() -> std::io::Result<()> {
-    // Creates an instance of Capability with read, copy, and move permissions
+    // Creates an instance of CapBuf with read, copy, and move permissions
     let rcm_cap = cap!("examples/files/example.txt" with (Read, View, Copy, Move));
     let cwd_cap = cap!("examples/files/example_copied.txt" with (Delete, Write, Create));
 

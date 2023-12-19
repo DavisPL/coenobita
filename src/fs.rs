@@ -1,7 +1,7 @@
 #![allow(clippy::type_complexity)]
 
 use crate::traits;
-use crate::{Append, Capability, CapabilitySlice, Copy, Create, Delete, Move, Read, View, Write};
+use crate::{Append, CapBuf, Cap, Copy, Create, Delete, Move, Read, View, Write};
 
 use std::fmt;
 use std::marker::PhantomData;
@@ -9,7 +9,7 @@ use std::os::unix::fs::{DirEntryExt, MetadataExt};
 use std::time::SystemTime;
 use std::{fs, io};
 
-// Provides capability-safe wrapper for files with permissions passed as generic type arguments
+// Provides CapBuf-safe wrapper for files with permissions passed as generic type arguments
 // As before, permissions that aren't granted should be represented as the unit type ()
 
 // A -> Create
@@ -24,12 +24,12 @@ pub struct File<A, B, C> {
 }
 
 impl File<(), (), ()> {
-    pub fn open<A1, A2, A3>(cap: &Capability<A1, A2, A3>) -> io::Result<File<A1, A2, A3>> {
+    pub fn open<A1, A2, A3>(cap: &CapBuf<A1, A2, A3>) -> io::Result<File<A1, A2, A3>> {
         fs::OpenOptions::new()
             .read(true)
             .write(true)
             .append(true)
-            .open(cap.get_path())
+            .open(cap.to_path())
             .map(|file| File::<A1, A2, A3> {
                 file,
                 phantom: PhantomData::<(A1, A2, A3)>,
@@ -37,14 +37,14 @@ impl File<(), (), ()> {
     }
 
     pub fn create<A1: traits::Create, A2, A3>(
-        cap: &Capability<A1, A2, A3>,
+        cap: &CapBuf<A1, A2, A3>,
     ) -> io::Result<File<A1, A2, A3>> {
         fs::OpenOptions::new()
             .read(true)
             .write(true)
             .append(true)
             .create(true)
-            .open(cap.get_path())
+            .open(cap.to_path())
             .map(|file| File::<A1, A2, A3> {
                 file,
                 phantom: PhantomData::<(A1, A2, A3)>,
@@ -52,14 +52,14 @@ impl File<(), (), ()> {
     }
 
     pub fn create_new<A1: traits::Create, A2, A3>(
-        cap: &Capability<A1, A2, A3>,
+        cap: &CapBuf<A1, A2, A3>,
     ) -> io::Result<File<A1, A2, A3>> {
         fs::OpenOptions::new()
             .read(true)
             .write(true)
             .append(true)
             .create_new(true)
-            .open(cap.get_path())
+            .open(cap.to_path())
             .map(|file| File::<A1, A2, A3> {
                 file,
                 phantom: PhantomData::<(A1, A2, A3)>,
@@ -112,53 +112,53 @@ impl<A, B, C> io::Seek for File<A, B, C> {
     }
 }
 
-pub fn canonicalize<A1, A2, A3, P>(cap: P) -> io::Result<Capability<A1, A2, A3>>
+pub fn canonicalize<A1, A2, A3, P>(cap: P) -> io::Result<CapBuf<A1, A2, A3>>
 where
-    P: AsRef<CapabilitySlice<A1, A2, A3>>
+    P: AsRef<Cap<A1, A2, A3>>
 {
-    fs::canonicalize(cap.as_ref().to_path()).and_then(|path| Ok(Capability::new(path)))
+    fs::canonicalize(cap.as_ref().to_path()).and_then(|path| Ok(CapBuf::new(path)))
 }
 
 pub fn copy<A1, A2, A3, B1, B2, B3>(
-    from: &Capability<A1, A2, A3>,
-    to: &Capability<B1, B2, B3>,
+    from: &CapBuf<A1, A2, A3>,
+    to: &CapBuf<B1, B2, B3>,
 ) -> io::Result<u64>
 where
     A1: traits::Copy,
     B1: traits::Create,
 {
-    fs::copy(from.get_path(), to.get_path())
+    fs::copy(from.to_path(), to.to_path())
 }
 
-pub fn create_dir<A1: traits::Create, A2, A3>(cap: &Capability<A1, A2, A3>) -> io::Result<()> {
-    fs::create_dir(cap.get_path())
+pub fn create_dir<A1: traits::Create, A2, A3>(cap: &CapBuf<A1, A2, A3>) -> io::Result<()> {
+    fs::create_dir(cap.to_path())
 }
 
-pub fn create_dir_all<A1: traits::Create, A2, A3>(cap: &Capability<A1, A2, A3>) -> io::Result<()> {
-    fs::create_dir_all(cap.get_path())
+pub fn create_dir_all<A1: traits::Create, A2, A3>(cap: &CapBuf<A1, A2, A3>) -> io::Result<()> {
+    fs::create_dir_all(cap.to_path())
 }
 
 pub fn hard_link<A1: traits::View, A2, A3, B1: traits::Create, B2, B3>(
-    _original: &Capability<A1, A2, A3>,
-    _link: &Capability<B1, B2, B3>,
+    _original: &CapBuf<A1, A2, A3>,
+    _link: &CapBuf<B1, B2, B3>,
 ) -> io::Result<()> {
     panic!("[Coenobita] [ERROR] Hard linking is not supported yet.");
 }
 
 pub fn metadata<A1: traits::View, A2, A3, P>(cap: P) -> io::Result<Metadata>
 where
-    P: AsRef<CapabilitySlice<A1, A2, A3>>
+    P: AsRef<Cap<A1, A2, A3>>
 {
     Ok(Metadata(fs::metadata(cap.as_ref().to_path())?))
 }
 
-pub fn read<A1: traits::Read, A2, A3>(cap: &Capability<A1, A2, A3>) -> io::Result<Vec<u8>> {
-    fs::read(cap.get_path())
+pub fn read<A1: traits::Read, A2, A3>(cap: &CapBuf<A1, A2, A3>) -> io::Result<Vec<u8>> {
+    fs::read(cap.to_path())
 }
 
 pub fn read_dir<A1: traits::Read, A2, A3, P>(cap: P) -> io::Result<ReadDir<A1, A2, A3>>
 where
-    P: AsRef<CapabilitySlice<A1, A2, A3>>
+    P: AsRef<Cap<A1, A2, A3>>
 {
     fs::read_dir(cap.as_ref().to_path()).map(|r| ReadDir {
         _read_dir: r,
@@ -166,64 +166,64 @@ where
     })
 }
 
-pub fn read_link<A1: traits::View, A2, A3, P>(cap: P) -> io::Result<Capability<A1, A2, A3>> 
+pub fn read_link<A1: traits::View, A2, A3, P>(cap: P) -> io::Result<CapBuf<A1, A2, A3>> 
 where
-    P: AsRef<CapabilitySlice<A1, A2, A3>>
+    P: AsRef<Cap<A1, A2, A3>>
 {
-    fs::read_link(cap.as_ref().to_path()).and_then(|path| Ok(Capability::new(path)))
+    fs::read_link(cap.as_ref().to_path()).and_then(|path| Ok(CapBuf::new(path)))
 }
 
 pub fn read_to_string<A1: traits::Read, A2, A3>(
-    cap: &Capability<A1, A2, A3>,
+    cap: &CapBuf<A1, A2, A3>,
 ) -> io::Result<String> {
-    fs::read_to_string(cap.get_path())
+    fs::read_to_string(cap.to_path())
 }
 
-pub fn remove_dir<A1: traits::Delete, A2, A3>(cap: &Capability<A1, A2, A3>) -> io::Result<()> {
-    fs::remove_dir(cap.get_path())
+pub fn remove_dir<A1: traits::Delete, A2, A3>(cap: &CapBuf<A1, A2, A3>) -> io::Result<()> {
+    fs::remove_dir(cap.to_path())
 }
 
 pub fn remove_dir_all<A1: traits::Delete, A2, A3: traits::Delete>(
-    cap: &Capability<A1, A2, A3>,
+    cap: &CapBuf<A1, A2, A3>,
 ) -> io::Result<()> {
-    fs::remove_dir_all(cap.get_path())
+    fs::remove_dir_all(cap.to_path())
 }
 
-pub fn remove_file<A1: traits::Delete, A2, A3>(cap: &Capability<A1, A2, A3>) -> io::Result<()> {
-    fs::remove_file(cap.get_path())
+pub fn remove_file<A1: traits::Delete, A2, A3>(cap: &CapBuf<A1, A2, A3>) -> io::Result<()> {
+    fs::remove_file(cap.to_path())
 }
 
 pub fn rename<A1, A2, A3, B1, B2, B3>(
-    from: &Capability<A1, A2, A3>,
-    to: &Capability<B1, B2, B3>,
+    from: &CapBuf<A1, A2, A3>,
+    to: &CapBuf<B1, B2, B3>,
 ) -> io::Result<()>
 where
     A1: traits::Move,
     B1: traits::Create,
 {
-    fs::rename(from.get_path(), to.get_path())
+    fs::rename(from.to_path(), to.to_path())
 }
 
 // NOTE - Reconsider this functon and the permissions required
 pub fn set_permissions<A, B>(
-    cap: &Capability<(Create, View, Read, Write, Append, Copy, Move, Delete), A, B>,
+    cap: &CapBuf<(Create, View, Read, Write, Append, Copy, Move, Delete), A, B>,
     perm: fs::Permissions,
 ) -> io::Result<()> {
-    fs::set_permissions(cap.get_path(), perm)
+    fs::set_permissions(cap.to_path(), perm)
 }
 
 pub fn symlink_metadata<A1: traits::View, A2, A3, P>(cap: P) -> io::Result<Metadata>
 where
-    P: AsRef<CapabilitySlice<A1, A2, A3>>
+    P: AsRef<Cap<A1, A2, A3>>
 {
     Ok(Metadata(fs::symlink_metadata(cap.as_ref().to_path())?))
 }
 
 pub fn write<A1: traits::Write, A2, A3, J: AsRef<[u8]>>(
-    cap: &Capability<A1, A2, A3>,
+    cap: &CapBuf<A1, A2, A3>,
     contents: J,
 ) -> io::Result<()> {
-    fs::write(cap.get_path(), contents)
+    fs::write(cap.to_path(), contents)
 }
 
 pub struct Metadata(fs::Metadata);
@@ -297,8 +297,8 @@ pub struct DirEntry<A, B, C> {
 }
 
 impl<A, B, C> DirEntry<A, B, C> {
-    pub fn path(&self) -> Capability<A, B, C> {
-        Capability {
+    pub fn path(&self) -> CapBuf<A, B, C> {
+        CapBuf {
             path: self._entry.path(),
             phantom: PhantomData::<(A, B, C)>,
         }

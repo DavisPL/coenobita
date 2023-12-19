@@ -100,7 +100,7 @@ pub fn cap(input: TokenStream) -> TokenStream {
 
     // Generate the output struct using the extracted values
     quote! {
-        coenobita::capability(#path, #direct, #imm_child, #any_child)
+        coenobita::Cap::<#direct, #imm_child, #any_child>::new(#path)
     }.into()
 }
 
