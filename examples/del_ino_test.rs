@@ -1,12 +1,10 @@
-use std::fs;
-use std::os::unix::fs::MetadataExt;
+use coenobita::{cap, fs};
 use std::io;
 
 fn main() -> io::Result<()> {
-    let meta = fs::metadata("examples/files/example.txt")?;
+    let meta = fs::metadata(cap!("examples/files/example.txt" with (View)))?;
     let inode = meta.ino();
     
     println!("{}", inode);
-
     Ok(())
 }

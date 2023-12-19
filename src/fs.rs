@@ -24,42 +24,49 @@ pub struct File<A, B, C> {
 }
 
 impl File<(), (), ()> {
-    pub fn open<A1, A2, A3>(cap: &CapBuf<A1, A2, A3>) -> io::Result<File<A1, A2, A3>> {
+    pub fn open<A1, A2, A3, P>(cap: P) -> io::Result<File<A1, A2, A3>>
+	where
+		P: AsRef<Cap<A1, A2, A3>>
+	{
         fs::OpenOptions::new()
             .read(true)
             .write(true)
             .append(true)
-            .open(cap.to_path())
+            .open(cap.as_ref().to_path())
             .map(|file| File::<A1, A2, A3> {
                 file,
                 phantom: PhantomData::<(A1, A2, A3)>,
             })
     }
 
-    pub fn create<A1: traits::Create, A2, A3>(
-        cap: &CapBuf<A1, A2, A3>,
-    ) -> io::Result<File<A1, A2, A3>> {
+    pub fn create<A1, A2, A3, P>(cap: P) -> io::Result<File<A1, A2, A3>>
+	where
+		A1: traits::Create,
+		P: AsRef<Cap<A1, A2, A3>>
+	{
         fs::OpenOptions::new()
             .read(true)
             .write(true)
             .append(true)
             .create(true)
-            .open(cap.to_path())
+            .open(cap.as_ref().to_path())
             .map(|file| File::<A1, A2, A3> {
                 file,
                 phantom: PhantomData::<(A1, A2, A3)>,
             })
     }
 
-    pub fn create_new<A1: traits::Create, A2, A3>(
-        cap: &CapBuf<A1, A2, A3>,
-    ) -> io::Result<File<A1, A2, A3>> {
+    pub fn create_new<A1: traits::Create, A2, A3, P>(cap: P) -> io::Result<File<A1, A2, A3>>
+	where
+		A1: traits::Create,
+		P: AsRef<Cap<A1, A2, A3>>
+	{
         fs::OpenOptions::new()
             .read(true)
             .write(true)
             .append(true)
             .create_new(true)
-            .open(cap.to_path())
+            .open(cap.as_ref().to_path())
             .map(|file| File::<A1, A2, A3> {
                 file,
                 phantom: PhantomData::<(A1, A2, A3)>,
@@ -119,15 +126,14 @@ where
     fs::canonicalize(cap.as_ref().to_path()).and_then(|path| Ok(CapBuf::new(path)))
 }
 
-pub fn copy<A1, A2, A3, B1, B2, B3>(
-    from: &CapBuf<A1, A2, A3>,
-    to: &CapBuf<B1, B2, B3>,
-) -> io::Result<u64>
+pub fn copy<A1, A2, A3, B1, B2, B3, P1, P2>(from: P1,to: P2,) -> io::Result<u64>
 where
-    A1: traits::Copy,
-    B1: traits::Create,
+	A1: traits::Copy,
+	B1: traits::Create,
+	P1: AsRef<Cap<A1, A2, A3>>,
+	P2: AsRef<Cap<B1, B2, B3>>
 {
-    fs::copy(from.to_path(), to.to_path())
+    fs::copy(from.as_ref().to_path(), to.as_ref().to_path())
 }
 
 pub fn create_dir<A1: traits::Create, A2, A3>(cap: &CapBuf<A1, A2, A3>) -> io::Result<()> {
@@ -173,10 +179,12 @@ where
     fs::read_link(cap.as_ref().to_path()).and_then(|path| Ok(CapBuf::new(path)))
 }
 
-pub fn read_to_string<A1: traits::Read, A2, A3>(
-    cap: &CapBuf<A1, A2, A3>,
-) -> io::Result<String> {
-    fs::read_to_string(cap.to_path())
+pub fn read_to_string<A1, A2, A3, P>(cap: P) -> io::Result<String>
+where
+	A1: traits::Read,
+	P: AsRef<Cap<A1, A2, A3>>
+{
+    fs::read_to_string(cap.as_ref().to_path())
 }
 
 pub fn remove_dir<A1: traits::Delete, A2, A3>(cap: &CapBuf<A1, A2, A3>) -> io::Result<()> {
@@ -193,15 +201,14 @@ pub fn remove_file<A1: traits::Delete, A2, A3>(cap: &CapBuf<A1, A2, A3>) -> io::
     fs::remove_file(cap.to_path())
 }
 
-pub fn rename<A1, A2, A3, B1, B2, B3>(
-    from: &CapBuf<A1, A2, A3>,
-    to: &CapBuf<B1, B2, B3>,
-) -> io::Result<()>
+pub fn rename<A1, A2, A3, B1, B2, B3, P1, P2>(from: P1, to: P2,) -> io::Result<()>
 where
     A1: traits::Move,
     B1: traits::Create,
+	P1: AsRef<Cap<A1, A2, A3>>,
+	P2: AsRef<Cap<B1, B2, B3>>
 {
-    fs::rename(from.to_path(), to.to_path())
+    fs::rename(from.as_ref().to_path(), to.as_ref().to_path())
 }
 
 // NOTE - Reconsider this functon and the permissions required

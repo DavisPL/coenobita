@@ -1,7 +1,6 @@
+use std::io::{ self, Read, Write, Seek, SeekFrom };
 use coenobita::{ self, cap };
 use coenobita::fs::File;
-
-use std::io::{ self, Read, Write, Seek, SeekFrom };
 
 fn main() -> io::Result<()> {
     // Create capabilities with only Read/Write, Read, and Write permissions
@@ -11,10 +10,10 @@ fn main() -> io::Result<()> {
     let noperms_cap = cap!("examples/files/mc_original.txt");
 
     // Open files using capabilities
-    let mut rw_file = File::open(&rw_cap)?;
-    let mut r_file = File::open(&r_cap)?;
-    let mut w_file = File::open(&w_cap)?;
-    let mut file = File::open(&noperms_cap)?;
+    let mut rw_file = File::open(rw_cap)?;
+    let mut r_file = File::open(r_cap)?;
+    let mut w_file = File::open(w_cap)?;
+    let mut file = File::open(noperms_cap)?;
 
     // Print files to confirm permissions are correct
     println!("{:?}", rw_file);

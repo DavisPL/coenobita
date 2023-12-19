@@ -10,11 +10,11 @@ fn main() -> std::io::Result<()> {
     // let file = File::create(&rcm_cap);
 
     // This line succeeds since all permissions are given
-    let file = File::create(&cwd_cap)?;
+    let file = File::create(cwd_cap)?;
     println!("{:?}", file);
 
     // Now we'll open the other file and read its metadata
-    let readonly_file = File::open(&rcm_cap)?;
+    let readonly_file = File::open(rcm_cap)?;
     let metadata = readonly_file.metadata()?;
     println!("{:?}", metadata);
 
