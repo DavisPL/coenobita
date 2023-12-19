@@ -1,13 +1,13 @@
 #![allow(clippy::type_complexity)]
 
 use crate::traits;
-use crate::{Append, Capability, Copy, Create, Delete, Move, Read, View, Write};
+use crate::{Append, Capability, CapabilitySlice, Copy, Create, Delete, Move, Read, View, Write};
 
 use std::fmt;
 use std::marker::PhantomData;
 use std::os::unix::fs::{DirEntryExt, MetadataExt};
 use std::time::SystemTime;
-use std::{fs, io, path};
+use std::{fs, io};
 
 // Provides capability-safe wrapper for files with permissions passed as generic type arguments
 // As before, permissions that aren't granted should be represented as the unit type ()
@@ -112,8 +112,11 @@ impl<A, B, C> io::Seek for File<A, B, C> {
     }
 }
 
-pub fn canonicalize<A1, A2, A3>(cap: &Capability<A1, A2, A3>) -> io::Result<path::PathBuf> {
-    fs::canonicalize(cap.get_path())
+pub fn canonicalize<A1, A2, A3, P>(cap: P) -> io::Result<Capability<A1, A2, A3>>
+where
+    P: AsRef<CapabilitySlice<A1, A2, A3>>
+{
+    fs::canonicalize(cap.as_ref().to_path()).and_then(|path| Ok(Capability::new(path)))
 }
 
 pub fn copy<A1, A2, A3, B1, B2, B3>(
@@ -142,27 +145,32 @@ pub fn hard_link<A1: traits::View, A2, A3, B1: traits::Create, B2, B3>(
     panic!("[Coenobita] [ERROR] Hard linking is not supported yet.");
 }
 
-pub fn metadata<A1: traits::View, A2, A3>(cap: &Capability<A1, A2, A3>) -> io::Result<Metadata> {
-    Ok(Metadata(fs::metadata(cap.get_path())?))
+pub fn metadata<A1: traits::View, A2, A3, P>(cap: P) -> io::Result<Metadata>
+where
+    P: AsRef<CapabilitySlice<A1, A2, A3>>
+{
+    Ok(Metadata(fs::metadata(cap.as_ref().to_path())?))
 }
 
 pub fn read<A1: traits::Read, A2, A3>(cap: &Capability<A1, A2, A3>) -> io::Result<Vec<u8>> {
     fs::read(cap.get_path())
 }
 
-pub fn read_dir<A1: traits::Read, A2, A3>(
-    cap: &Capability<A1, A2, A3>,
-) -> io::Result<ReadDir<A1, A2, A3>> {
-    fs::read_dir(cap.get_path()).map(|r| ReadDir {
+pub fn read_dir<A1: traits::Read, A2, A3, P>(cap: P) -> io::Result<ReadDir<A1, A2, A3>>
+where
+    P: AsRef<CapabilitySlice<A1, A2, A3>>
+{
+    fs::read_dir(cap.as_ref().to_path()).map(|r| ReadDir {
         _read_dir: r,
         phantom: PhantomData::<(A1, A2, A3)>,
     })
 }
 
-pub fn read_link<A1: traits::Read, A2, A3>(
-    cap: &Capability<A1, A2, A3>,
-) -> io::Result<path::PathBuf> {
-    fs::read_link(cap.get_path())
+pub fn read_link<A1: traits::View, A2, A3, P>(cap: P) -> io::Result<Capability<A1, A2, A3>> 
+where
+    P: AsRef<CapabilitySlice<A1, A2, A3>>
+{
+    fs::read_link(cap.as_ref().to_path()).and_then(|path| Ok(Capability::new(path)))
 }
 
 pub fn read_to_string<A1: traits::Read, A2, A3>(
@@ -204,10 +212,11 @@ pub fn set_permissions<A, B>(
     fs::set_permissions(cap.get_path(), perm)
 }
 
-pub fn symlink_metadata<A1: traits::View, A2, A3>(
-    cap: &Capability<A1, A2, A3>,
-) -> io::Result<Metadata> {
-    Ok(Metadata(fs::symlink_metadata(cap.get_path())?))
+pub fn symlink_metadata<A1: traits::View, A2, A3, P>(cap: P) -> io::Result<Metadata>
+where
+    P: AsRef<CapabilitySlice<A1, A2, A3>>
+{
+    Ok(Metadata(fs::symlink_metadata(cap.as_ref().to_path())?))
 }
 
 pub fn write<A1: traits::Write, A2, A3, J: AsRef<[u8]>>(

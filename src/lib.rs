@@ -1,11 +1,20 @@
 pub mod fs;
 pub use macros::cap;
 
+use std::ops;
 use std::borrow::Cow;
 use std::ffi::{OsStr, OsString};
 use std::marker::PhantomData;
-use std::path::{Display, Path, PathBuf, StripPrefixError};
+use std::path::{
+    Display,
+    Path,
+    PathBuf,
+    StripPrefixError,
+    Components,
+    Iter
+};
 use std::iter::FusedIterator;
+use std::io;
 
 #[derive(Debug)]
 pub struct Create;
@@ -62,6 +71,29 @@ pub struct Capability<A, B, C> {
 pub struct CapabilitySlice<A, B, C> {
     phantom: PhantomData<(A, B, C)>,
     path: Path
+}
+
+impl<A, B, C> ops::Deref for Capability<A, B, C> {
+    type Target = CapabilitySlice<A, B, C>;
+
+    #[inline]
+    fn deref(&self) -> &CapabilitySlice<A, B, C> {
+        CapabilitySlice::new(&self.path)
+    }
+}
+
+impl<A, B, C> AsRef<CapabilitySlice<A, B, C>> for CapabilitySlice<A, B, C> {
+    #[inline]
+    fn as_ref(&self) -> &CapabilitySlice<A, B, C> {
+        self
+    }
+}
+
+impl<A, B, C> AsRef<CapabilitySlice<A, B, C>> for Capability<A, B, C> {
+    #[inline]
+    fn as_ref(&self) -> &CapabilitySlice<A, B, C> {
+        self
+    }
 }
 
 #[derive(Debug)]
@@ -160,6 +192,87 @@ impl<A, B, C> CapabilitySlice<A, B, C> {
     pub fn to_path(&self) -> &Path {
         &self.path
     }
+
+    // TODO - Return to this one later...
+
+    // It should be okay in its current form because it's just returning an iterator
+    // that contains the internal path as a u8 slice and returns &OsStr values, but
+    // it could be potentially useful to return capability slice values as well. Is
+    // that compatible with the object-capability model?
+
+    pub fn components(&self) -> Components<'_> {
+        self.path.components()
+    }
+
+    // NOTE - See above
+    pub fn iter(&self) -> Iter<'_> {
+        self.path.iter()
+    }
+
+    // NOTE - Should this display only the internal path, or associated
+    // permissions as well?
+    pub fn display(&self) -> Display<'_> {
+        self.path.display()
+    }
+}
+
+impl<A: traits::View, B, C> CapabilitySlice<A, B, C> {
+    pub fn metadata(&self) -> io::Result<fs::Metadata> {
+        fs::metadata(self)
+    }
+
+    pub fn symlink_metadata(&self) -> io::Result<fs::Metadata> {
+        fs::symlink_metadata(self)
+    }
+
+    pub fn canonicalize(&self) -> io::Result<Capability<A, B, C>> {
+        fs::canonicalize(self)
+    }
+
+    pub fn read_link(&self) -> io::Result<Capability<A, B, C>> {
+        fs::read_link(self)
+    }
+
+    pub fn exists(&self) -> bool {
+        self.path.exists()
+    }
+
+    pub fn try_exists(&self) -> io::Result<bool> {
+        self.path.try_exists()
+    }
+
+    pub fn is_file(&self) -> bool {
+        self.path.is_file()
+    }
+
+    pub fn is_dir(&self) -> bool {
+        self.path.is_dir()
+    }
+
+    pub fn is_symlink(&self) -> bool {
+        self.path.is_symlink()
+    }
+
+    // NOTE - Corresponds to 'into_path_buf'
+    
+    // This _should_ convert a Box<CapabilitySlice> into a Capability without
+    // copying or allocating... in its current form, I don't think it does that
+    
+    /*pub fn into_cap(self: Box<CapabilitySlice<A, B, C>) -> Capability<A, B, C> {
+        /* let rw = Box::into_raw(self) as *mut OsStr;
+         * let inner = unsafe { Box::from_raw(rw) };
+         * PathBuf { inner: OsString::from(inner) }
+         */
+
+        Capability::new(self.path.into_path_buf())
+    }*/
+}
+
+impl<A: traits::Read, B, C> CapabilitySlice<A, B, C> {
+    // TODO - Implement under different trait bound (maybe C: traits::View)
+    pub fn read_dir(&self) -> io::Result<fs::ReadDir<A, B, C>> {
+        fs::read_dir(self)
+    }
 }
 
 // Implements methods for Capabilities with any permissions
@@ -171,12 +284,17 @@ impl<A, B, C> Capability<A, B, C> {
         }
     }
 
+    // TODO - Replace all invocations of this function with 'to_path'
     pub fn get_path(&self) -> &PathBuf {
         &self.path
     }
 
     pub fn display(&self) -> Display<'_> {
         self.get_path().display()
+    }
+
+    pub fn to_path(&self) -> &Path {
+        &self.path
     }
 }
 
