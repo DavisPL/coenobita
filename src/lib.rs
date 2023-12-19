@@ -4,7 +4,8 @@ pub use macros::cap;
 use std::borrow::Cow;
 use std::ffi::{OsStr, OsString};
 use std::marker::PhantomData;
-use std::path::{Display, Path, PathBuf};
+use std::path::{Display, Path, PathBuf, StripPrefixError};
+use std::iter::FusedIterator;
 
 #[derive(Debug)]
 pub struct Create;
@@ -63,6 +64,25 @@ pub struct CapabilitySlice<A, B, C> {
     path: Path
 }
 
+#[derive(Debug)]
+pub struct Ancestors<'a, A, B, C> {
+    next: Option<&'a CapabilitySlice<A, B, C>>,
+}
+
+impl<'a, A, B, C> Iterator for Ancestors<'a, A, B, C> {
+    type Item = &'a CapabilitySlice<A, B, C>;
+
+    #[inline]
+    fn next(&mut self) -> Option<Self::Item> {
+        let next = self.next;
+        self.next = next.and_then(CapabilitySlice::<A, B, C>::parent);
+        next
+    }
+}
+
+// NOTE - Currently not used anywhere AFAIK, may be unnecessary
+impl<A, B, C> FusedIterator for Ancestors<'_, A, B, C> {}
+
 // These are all implemented for Path
 impl<A, B, C> CapabilitySlice<A, B, C> {
     pub fn new<S: AsRef<OsStr> + ?Sized>(s: &S) -> &CapabilitySlice<A, B, C> {
@@ -84,6 +104,7 @@ impl<A, B, C> CapabilitySlice<A, B, C> {
     // NOTE - This is equivalent to 'to_path_buf'
     pub fn to_cap(&self) -> Capability<A, B, C> {
         Capability {
+            // path: PathBuf::from(self.path.to_os_string()),
             path: self.path.to_path_buf(),
             phantom: PhantomData::<(A, B, C)>
         }
@@ -103,6 +124,41 @@ impl<A, B, C> CapabilitySlice<A, B, C> {
 
     pub fn parent(&self) -> Option<&CapabilitySlice<A, B, C>> {
         self.path.parent().and_then(|path| Some(CapabilitySlice::new(path)))
+    }
+
+    pub fn ancestors(&self) -> Ancestors<'_, A, B, C> {
+        Ancestors { next: Some(&self) }
+    }
+
+    pub fn file_name(&self) -> Option<&OsStr> {
+        self.path.file_name()
+    }
+
+    // TODO - Change from 'CapabilitySlice' to 'AsRef<CapabilitySlice>'
+    pub fn strip_prefix(&self, base: &CapabilitySlice<A, B, C>) -> Result<&CapabilitySlice<A, B, C>, StripPrefixError> {
+        self.path.strip_prefix(base.to_path()).and_then(|path| Ok(CapabilitySlice::new(path)))
+    }
+
+    // TODO - Change from 'CapabilitySlice' to 'AsRef<CapabilitySlice>'
+    pub fn starts_with(&self, base: &CapabilitySlice<A, B, C>) -> bool {
+        self.path.starts_with(base.to_path())
+    }
+
+    // TODO - Change from 'CapabilitySlice' to 'AsRef<CapabilitySlice>'
+    pub fn ends_with(&self, base: &CapabilitySlice<A, B, C>) -> bool {
+        self.path.ends_with(base.to_path())
+    }
+
+    pub fn file_stem(&self) -> Option<&OsStr> {
+        self.path.file_stem()
+    }
+
+    pub fn extension(&self) -> Option<&OsStr> {
+        self.path.extension()
+    }
+
+    pub fn to_path(&self) -> &Path {
+        &self.path
     }
 }
 
