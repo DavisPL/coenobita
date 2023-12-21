@@ -7,8 +7,13 @@ fn main() {
 
     match fs::copy(rcm_cap, wd_cap) {
         Ok(bytes) => {
-            println!("Successfully copied {} bytes from {:?} to {:?}", bytes, rcm_cap.to_path(), wd_cap.to_path());
-        },
+            println!(
+                "Successfully copied {} bytes from {:?} to {:?}",
+                bytes,
+                rcm_cap.to_path(),
+                wd_cap.to_path()
+            );
+        }
 
         Err(details) => {
             println!("Failed to copy - {:?}", details);

@@ -1,21 +1,13 @@
 #![allow(clippy::type_complexity)]
 
 use crate::traits;
-use crate::{Append, CapBuf, Cap, Copy, Create, Delete, Move, Read, View, Write};
+use crate::{Append, Cap, CapBuf, Copy, Create, Delete, Move, Read, View, Write};
 
 use std::fmt;
 use std::marker::PhantomData;
 use std::os::unix::fs::{DirEntryExt, MetadataExt};
 use std::time::SystemTime;
 use std::{fs, io};
-
-// Provides CapBuf-safe wrapper for files with permissions passed as generic type arguments
-// As before, permissions that aren't granted should be represented as the unit type ()
-
-// A -> Create
-// B -> View
-// C -> Read
-// D -> Write
 
 #[derive(Debug)]
 pub struct File<A, B, C> {
@@ -25,9 +17,9 @@ pub struct File<A, B, C> {
 
 impl File<(), (), ()> {
     pub fn open<A1, A2, A3, P>(cap: P) -> io::Result<File<A1, A2, A3>>
-	where
-		P: AsRef<Cap<A1, A2, A3>>
-	{
+    where
+        P: AsRef<Cap<A1, A2, A3>>,
+    {
         fs::OpenOptions::new()
             .read(true)
             .write(true)
@@ -40,10 +32,10 @@ impl File<(), (), ()> {
     }
 
     pub fn create<A1, A2, A3, P>(cap: P) -> io::Result<File<A1, A2, A3>>
-	where
-		A1: traits::Create,
-		P: AsRef<Cap<A1, A2, A3>>
-	{
+    where
+        A1: traits::Create,
+        P: AsRef<Cap<A1, A2, A3>>,
+    {
         fs::OpenOptions::new()
             .read(true)
             .write(true)
@@ -57,10 +49,10 @@ impl File<(), (), ()> {
     }
 
     pub fn create_new<A1: traits::Create, A2, A3, P>(cap: P) -> io::Result<File<A1, A2, A3>>
-	where
-		A1: traits::Create,
-		P: AsRef<Cap<A1, A2, A3>>
-	{
+    where
+        A1: traits::Create,
+        P: AsRef<Cap<A1, A2, A3>>,
+    {
         fs::OpenOptions::new()
             .read(true)
             .write(true)
@@ -121,17 +113,17 @@ impl<A, B, C> io::Seek for File<A, B, C> {
 
 pub fn canonicalize<A1, A2, A3, P>(cap: P) -> io::Result<CapBuf<A1, A2, A3>>
 where
-    P: AsRef<Cap<A1, A2, A3>>
+    P: AsRef<Cap<A1, A2, A3>>,
 {
-    fs::canonicalize(cap.as_ref().to_path()).and_then(|path| Ok(CapBuf::new(path)))
+    fs::canonicalize(cap.as_ref().to_path()).map(|path| CapBuf::new(path))
 }
 
-pub fn copy<A1, A2, A3, B1, B2, B3, P1, P2>(from: P1,to: P2,) -> io::Result<u64>
+pub fn copy<A1, A2, A3, B1, B2, B3, P1, P2>(from: P1, to: P2) -> io::Result<u64>
 where
-	A1: traits::Copy,
-	B1: traits::Create,
-	P1: AsRef<Cap<A1, A2, A3>>,
-	P2: AsRef<Cap<B1, B2, B3>>
+    A1: traits::Copy,
+    B1: traits::Create,
+    P1: AsRef<Cap<A1, A2, A3>>,
+    P2: AsRef<Cap<B1, B2, B3>>,
 {
     fs::copy(from.as_ref().to_path(), to.as_ref().to_path())
 }
@@ -153,7 +145,7 @@ pub fn hard_link<A1: traits::View, A2, A3, B1: traits::Create, B2, B3>(
 
 pub fn metadata<A1: traits::View, A2, A3, P>(cap: P) -> io::Result<Metadata>
 where
-    P: AsRef<Cap<A1, A2, A3>>
+    P: AsRef<Cap<A1, A2, A3>>,
 {
     Ok(Metadata(fs::metadata(cap.as_ref().to_path())?))
 }
@@ -164,7 +156,7 @@ pub fn read<A1: traits::Read, A2, A3>(cap: &CapBuf<A1, A2, A3>) -> io::Result<Ve
 
 pub fn read_dir<A1: traits::Read, A2, A3, P>(cap: P) -> io::Result<ReadDir<A1, A2, A3>>
 where
-    P: AsRef<Cap<A1, A2, A3>>
+    P: AsRef<Cap<A1, A2, A3>>,
 {
     fs::read_dir(cap.as_ref().to_path()).map(|r| ReadDir {
         _read_dir: r,
@@ -172,17 +164,17 @@ where
     })
 }
 
-pub fn read_link<A1: traits::View, A2, A3, P>(cap: P) -> io::Result<CapBuf<A1, A2, A3>> 
+pub fn read_link<A1: traits::View, A2, A3, P>(cap: P) -> io::Result<CapBuf<A1, A2, A3>>
 where
-    P: AsRef<Cap<A1, A2, A3>>
+    P: AsRef<Cap<A1, A2, A3>>,
 {
-    fs::read_link(cap.as_ref().to_path()).and_then(|path| Ok(CapBuf::new(path)))
+    fs::read_link(cap.as_ref().to_path()).map(|path| CapBuf::new(path))
 }
 
 pub fn read_to_string<A1, A2, A3, P>(cap: P) -> io::Result<String>
 where
-	A1: traits::Read,
-	P: AsRef<Cap<A1, A2, A3>>
+    A1: traits::Read,
+    P: AsRef<Cap<A1, A2, A3>>,
 {
     fs::read_to_string(cap.as_ref().to_path())
 }
@@ -201,12 +193,12 @@ pub fn remove_file<A1: traits::Delete, A2, A3>(cap: &CapBuf<A1, A2, A3>) -> io::
     fs::remove_file(cap.to_path())
 }
 
-pub fn rename<A1, A2, A3, B1, B2, B3, P1, P2>(from: P1, to: P2,) -> io::Result<()>
+pub fn rename<A1, A2, A3, B1, B2, B3, P1, P2>(from: P1, to: P2) -> io::Result<()>
 where
     A1: traits::Move,
     B1: traits::Create,
-	P1: AsRef<Cap<A1, A2, A3>>,
-	P2: AsRef<Cap<B1, B2, B3>>
+    P1: AsRef<Cap<A1, A2, A3>>,
+    P2: AsRef<Cap<B1, B2, B3>>,
 {
     fs::rename(from.as_ref().to_path(), to.as_ref().to_path())
 }
@@ -221,7 +213,7 @@ pub fn set_permissions<A, B>(
 
 pub fn symlink_metadata<A1: traits::View, A2, A3, P>(cap: P) -> io::Result<Metadata>
 where
-    P: AsRef<Cap<A1, A2, A3>>
+    P: AsRef<Cap<A1, A2, A3>>,
 {
     Ok(Metadata(fs::symlink_metadata(cap.as_ref().to_path())?))
 }

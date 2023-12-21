@@ -1,6 +1,6 @@
-use std::io::{ self, Read, Write, Seek, SeekFrom };
-use coenobita::{ self, cap };
 use coenobita::fs::File;
+use coenobita::{self, cap};
+use std::io::{self, Read, Seek, SeekFrom, Write};
 
 fn main() -> io::Result<()> {
     // Create capabilities with only Read/Write, Read, and Write permissions
@@ -23,10 +23,14 @@ fn main() -> io::Result<()> {
     // Read from 'r_file'
     let mut r_buffer = [0; 10];
     let n = r_file.read(&mut r_buffer[..])?;
-    println!("Success! We just read bytes {:?} from the file.", &r_buffer[..n]);
-   
+    println!(
+        "Success! We just read bytes {:?} from the file.",
+        &r_buffer[..n]
+    );
+
     // Write to 'w_file'
-    let n = w_file.write(b"This excerpt is from the beginning of Dumas's The Count of Monte Cristo")?;
+    let n =
+        w_file.write(b"This excerpt is from the beginning of Dumas's The Count of Monte Cristo")?;
     println!("Success! We just wrote {:?} bytes to the file buffer.", n);
 
     // Test seeking using 'rw_file'
@@ -41,7 +45,7 @@ fn main() -> io::Result<()> {
 
     // Now let's see if we can read from a non-readable file or write to a non-writeable file
     let mut _w_buffer = [0; 10];
-    
+
     // The line below will cause a compiler error because 'Read' isn't implemented
     // for File<NotGranted, Write>
     // let n = w_file.read(&mut w_buffer[..])?;

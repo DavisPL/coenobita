@@ -1,20 +1,13 @@
 pub mod fs;
 pub use macros::cap;
 
-use std::ops;
 use std::borrow::Cow;
 use std::ffi::{OsStr, OsString};
-use std::marker::PhantomData;
-use std::path::{
-    Display,
-    Path,
-    PathBuf,
-    StripPrefixError,
-    Components,
-    Iter
-};
-use std::iter::FusedIterator;
 use std::io;
+use std::iter::FusedIterator;
+use std::marker::PhantomData;
+use std::ops;
+use std::path::{Components, Display, Iter, Path, PathBuf, StripPrefixError};
 
 #[derive(Debug)]
 pub struct Create;
@@ -70,7 +63,7 @@ pub struct CapBuf<A, B, C> {
 #[derive(Debug)]
 pub struct Cap<A, B, C> {
     phantom: PhantomData<(A, B, C)>,
-    path: Path
+    path: Path,
 }
 
 impl<A, B, C> ops::Deref for CapBuf<A, B, C> {
@@ -138,7 +131,7 @@ impl<A, B, C> Cap<A, B, C> {
         CapBuf {
             // path: PathBuf::from(self.path.to_os_string()),
             path: self.path.to_path_buf(),
-            phantom: PhantomData::<(A, B, C)>
+            phantom: PhantomData::<(A, B, C)>,
         }
     }
 
@@ -155,28 +148,27 @@ impl<A, B, C> Cap<A, B, C> {
     }
 
     pub fn parent(&self) -> Option<&Cap<A, B, C>> {
-        self.path.parent().and_then(|path| Some(Cap::new(path)))
+        self.path.parent().map(|path| Cap::new(path))
     }
 
     pub fn ancestors(&self) -> Ancestors<'_, A, B, C> {
-        Ancestors { next: Some(&self) }
+        Ancestors { next: Some(self) }
     }
 
     pub fn file_name(&self) -> Option<&OsStr> {
         self.path.file_name()
     }
 
-    // TODO - Change from 'Cap' to 'AsRef<Cap>'
     pub fn strip_prefix(&self, base: &Cap<A, B, C>) -> Result<&Cap<A, B, C>, StripPrefixError> {
-        self.path.strip_prefix(base.to_path()).and_then(|path| Ok(Cap::new(path)))
+        self.path
+            .strip_prefix(base.to_path())
+            .map(|path| Cap::new(path))
     }
 
-    // TODO - Change from 'Cap' to 'AsRef<Cap>'
     pub fn starts_with(&self, base: &Cap<A, B, C>) -> bool {
         self.path.starts_with(base.to_path())
     }
 
-    // TODO - Change from 'Cap' to 'AsRef<Cap>'
     pub fn ends_with(&self, base: &Cap<A, B, C>) -> bool {
         self.path.ends_with(base.to_path())
     }
@@ -254,10 +246,10 @@ impl<A: traits::View, B, C> Cap<A, B, C> {
     }
 
     // NOTE - Corresponds to 'into_path_buf'
-    
+
     // This _should_ convert a Box<Cap> into a CapBuf without
     // copying or allocating... in its current form, I don't think it does that
-    
+
     /*pub fn into_cap(self: Box<Cap<A, B, C>) -> CapBuf<A, B, C> {
         /* let rw = Box::into_raw(self) as *mut OsStr;
          * let inner = unsafe { Box::from_raw(rw) };
@@ -331,8 +323,6 @@ impl<A1, A2, A3> CapBuf<A1, A2, A3> {
     pub fn into_os_string(self) -> OsString {
         self.path.into_os_string()
     }
-
-
 }
 
 impl<A1: traits::View, A2, A3> CapBuf<A1, A2, A3> {
