@@ -150,8 +150,8 @@ where
     Ok(Metadata(fs::metadata(cap.as_ref().to_path())?))
 }
 
-pub fn read<A1: traits::Read, A2, A3>(cap: &CapBuf<A1, A2, A3>) -> io::Result<Vec<u8>> {
-    fs::read(cap.to_path())
+pub fn read<A1: traits::Read, A2, A3, C: AsRef<Cap<A1, A2, A3>>>(cap: C) -> io::Result<Vec<u8>> {
+    fs::read(cap.as_ref().to_path())
 }
 
 pub fn read_dir<A1: traits::Read, A2, A3, P>(cap: P) -> io::Result<ReadDir<A1, A2, A3>>
