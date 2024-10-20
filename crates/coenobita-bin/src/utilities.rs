@@ -14,7 +14,8 @@ use rustc_session::config::{ErrorOutputType, Options};
 use rustc_span::source_map::SourceMap;
 
 static LOGGER: Lazy<Logger> = Lazy::new(|| {
-    Logger::new("/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/lagoon/log").unwrap()
+    Logger::new("/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/coenobita.log")
+        .unwrap()
 });
 
 pub struct Logger {

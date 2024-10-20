@@ -1,11 +1,12 @@
-[package]
-name = "coenobita"
-version = "0.1.0"
+[workspace]
+members = ["crates/*"]
+
+[workspace.package]
 edition = "2021"
 
-[package.metadata.rust-analyzer]
-rustc_private = true
-
-[dependencies]
-coenobita-typeck = { path = "crates/coenobita-typeck" }
-once_cell = "1.19.0"
+[workspace.dependencies]
+coenobita-ast = { path = "./crates/coenobita-ast" }
+coenobita-bin = { path = "./crates/coenobita-bin" }
+coenobita-middle = { path = "./crates/coenobita-middle" }
+coenobita-parse = { path = "./crates/coenobita-parse" }
+coenobita-typeck = { path = "./crates/coenobita-typeck" }

@@ -1,11 +1,11 @@
 use coenobita_middle::ty::Ty;
 
-pub struct Context {
-    crate_name: String
+pub struct Context<'cnbt> {
+    crate_name: &'cnbt str,
 }
 
-impl Context {
-    pub fn new(crate_name: String) -> Self {
+impl<'cnbt> Context<'cnbt> {
+    pub fn new(crate_name: &'cnbt str) -> Self {
         Context { crate_name }
     }
 

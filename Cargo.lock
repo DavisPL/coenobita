@@ -3,7 +3,11 @@
 version = 3
 
 [[package]]
-name = "coenobita"
+name = "coenobita-ast"
+version = "0.1.0"
+
+[[package]]
+name = "coenobita-bin"
 version = "0.1.0"
 dependencies = [
  "coenobita-typeck",
@@ -12,6 +16,10 @@ dependencies = [
 
 [[package]]
 name = "coenobita-middle"
+version = "0.1.0"
+
+[[package]]
+name = "coenobita-parse"
 version = "0.1.0"
 
 [[package]]

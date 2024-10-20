@@ -11,8 +11,8 @@ use rustc_span::ErrorGuaranteed;
 
 use crate::context::Context;
 
-pub struct Checker<'tcx> {
-    crate_name: String,
+pub struct Checker<'cnbt, 'tcx> {
+    crate_name: &'cnbt str,
     tcx: TyCtxt<'tcx>,
     def_map: Map<DefId, Ty>,
     hir_map: Map<HirId, Ty>,
@@ -20,13 +20,13 @@ pub struct Checker<'tcx> {
 
 type Result<T = ()> = std::result::Result<T, ErrorGuaranteed>;
 
-impl<'tcx> Checker<'tcx> {
-    pub fn new(crate_name: String, tcx: TyCtxt<'tcx>) -> Self {
+impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
+    pub fn new(crate_name: &'cnbt str, tcx: TyCtxt<'tcx>) -> Self {
         Checker {
             crate_name,
             tcx,
             def_map: Map::new(),
-            hir_map: Map::new()
+            hir_map: Map::new(),
         }
     }
 

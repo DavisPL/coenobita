@@ -31,20 +31,20 @@ fn main() {
 
     let crate_name = crate_name(&args)
         .and_then(|s| {
-            debug(format!("Lagoon invoked for crate '{s}'\n========="));
+            debug(format!("Coenobita invoked for crate '{s}'\n========="));
             Some(s)
         })
-        .unwrap_or("-");
+        .unwrap_or("-".into());
 
     // Create callbacks and run the compiler
     let mut callbacks = CoenobitaCallbacks::new(crate_name);
     let _result = RunCompiler::new(&args, &mut callbacks).run();
 }
 
-fn crate_name<'a>(args: &'a [String]) -> Option<&'a str> {
+fn crate_name<'a>(args: &'a [String]) -> Option<String> {
     for pair in args.windows(2) {
         if pair[0] == "--crate-name" {
-            return Some(&pair[1]);
+            return Some(pair[1].clone());
         }
     }
 
