@@ -1,0 +1,10 @@
+[package]
+name = "coenobita-typeck"
+version = "0.1.0"
+edition = "2021"
+
+[package.metadata.rust-analyzer]
+rustc_private = true
+
+[dependencies]
+coenobita-middle = { path = "../coenobita-middle" }
