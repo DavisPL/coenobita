@@ -11,15 +11,25 @@ use rustc_span::ErrorGuaranteed;
 
 use crate::context::Context;
 
-struct Checker<'a> {
-    tcx: TyCtxt<'a>,
+pub struct Checker<'tcx> {
+    crate_name: String,
+    tcx: TyCtxt<'tcx>,
     def_map: Map<DefId, Ty>,
     hir_map: Map<HirId, Ty>,
 }
 
 type Result<T = ()> = std::result::Result<T, ErrorGuaranteed>;
 
-impl<'a> Checker<'a> {
+impl<'tcx> Checker<'tcx> {
+    pub fn new(crate_name: String, tcx: TyCtxt<'tcx>) -> Self {
+        Checker {
+            crate_name,
+            tcx,
+            def_map: Map::new(),
+            hir_map: Map::new()
+        }
+    }
+
     pub fn function_ty(&self, def_id: DefId) -> Result<Ty> {
         match self.def_map.get(&def_id) {
             Some(ty) => Ok(ty.clone()),

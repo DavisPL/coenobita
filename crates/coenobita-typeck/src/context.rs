@@ -1,8 +1,14 @@
 use coenobita_middle::ty::Ty;
 
-pub struct Context {}
+pub struct Context {
+    crate_name: String
+}
 
 impl Context {
+    pub fn new(crate_name: String) -> Self {
+        Context { crate_name }
+    }
+
     pub fn default(&self) -> Ty {
         todo!()
     }
