@@ -21,6 +21,9 @@ version = "0.1.0"
 [[package]]
 name = "coenobita-parse"
 version = "0.1.0"
+dependencies = [
+ "coenobita-ast",
+]
 
 [[package]]
 name = "coenobita-typeck"

@@ -3,7 +3,7 @@ use rustc_span::Span;
 use crate::flow::FlowPair;
 
 pub struct Ty {
-    pub fpair: FlowPair,
+    pub flow_pair: FlowPair,
 
     pub kind: TyKind,
 
