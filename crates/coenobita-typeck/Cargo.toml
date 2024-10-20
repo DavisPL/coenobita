@@ -8,3 +8,5 @@ rustc_private = true
 
 [dependencies]
 coenobita-middle = { path = "../coenobita-middle" }
+coenobita-parse = { path = "../coenobita-parse" }
+coenobita-ast = { path = "../coenobita-ast" }

@@ -12,4 +12,6 @@ impl<F, T> Map<F, T> {
     pub fn get(&self, key: &F) -> Option<&T> {
         todo!()
     }
+
+    pub fn insert(&self, key: F, value: T) {}
 }

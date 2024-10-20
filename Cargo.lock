@@ -17,6 +17,9 @@ dependencies = [
 [[package]]
 name = "coenobita-middle"
 version = "0.1.0"
+dependencies = [
+ "coenobita-ast",
+]
 
 [[package]]
 name = "coenobita-parse"
@@ -29,7 +32,9 @@ dependencies = [
 name = "coenobita-typeck"
 version = "0.1.0"
 dependencies = [
+ "coenobita-ast",
  "coenobita-middle",
+ "coenobita-parse",
 ]
 
 [[package]]
