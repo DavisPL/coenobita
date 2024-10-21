@@ -3,10 +3,13 @@ name = "coenobita-bin"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "coenobita"
+path = "src/main.rs"
+
 [package.metadata.rust-analyzer]
 rustc_private = true
 
 [dependencies]
 coenobita-typeck.workspace = true
-
-once_cell = "1.19.0"
+coenobita-log.workspace = true

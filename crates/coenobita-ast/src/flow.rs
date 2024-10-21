@@ -3,6 +3,7 @@ use std::fmt::Display;
 use rustc_span::symbol::Ident;
 use rustc_span::Span;
 
+#[derive(Clone)]
 pub struct FlowPair {
     pub explicit: FlowSet,
 
@@ -13,10 +14,11 @@ pub struct FlowPair {
 
 impl Display for FlowPair {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} {}", self.explicit, self.implicit)
+        write!(f, "{}{}", self.explicit, self.implicit)
     }
 }
 
+#[derive(Clone)]
 pub enum FlowSet {
     Specific(Vec<Ident>, Span),
     Universal(Span),

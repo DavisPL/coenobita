@@ -4,8 +4,9 @@ use rustc_span::Span;
 
 use crate::flow::FlowPair;
 
+#[derive(Clone)]
 pub struct Ty {
-    pub flow_pair: FlowPair,
+    pub fpair: FlowPair,
 
     pub kind: TyKind,
 
@@ -14,11 +15,11 @@ pub struct Ty {
 
 impl Display for Ty {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.flow_pair);
-        write!(f, " {}", self.kind)
+        write!(f, "{}{}", self.fpair, self.kind)
     }
 }
 
+#[derive(Clone)]
 pub enum TyKind {
     Fn(Vec<Ty>, Box<Ty>),
     Tup(Vec<Ty>),
@@ -34,7 +35,7 @@ impl Display for TyKind {
                     .map(|ty| ty.to_string())
                     .collect::<Vec<_>>()
                     .join(",");
-                write!(f, "fn({}) -> {}", args, ret_ty)
+                write!(f, " fn({}) -> {}", args, ret_ty)
             }
 
             Self::Tup(item_tys) => {
@@ -43,7 +44,7 @@ impl Display for TyKind {
                     .map(|ty| ty.to_string())
                     .collect::<Vec<_>>()
                     .join(",");
-                write!(f, "({})", items)
+                write!(f, " ({})", items)
             }
 
             Self::Abstract => write!(f, ""),

@@ -1,5 +1,6 @@
 [workspace]
 members = ["crates/*"]
+resolver = "2"
 
 [workspace.package]
 edition = "2021"
@@ -7,6 +8,7 @@ edition = "2021"
 [workspace.dependencies]
 coenobita-ast = { path = "./crates/coenobita-ast" }
 coenobita-bin = { path = "./crates/coenobita-bin" }
+coenobita-log = { path = "./crates/coenobita-log" }
 coenobita-middle = { path = "./crates/coenobita-middle" }
 coenobita-parse = { path = "./crates/coenobita-parse" }
 coenobita-typeck = { path = "./crates/coenobita-typeck" }

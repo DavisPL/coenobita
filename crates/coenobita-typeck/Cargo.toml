@@ -7,6 +7,7 @@ edition = "2021"
 rustc_private = true
 
 [dependencies]
-coenobita-middle = { path = "../coenobita-middle" }
-coenobita-parse = { path = "../coenobita-parse" }
-coenobita-ast = { path = "../coenobita-ast" }
+coenobita-ast.workspace = true
+coenobita-log.workspace = true
+coenobita-middle.workspace = true
+coenobita-parse.workspace = true

@@ -17,54 +17,53 @@ use coenobita_ast::flow::{FlowPair, FlowSet};
 
 pub struct CoenobitaParser<'cnbt> {
     parser: Parser<'cnbt>,
-    start: BytePos,
 }
 
 impl<'cnbt> CoenobitaParser<'cnbt> {
     pub fn new(parser: Parser<'cnbt>) -> Self {
         let start = parser.token.span.lo();
-        CoenobitaParser { parser, start }
+        CoenobitaParser { parser }
     }
 
     pub fn parse_ty(&mut self) -> PResult<'cnbt, Ty> {
-        self.start();
+        let start = self.start();
 
         Ok(Ty {
-            flow_pair: self.parse_flow_pair()?,
+            fpair: self.parse_flow_pair()?,
             kind: self.parse_ty_kind()?,
-            span: self.end(),
+            span: self.end(start),
         })
     }
 
     pub fn parse_flow_pair(&mut self) -> PResult<'cnbt, FlowPair> {
-        self.start();
+        let start = self.start();
 
         Ok(FlowPair {
             explicit: self.parse_flow_set()?,
             implicit: self.parse_flow_set()?,
-            span: self.end(),
+            span: self.end(start),
         })
     }
 
     pub fn parse_flow_set(&mut self) -> PResult<'cnbt, FlowSet> {
-        self.start();
+        let start = self.start();
         self.parser.expect(&OpenDelim(Delimiter::Brace))?;
 
         if self.parser.eat(&BinOp(BinOpToken::Star)) {
             self.parser.expect(&CloseDelim(Delimiter::Brace))?;
-            Ok(FlowSet::Universal(self.end()))
+            Ok(FlowSet::Universal(self.end(start)))
         } else {
             let mut origins = vec![];
-            while self.parser.token != CloseDelim(Delimiter::Bracket) {
+            while self.parser.token != CloseDelim(Delimiter::Brace) {
                 origins.push(self.parser.parse_ident()?);
 
-                if self.parser.token != CloseDelim(Delimiter::Bracket) {
+                if self.parser.token != CloseDelim(Delimiter::Brace) {
                     self.parser.expect(&Comma)?;
                 }
             }
 
             self.parser.expect(&CloseDelim(Delimiter::Brace))?;
-            Ok(FlowSet::Specific(origins, self.end()))
+            Ok(FlowSet::Specific(origins, self.end(start)))
         }
     }
 
@@ -83,7 +82,9 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
                 }
             }
 
+            self.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
             self.parser.expect(&TokenKind::RArrow)?;
+
             Ok(TyKind::Fn(args, Box::new(self.parse_ty()?)))
         } else if self.parser.eat(&OpenDelim(Delimiter::Parenthesis)) {
             // We are parsing a tuple type
@@ -103,11 +104,11 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
         }
     }
 
-    fn start(&mut self) {
-        self.start = self.parser.token.span.lo()
+    fn start(&mut self) -> BytePos {
+        self.parser.token.span.lo()
     }
 
-    fn end(&self) -> Span {
-        self.parser.prev_token.span.with_lo(self.start)
+    fn end(&self, start: BytePos) -> Span {
+        self.parser.prev_token.span.with_lo(start)
     }
 }

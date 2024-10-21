@@ -1,7 +1,6 @@
 #![feature(rustc_private)]
 
 mod callbacks;
-mod utilities;
 
 extern crate rustc_ast;
 extern crate rustc_data_structures;
@@ -14,10 +13,11 @@ extern crate rustc_parse;
 extern crate rustc_session;
 extern crate rustc_span;
 
+use coenobita_log::debug;
+
 use std::env;
 
 use callbacks::CoenobitaCallbacks;
-use utilities::debug;
 
 use rustc_driver::RunCompiler;
 
