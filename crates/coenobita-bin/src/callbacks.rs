@@ -59,6 +59,6 @@ impl<'c, 'tcx> Visitor<'tcx> for CoenobitaVisitor<'c, 'tcx> {
 
     fn visit_item(&mut self, item: &'tcx Item<'tcx>) -> Self::Result {
         let mut context = Context::new(self.crate_name);
-        self.checker.check_item(&mut context, item);
+        let _ = self.checker.check_item(&mut context, item);
     }
 }

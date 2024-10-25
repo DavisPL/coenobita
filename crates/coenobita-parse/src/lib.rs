@@ -21,7 +21,6 @@ pub struct CoenobitaParser<'cnbt> {
 
 impl<'cnbt> CoenobitaParser<'cnbt> {
     pub fn new(parser: Parser<'cnbt>) -> Self {
-        let start = parser.token.span.lo();
         CoenobitaParser { parser }
     }
 

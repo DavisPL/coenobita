@@ -1,14 +1,12 @@
 use coenobita_ast::ast::TyKind as ATyKind;
-use coenobita_middle::flow::FlowPair;
 use coenobita_middle::map::Map;
 use coenobita_middle::ty::{Ty, TyKind};
 
 use coenobita_log::debug;
 
 use coenobita_parse::CoenobitaParser;
-use rustc_ast::ptr::P;
 use rustc_ast::tokenstream::TokenStream;
-use rustc_ast::{AttrKind, NormalAttr};
+use rustc_ast::AttrKind;
 use rustc_driver::DEFAULT_LOCALE_RESOURCES;
 use rustc_errors::fallback_fluent_bundle;
 use rustc_hir::def::{DefKind, Res};
@@ -53,7 +51,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             Some(ty) => ty.clone(),
             None => {
                 // We haven't processed the definition of this function yet
-                self.new_check_item_fn(context, def_id);
+                let _ = self.new_check_item_fn(context, def_id);
                 self.def_map.get(&def_id).unwrap().clone()
             }
         }
@@ -73,6 +71,15 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
     pub fn check_item(&mut self, context: &mut Context, item: &Item) -> Result {
         debug(format!("Checking item {:?}", item.kind));
+
+        if self
+            .tcx
+            .get_attr(item.owner_id.to_def_id(), Symbol::intern("ignore"))
+            .is_some()
+        {
+            return Ok(());
+        }
+
         match item.kind {
             ItemKind::Fn(signature, _, body_id) => self.check_item_fn(context, &signature, body_id),
             _ => Ok(()),
@@ -390,14 +397,14 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     pub fn check_stmt(&mut self, context: &mut Context, stmt: &Stmt) -> Result<Ty> {
         match stmt.kind {
             StmtKind::Expr(expr) => {
-                self.check_expr(context, expr);
+                let _ = self.check_expr(context, expr);
             }
             StmtKind::Semi(expr) => {
-                self.check_expr(context, expr);
+                let _ = self.check_expr(context, expr);
             }
             StmtKind::Let(local) => self.check_let_stmt(context, local),
             StmtKind::Item(item_id) => {
-                self.check_item(context, self.tcx.hir().item(item_id));
+                let _ = self.check_item(context, self.tcx.hir().item(item_id));
             }
         };
 
