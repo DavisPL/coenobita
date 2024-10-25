@@ -2,35 +2,49 @@ use std::collections::HashSet;
 
 use coenobita_middle::{
     flow::{FlowPair, FlowSet},
-    ty::Ty,
+    ty::{Ty, TyKind},
 };
 
 pub struct Context<'cnbt> {
     crate_name: &'cnbt str,
-    levels: Vec<HashSet<String>>,
+    levels: Vec<FlowSet>,
 }
 
 impl<'cnbt> Context<'cnbt> {
     pub fn new(crate_name: &'cnbt str) -> Self {
         Context {
             crate_name,
-            levels: vec![HashSet::from([crate_name.to_owned()])],
+            levels: vec![FlowSet::Specific(HashSet::from([crate_name.to_owned()]))],
         }
     }
 
-    pub fn default(&self) -> Ty {
-        self.influence(Ty::default().with_explicit(self.origin()))
+    pub fn universal(&self) -> Ty {
+        Ty::new(
+            FlowPair(FlowSet::Universal, FlowSet::Universal),
+            TyKind::Infer,
+        )
+    }
+
+    pub fn introduce(&self) -> Ty {
+        let explicit = self.origin();
+        let implicit = self
+            .levels
+            .iter()
+            .fold(self.levels[0].clone(), |acc, elem| acc.union(elem));
+
+        Ty::new(FlowPair(explicit, implicit), TyKind::Infer)
     }
 
     pub fn influence(&self, ty: Ty) -> Ty {
-        let mut influencers = self.levels[0].clone();
+        let implicit = self
+            .levels
+            .iter()
+            .fold(self.levels[0].clone(), |acc, elem| acc.union(elem));
 
-        for influencer in self.levels.iter().skip(1) {
-            influencers.extend(influencer.clone());
-        }
-
-        let implicit = FlowSet::Specific(influencers);
-        let fpair = FlowPair::new(ty.fpair.explicit().clone(), implicit);
+        let fpair = FlowPair(
+            ty.fpair.explicit().clone(),
+            ty.fpair.implicit().clone().union(&implicit),
+        );
 
         Ty::new(fpair, ty.kind)
     }
@@ -40,7 +54,8 @@ impl<'cnbt> Context<'cnbt> {
     }
 
     pub fn enter(&mut self, ty: &Ty) {
-        self.levels.push(HashSet::from_iter(ty.origins()));
+        let fset = ty.fpair.explicit().clone().union(ty.fpair.implicit());
+        self.levels.push(fset);
     }
 
     pub fn exit(&mut self) {

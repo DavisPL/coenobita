@@ -1,6 +1,7 @@
 use std::{collections::HashSet, fmt::Display};
 
 use coenobita_ast::flow;
+use itertools::Itertools;
 
 #[derive(Debug, Clone)]
 pub struct FlowPair(pub FlowSet, pub FlowSet);
@@ -8,10 +9,6 @@ pub struct FlowPair(pub FlowSet, pub FlowSet);
 impl FlowPair {
     pub fn new(explicit: FlowSet, implicit: FlowSet) -> Self {
         FlowPair(explicit, implicit)
-    }
-
-    pub fn default() -> Self {
-        FlowPair(FlowSet::Universal, FlowSet::Universal)
     }
 
     pub fn origins(&self) -> Vec<String> {
@@ -47,7 +44,13 @@ pub enum FlowSet {
 
 impl FlowSet {
     pub fn union(&self, other: &FlowSet) -> FlowSet {
-        todo!()
+        match self {
+            FlowSet::Universal => FlowSet::Universal,
+            FlowSet::Specific(s1) => match other {
+                FlowSet::Universal => FlowSet::Universal,
+                FlowSet::Specific(s2) => FlowSet::Specific(s1.union(&s2).cloned().collect()),
+            },
+        }
     }
 
     pub fn is_subset(&self, other: &FlowSet) -> bool {
@@ -82,7 +85,7 @@ impl Display for FlowSet {
                 let origins = origins
                     .iter()
                     .map(|ident| ident.to_string())
-                    .collect::<Vec<_>>()
+                    .sorted()
                     .join(",");
                 write!(f, "{{{origins}}}")
             }

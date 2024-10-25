@@ -12,3 +12,5 @@ coenobita-log = { path = "./crates/coenobita-log" }
 coenobita-middle = { path = "./crates/coenobita-middle" }
 coenobita-parse = { path = "./crates/coenobita-parse" }
 coenobita-typeck = { path = "./crates/coenobita-typeck" }
+
+itertools = "0.13.0"

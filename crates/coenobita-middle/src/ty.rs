@@ -2,6 +2,7 @@ use std::fmt::Display;
 
 use crate::flow::{FlowPair, FlowSet};
 use coenobita_ast::ast::{self, Ty as ATy, TyKind as ATyKind};
+use itertools::Itertools;
 
 #[derive(Debug, Clone)]
 pub struct Ty {
@@ -15,20 +16,17 @@ impl Ty {
         Ty { fpair, kind }
     }
 
-    pub fn default() -> Self {
-        Ty {
-            fpair: FlowPair::default(),
-            kind: TyKind::Abs,
-        }
-    }
-
     pub fn with_explicit(mut self, explicit: FlowSet) -> Self {
         self.fpair.0 = explicit;
         self
     }
 
     pub fn merge(self, other: Ty) -> Ty {
-        todo!()
+        let explicit = self.fpair.explicit().union(other.fpair.explicit());
+        let implicit = self.fpair.implicit().union(other.fpair.implicit());
+
+        // We assume both types have the same shape
+        Ty::new(FlowPair(explicit, implicit), self.kind())
     }
 
     pub fn kind(self) -> TyKind {
@@ -84,11 +82,8 @@ impl Display for TyKind {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Fn(arg_tys, ret_ty) => {
-                let args = arg_tys
-                    .iter()
-                    .map(|ty| ty.to_string())
-                    .collect::<Vec<_>>()
-                    .join(",");
+                let args = arg_tys.iter().map(|ty| ty.to_string()).sorted().join(",");
+
                 write!(f, " fn({}) -> {}", args, ret_ty)
             }
 
@@ -102,7 +97,7 @@ impl Display for TyKind {
             }
 
             Self::Abs => write!(f, ""),
-            _ => todo!(),
+            Self::Infer => write!(f, ""),
         }
     }
 }

@@ -1,5 +1,6 @@
 use std::fmt::Display;
 
+use itertools::Itertools;
 use rustc_span::symbol::Ident;
 use rustc_span::Span;
 
@@ -31,7 +32,7 @@ impl Display for FlowSet {
                 let origins = origins
                     .iter()
                     .map(|ident| ident.to_string())
-                    .collect::<Vec<_>>()
+                    .sorted()
                     .join(",");
                 write!(f, "{{{origins}}}")
             }
