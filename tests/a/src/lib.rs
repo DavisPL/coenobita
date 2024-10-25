@@ -78,6 +78,32 @@ fn test_assign_mut() {
     }
 }
 
+fn test_struct() {
+    struct Boo {
+        #[cnbt::tag({a}{a})]
+        x: i32,
+        y: bool,
+    }
+
+    #[cnbt::tag({a}{a})]
+    let boo = Boo { x: 5, y: true };
+}
+
+fn test_if_struct() {
+    struct Boo {
+        #[cnbt::tag({a}{a,c})]
+        x: i32,
+        y: bool,
+    }
+
+    #[cnbt::tag({a}{a,c})]
+    let boo = if c::boolean() {
+        Boo { x: 5, y: true }
+    } else {
+        Boo { x: 6, y: true }
+    };
+}
+
 // fn test_loop_with_pattern() {
 //     #[cnbt::tag({a}{a,c})]
 //     let mut x = 5;

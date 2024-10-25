@@ -1,8 +1,9 @@
-use std::fmt::Display;
+use std::{cmp, collections::HashMap, fmt::Display};
 
 use crate::flow::{FlowPair, FlowSet};
 use coenobita_ast::ast::{self, Ty as ATy, TyKind as ATyKind};
 use itertools::Itertools;
+use rustc_span::Symbol;
 
 #[derive(Debug, Clone)]
 pub struct Ty {
@@ -46,6 +47,7 @@ impl Ty {
     }
 
     pub fn satisfies(&self, other: &Ty) -> bool {
+        // TODO: Take type shape (kind) into account
         self.fpair.explicit().is_subset(other.fpair.explicit())
             && self.fpair.implicit().is_subset(other.fpair.implicit())
     }
@@ -75,6 +77,7 @@ pub enum TyKind {
     Abs,
     Fn(Vec<Ty>, Box<Ty>),
     Tup(Vec<Ty>),
+    Adt(HashMap<Symbol, Ty>),
     Infer,
 }
 
@@ -94,6 +97,17 @@ impl Display for TyKind {
                     .collect::<Vec<_>>()
                     .join(",");
                 write!(f, " ({})", items)
+            }
+
+            Self::Adt(field_tys) => {
+                let fields = field_tys
+                    .iter()
+                    .sorted_by_key(|&(key, _)| key)
+                    .map(|(key, value)| format!("{key}:{value}"))
+                    .collect::<Vec<_>>()
+                    .join(",");
+
+                write!(f, " struct {{{fields}}}")
             }
 
             Self::Abs => write!(f, ""),

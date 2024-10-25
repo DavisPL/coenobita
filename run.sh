@@ -4,7 +4,7 @@
 ./install.sh
 
 # Find the sample project
-cd ../a
+cd tests/a
 
 # Clean and check
 cargo clean

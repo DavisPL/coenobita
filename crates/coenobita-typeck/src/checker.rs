@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use coenobita_ast::ast::TyKind as ATyKind;
 use coenobita_middle::map::Map;
 use coenobita_middle::ty::{Ty, TyKind};
@@ -12,10 +14,10 @@ use rustc_errors::fallback_fluent_bundle;
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::def_id::DefId;
 use rustc_hir::{
-    Arm, Block, BodyId, Expr, ExprKind, FnSig, HirId, Item, ItemKind, LetStmt, QPath, Stmt,
-    StmtKind,
+    Arm, Block, BodyId, Expr, ExprField, ExprKind, FnSig, HirId, Item, ItemKind, LetStmt, QPath,
+    Stmt, StmtKind,
 };
-use rustc_middle::ty::TyCtxt;
+use rustc_middle::ty::{self, FieldDef, TyCtxt};
 use rustc_parse::parser::Parser;
 use rustc_session::parse::ParseSess;
 use rustc_span::{ErrorGuaranteed, Symbol};
@@ -57,6 +59,29 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         }
     }
 
+    pub fn adt_ty(&mut self, context: &mut Context, def_id: DefId) -> Ty {
+        debug(format!("Trying to get type of adt (struct) {:#?}", def_id));
+
+        match self.def_map.get(&def_id) {
+            Some(ty) => ty.clone(),
+            None => {
+                // We haven't processed the definition of this function yet
+                let field_defs = &self
+                    .tcx
+                    .adt_def(def_id)
+                    .variants()
+                    .iter()
+                    .next()
+                    .unwrap()
+                    .fields
+                    .raw;
+
+                let _ = self.check_item_struct(context, def_id, field_defs);
+                self.def_map.get(&def_id).unwrap().clone()
+            }
+        }
+    }
+
     pub fn local_ty(&mut self, context: &mut Context, hir_id: HirId) -> Result<Ty> {
         match self.hir_map.get(&hir_id) {
             Some(ty) => Ok(ty.clone()),
@@ -71,17 +96,27 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
     pub fn check_item(&mut self, context: &mut Context, item: &Item) -> Result {
         debug(format!("Checking item {:?}", item.kind));
+        let did = item.owner_id.to_def_id();
 
-        if self
-            .tcx
-            .get_attr(item.owner_id.to_def_id(), Symbol::intern("ignore"))
-            .is_some()
-        {
+        if self.tcx.get_attr(did, Symbol::intern("ignore")).is_some() {
             return Ok(());
         }
 
         match item.kind {
             ItemKind::Fn(signature, _, body_id) => self.check_item_fn(context, &signature, body_id),
+            ItemKind::Struct(var_data, _) => {
+                let fields: Vec<FieldDef> = var_data
+                    .fields()
+                    .iter()
+                    .map(|f| ty::FieldDef {
+                        did: f.def_id.to_def_id(),
+                        name: f.ident.name,
+                        vis: self.tcx.visibility(f.def_id),
+                    })
+                    .collect();
+
+                self.check_item_struct(context, did, &fields)
+            }
             _ => Ok(()),
         }
     }
@@ -155,6 +190,46 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         Ok(())
     }
 
+    pub fn check_item_struct(
+        &mut self,
+        context: &mut Context,
+        def_id: DefId,
+        field_defs: &[FieldDef],
+    ) -> Result {
+        let mut fields = HashMap::new();
+
+        for field in field_defs {
+            match self.tcx.get_attrs_by_path(field.did, &self.attr).next() {
+                Some(attr) => {
+                    // The `coenobita::tag` is guaranteed to be a normal attribute
+                    let AttrKind::Normal(normal) = &attr.kind else {
+                        unreachable!()
+                    };
+
+                    let psess = create_psess(&self.tcx);
+                    let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
+
+                    if let Ok(ty) = parser.parse_ty() {
+                        fields.insert(field.name, ty.into());
+                    };
+                }
+
+                _ => {
+                    fields.insert(field.name, context.universal());
+                }
+            };
+        }
+
+        // Since this type is a struct definition, its flow pair will never be used and is only here for consistency
+        let mut ty = context.universal();
+        ty.kind = TyKind::Adt(fields);
+
+        self.def_map.insert(def_id, ty);
+
+        Ok(())
+    }
+
+    // TODO: Change the name of this function
     pub fn new_check_item_fn(&mut self, context: &mut Context, def_id: DefId) -> Result {
         let expected = self
             .tcx
@@ -220,6 +295,8 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     }
 
     pub fn check_expr(&mut self, context: &mut Context, expr: &Expr) -> Result<Ty> {
+        debug(format!("> expr kind is {:?}", expr.kind));
+
         match expr.kind {
             ExprKind::Lit(_) => Ok(context.introduce()),
             ExprKind::Path(qpath) => self.check_expr_path(context, expr.hir_id, &qpath),
@@ -233,6 +310,10 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             ExprKind::Block(block, _) => self.check_expr_block(context, block),
             ExprKind::Assign(dest, expr, _) => self.check_expr_assign(context, dest, expr),
             ExprKind::AssignOp(_, dest, expr) => self.check_expr_assign(context, dest, expr),
+            ExprKind::Struct(qpath, fields, _) => {
+                // TODO: Account for `..base` (the last field of the tuple above)
+                self.check_expr_struct(context, expr.hir_id, qpath, fields)
+            }
 
             // This kind of expression is typically generated by the compiler
             ExprKind::DropTemps(expr) => self.check_expr(context, expr),
@@ -394,6 +475,54 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         }
     }
 
+    pub fn check_expr_struct(
+        &mut self,
+        context: &mut Context,
+        hir_id: HirId,
+        qpath: &QPath,
+        fields: &[ExprField],
+    ) -> Result<Ty> {
+        let local_def_id = hir_id.owner.to_def_id().as_local().unwrap();
+
+        match self.tcx.typeck(local_def_id).qpath_res(qpath, hir_id) {
+            Res::Def(def_kind, def_id) => match def_kind {
+                DefKind::Struct => {
+                    let sty = self.adt_ty(context, def_id);
+
+                    match sty.kind() {
+                        TyKind::Adt(field_tys) => {
+                            for field in fields {
+                                let expected = &field_tys[&field.ident.name];
+                                let actual = self.check_expr(context, field.expr)?;
+
+                                if !actual.satisfies(expected) {
+                                    let msg = format!("Expected {expected}, found {actual}");
+                                    return Err(self.tcx.dcx().span_err(field.expr.span, msg));
+                                }
+                            }
+
+                            // We need to replace the flow pair of `ty` with the introduction pair
+                            let mut ty = context.introduce();
+                            ty.kind = TyKind::Adt(field_tys);
+
+                            Ok(ty)
+                        }
+
+                        _ => {
+                            let msg =
+                                format!("'{}' is not a struct", qpath_string(self.tcx, qpath));
+                            Err(self.tcx.dcx().span_err(qpath.span(), msg))
+                        }
+                    }
+                }
+
+                _ => todo!(),
+            },
+
+            _ => todo!(),
+        }
+    }
+
     pub fn check_stmt(&mut self, context: &mut Context, stmt: &Stmt) -> Result<Ty> {
         match stmt.kind {
             StmtKind::Expr(expr) => {
@@ -428,4 +557,26 @@ fn create_parser<'cnbt>(psess: &'cnbt ParseSess, stream: TokenStream) -> Coenobi
     let parser = CoenobitaParser::new(rustc_parser);
 
     parser
+}
+
+fn qpath_string<'tcx>(tcx: TyCtxt<'tcx>, qpath: &QPath<'_>) -> String {
+    match qpath {
+        QPath::Resolved(_, path) => {
+            // If the path is resolved, we can get the DefId and print it
+            if let Res::Def(_, def_id) = path.res {
+                let path_str = tcx.def_path_str(def_id);
+                format!("Resolved QPath: {}", path_str)
+            } else {
+                todo!()
+            }
+        }
+        QPath::TypeRelative(ty, segment) => {
+            // If it's a type-relative path, we print it in a type-relative way
+            format!("TypeRelative QPath: {:?}::{}", ty, segment.ident)
+        }
+        QPath::LangItem(lang_item, _) => {
+            // Language items can be printed directly by their known name
+            format!("LangItem QPath: {:?}", lang_item)
+        }
+    }
 }
