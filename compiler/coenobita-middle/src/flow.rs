@@ -3,7 +3,7 @@ use std::{collections::HashSet, fmt::Display};
 use coenobita_ast::flow;
 use itertools::Itertools;
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct FlowPair(pub FlowSet, pub FlowSet);
 
 impl FlowPair {
@@ -36,7 +36,7 @@ impl Display for FlowPair {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum FlowSet {
     Universal,
     Specific(HashSet<String>),

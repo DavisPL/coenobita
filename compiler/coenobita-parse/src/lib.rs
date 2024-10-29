@@ -163,6 +163,11 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
 
             self.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
             Ok(TyKind::Tup(items))
+        } else if self.parser.eat(&OpenDelim(Delimiter::Bracket)) {
+            // We are parsing an array type
+            let item = self.parse_ity()?;
+            self.parser.expect(&CloseDelim(Delimiter::Bracket))?;
+            Ok(TyKind::Arr(Box::new(item)))
         } else {
             Ok(TyKind::Abstract)
         }
@@ -200,6 +205,9 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
 
             self.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
             Ok(TyKind::Tup(items))
+        } else if self.parser.eat(&OpenDelim(Delimiter::Bracket)) {
+            // We are parsing an array type
+            todo!()
         } else {
             Ok(TyKind::Abstract)
         }

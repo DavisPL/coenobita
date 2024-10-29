@@ -67,6 +67,6 @@ impl<'c, 'tcx> Visitor<'tcx> for CoenobitaVisitor<'c, 'tcx> {
         let _ = self.ichecker.check_item(&mut context, item);
 
         // Check provenance
-        let _ = self.pchecker.check_item(item);
+        // let _ = self.pchecker.check_item(item);
     }
 }

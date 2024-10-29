@@ -22,6 +22,7 @@ impl<T: Display> Display for Ty<T> {
 pub enum TyKind<T> {
     Fn(Vec<Ty<T>>, Box<Ty<T>>),
     Tup(Vec<Ty<T>>),
+    Arr(Box<Ty<T>>),
     Abstract,
 }
 
@@ -42,6 +43,8 @@ impl<T: Display> Display for TyKind<T> {
                     .join(",");
                 write!(f, " ({})", items)
             }
+
+            Self::Arr(item_ty) => write!(f, " [{}]", item_ty),
 
             Self::Abstract => write!(f, ""),
         }

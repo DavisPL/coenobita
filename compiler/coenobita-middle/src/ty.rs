@@ -8,20 +8,20 @@ use coenobita_ast::provenance::ProvenancePair as AProvenancePair;
 use itertools::Itertools;
 use rustc_span::Symbol;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Ty<T> {
     pub property: T,
 
     pub kind: TyKind<T>,
 }
 
-impl<T> Ty<T> {
+impl<T: Clone> Ty<T> {
     pub fn new(property: T, kind: TyKind<T>) -> Self {
         Ty { property, kind }
     }
 
-    pub fn kind(self) -> TyKind<T> {
-        self.kind
+    pub fn kind(&self) -> TyKind<T> {
+        self.kind.clone()
     }
 }
 
@@ -36,7 +36,7 @@ impl Ty<FlowPair> {
         let implicit = self.property.implicit().union(other.property.implicit());
 
         // We assume both types have the same shape
-        Ty::new(FlowPair(explicit, implicit), self.kind())
+        Ty::new(FlowPair(explicit, implicit), self.kind().clone())
     }
 
     pub fn ty_fn(n: usize) -> Ty<FlowPair> {
@@ -52,14 +52,60 @@ impl Ty<FlowPair> {
     }
 
     pub fn satisfies(&self, other: &Ty<FlowPair>) -> bool {
-        // TODO: Take type shape (kind) into account
-        self.property
+        let explicit = self
+            .property
             .explicit()
-            .is_subset(other.property.explicit())
-            && self
-                .property
-                .implicit()
-                .is_subset(other.property.implicit())
+            .is_subset(other.property.explicit());
+        let implicit = self
+            .property
+            .implicit()
+            .is_subset(other.property.implicit());
+
+        explicit
+            && implicit
+            && match (self.kind(), other.kind()) {
+                // TODO: `Abs` should really be `Infer`
+                (_, TyKind::Abs) => true,
+                (_, TyKind::Infer) => true,
+                (TyKind::Adt(f1), TyKind::Adt(f2)) => {
+                    if f1.len() != f2.len() {
+                        false
+                    } else {
+                        for (field, ty) in f1 {
+                            if !f2.contains_key(&field) || !ty.satisfies(&f2[&field]) {
+                                return false;
+                            }
+                        }
+
+                        true
+                    }
+                }
+                (TyKind::Arr(t1), TyKind::Arr(t2)) => t1.satisfies(&t2),
+                (TyKind::Fn(as1, r1), TyKind::Fn(as2, r2)) => {
+                    // Subtyping is contravariant for argument types
+                    if as1.len() != as2.len() {
+                        return false;
+                    } else {
+                        for (a1, a2) in as1.iter().zip(as2) {
+                            if !a1.satisfies(&a2) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    r1.satisfies(&r2)
+                }
+                (TyKind::Tup(items1), TyKind::Tup(items2)) => {
+                    for (i1, i2) in items1.iter().zip(items2) {
+                        if !i1.satisfies(&i2) {
+                            return false;
+                        }
+                    }
+
+                    true
+                }
+                _ => false,
+            }
     }
 
     pub fn origins(&self) -> Vec<String> {
@@ -94,6 +140,14 @@ impl Ty<ProvenancePair> {
             _ => false,
         };
 
+        // first && last && match (self.kind(), other.kind()) {
+        //     (TyKind::Abs, TyKind::Abs) => true,
+        //     (TyKind::Adt(f1), TyKind::Adt(f2)) => {
+        //         f1 == f2
+        //     }
+        //     (TyKind::Arr(t1), TyKind::Arr(t2))
+        // }
+
         first && last
     }
 }
@@ -122,11 +176,12 @@ impl From<ATy<AProvenancePair>> for Ty<ProvenancePair> {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TyKind<T> {
     Abs,
     Fn(Vec<Ty<T>>, Box<Ty<T>>),
     Tup(Vec<Ty<T>>),
+    Arr(Box<Ty<T>>),
     Adt(HashMap<Symbol, Ty<T>>),
     Infer,
 }
@@ -148,6 +203,8 @@ impl<T: Display> Display for TyKind<T> {
                     .join(",");
                 write!(f, " ({})", items)
             }
+
+            Self::Arr(item_ty) => write!(f, " [{}]", item_ty),
 
             Self::Adt(field_tys) => {
                 let fields = field_tys
@@ -177,6 +234,7 @@ impl From<ATyKind<AFlowPair>> for TyKind<FlowPair> {
             ast::TyKind::Tup(item_tys) => {
                 Self::Tup(item_tys.into_iter().map(|ty| ty.into()).collect())
             }
+            ast::TyKind::Arr(item_ty) => Self::Arr(Box::new(Ty::from(*item_ty))),
         }
     }
 }
@@ -192,6 +250,7 @@ impl From<ATyKind<AProvenancePair>> for TyKind<ProvenancePair> {
             ast::TyKind::Tup(item_tys) => {
                 Self::Tup(item_tys.into_iter().map(|ty| ty.into()).collect())
             }
+            ast::TyKind::Arr(item_ty) => Self::Arr(Box::new(Ty::from(*item_ty))),
         }
     }
 }

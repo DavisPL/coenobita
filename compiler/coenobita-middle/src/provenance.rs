@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use coenobita_ast::provenance;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ProvenancePair(pub Provenance, pub Provenance);
 
 impl ProvenancePair {
@@ -27,7 +27,7 @@ impl Display for ProvenancePair {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Provenance {
     Specific(String),
     Universal,

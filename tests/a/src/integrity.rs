@@ -69,6 +69,8 @@ fn test_if_else_guard_expr() {
 }
 
 fn test_assign_mut() {
+    use std::iter::IntoIterator;
+
     #[cnbt::tag({a}{a,b,c})]
     let mut x = 5;
 
@@ -103,4 +105,30 @@ fn test_if_struct() {
     } else {
         Boo { x: 6, y: true }
     };
+}
+
+fn test_basic_for_loop() {
+    #[cnbt::tag({a}{a})]
+    let mut x = 5;
+
+    #[cnbt::tag({a}{a} [{a}{a}])]
+    let v = [1, 2];
+
+    for i in v {
+        x = 6;
+    }
+}
+
+fn test_basic_while_loop() {
+    #[cnbt::tag({a}{a})]
+    let mut x = 5;
+
+    while true && false {
+        x = 6;
+    }
+
+    // This should fail
+    // while c::boolean() {
+    //     x = 7;
+    // }
 }
