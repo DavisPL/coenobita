@@ -1,4 +1,7 @@
 #![allow(unused)]
+#![feature(new_range_api)]
+
+use core::range::Range;
 
 fn test_let_annotation() {
     #[cnbt::tag({b}{b})]
@@ -102,6 +105,73 @@ fn test_if_struct() {
     } else {
         Boo { x: 6, y: true }
     };
+}
+
+fn test_basic_fn_args() {
+    #[cnbt::tag({*}{*} fn({a}{a}) -> {a}{a})]
+
+    #[cnbt::integrity({*}{*} fn({a}{a}) -> {a}{a})]
+    #[cnbt::provenance((a, b) fn((b, *)) -> (a, a))]
+    fn foo(x: i32) -> i32 {
+        5
+    }
+
+    foo(5);
+}
+
+fn test_fn_args_in_loop() {
+    let s = String::from("far");
+
+    let itr = 0..10;
+
+{
+    let _t = match (Range { start: 0, end: 10 }).into_iter() {
+        mut iter => loop {
+            match (&mut iter).next() {
+                None => break,
+                Some { 0: i } => {
+                    #[cnbt::tag({ * }{ * } fn({ a }{ a }) -> { a }{ a })]
+                    fn foo(x: i32) -> i32 {
+                        5
+                    }
+                    foo(5);
+                }
+            }
+        },
+    };
+    _t
+}
+
+    // for i in 0..10 {
+    //     #[cnbt::tag({*}{*} fn({a}{a}) -> {a}{a})]
+    //     fn foo(x: i32) -> i32 {
+    //         5
+    //     }
+
+    //     foo(5);
+    // }
+}
+
+fn for_loops_desugared() {
+    let v = vec![1, 2, 3];
+
+    for i in v {
+        
+    }
+
+    let p = 0..10;
+
+    for i in v {
+        
+    }
+}
+
+fn while_loops_desugared() {
+    let mut i = 0;
+
+    while i < 10 {
+        i += 1;
+    }
 }
 
 // fn test_loop_with_pattern() {
