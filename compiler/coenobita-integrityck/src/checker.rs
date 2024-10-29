@@ -11,11 +11,13 @@ use rustc_ast::AttrKind;
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::def_id::DefId;
 use rustc_hir::{
-    Arm, Block, BodyId, Expr, ExprField, ExprKind, FnSig, HirId, Item, ItemKind, LetStmt,
-    LoopSource, MatchSource, PatKind, QPath, Stmt, StmtKind,
+    Arm, Block, BodyId, Expr, ExprField, ExprKind, FnSig, HirId, Impl, ImplItem, ImplItemKind,
+    Item, ItemKind, LetStmt, LoopSource, MatchSource, PatKind, PathSegment, QPath, Stmt, StmtKind,
 };
 use rustc_middle::query::queries::def_kind;
+use rustc_middle::ty::layout::HasTyCtxt;
 use rustc_middle::ty::{self, FieldDef, TyCtxt};
+use rustc_span::symbol::kw;
 use rustc_span::{ErrorGuaranteed, Symbol};
 
 use crate::context::Context;
@@ -100,6 +102,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
         match item.kind {
             ItemKind::Fn(signature, _, body_id) => self.check_item_fn(context, &signature, body_id),
+            ItemKind::Impl(impl_) => self.check_item_impl(context, impl_),
             ItemKind::Struct(var_data, _) => {
                 let fields: Vec<FieldDef> = var_data
                     .fields()
@@ -117,6 +120,21 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         }
     }
 
+    pub fn check_impl_item(&mut self, context: &mut Context, item: &ImplItem) -> Result {
+        let did = item.owner_id.to_def_id();
+
+        if self.tcx.get_attr(did, Symbol::intern("ignore")).is_some() {
+            return Ok(());
+        }
+
+        match item.kind {
+            ImplItemKind::Fn(signature, body_id) => {
+                self.check_item_fn(context, &signature, body_id)
+            }
+            _ => Ok(()),
+        }
+    }
+
     pub fn check_item_fn(
         &mut self,
         context: &mut Context,
@@ -124,7 +142,8 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         body_id: BodyId,
     ) -> Result {
         let def_id = body_id.hir_id.owner.to_def_id();
-        let expected = signature.decl.inputs.len();
+        let expected = signature.decl.inputs.iter().count();
+
         let default = context.influence(Ty::ty_fn(expected));
 
         match self.tcx.get_attrs_by_path(def_id, &self.attr).next() {
@@ -170,17 +189,34 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         }
 
         debug("Preapring to check item fn body...");
-        let expr = self.tcx.hir().body(body_id).value;
-        let actual = self.check_expr(context, expr)?;
-        debug("Done checking item fn body");
-
-        let TyKind::Fn(_, expected) = self.function_ty(context, def_id).kind else {
+        let TyKind::Fn(args, expected) = self.function_ty(context, def_id).kind else {
             panic!()
         };
+
+        let body = self.tcx.hir().body(body_id);
+
+        for (param, arg) in body.params.iter().zip(args) {
+            self.hir_map.insert(param.pat.hir_id, arg);
+        }
+
+        let expr = body.value;
+        let actual = self.check_expr(context, &body.value)?;
+
+        debug("Done checking item fn body");
 
         if !actual.satisfies(&expected) {
             let msg = format!("Expected {expected}, found {actual}");
             self.tcx.dcx().span_err(expr.span, msg);
+        }
+
+        Ok(())
+    }
+
+    pub fn check_item_impl(&mut self, context: &mut Context, impl_: &Impl) -> Result {
+        for item_ref in impl_.items {
+            // Get the impl item
+            let impl_item = self.tcx.hir().impl_item(item_ref.id);
+            self.check_impl_item(context, impl_item)?;
         }
 
         Ok(())
@@ -297,6 +333,9 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             ExprKind::Lit(_) => Ok(context.introduce()),
             ExprKind::Path(qpath) => self.check_expr_path(context, expr.hir_id, &qpath),
             ExprKind::Call(func, args) => self.check_expr_call(context, func, args),
+            ExprKind::MethodCall(_, receiver, args, _) => {
+                self.check_method_call(context, expr.hir_id, receiver, args)
+            }
             ExprKind::If(guard, then_expr, else_expr) => {
                 self.check_expr_if(context, guard, then_expr, else_expr)
             }
@@ -387,6 +426,56 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 Ok(*ret_ty)
             }
 
+            _ => todo!(),
+        }
+    }
+
+    pub fn check_method_call(
+        &mut self,
+        context: &mut Context,
+        hir_id: HirId,
+        receiver: &Expr,
+        args: &[Expr],
+    ) -> Result<Ty> {
+        let (def_kind, def_id) = self
+            .tcx
+            .typeck(hir_id.owner.def_id)
+            .type_dependent_def(hir_id)
+            .unwrap();
+
+        match def_kind {
+            DefKind::AssocFn => {
+                debug("Getting the ty of an assoc fn");
+                let fty = self.function_ty(context, def_id);
+                debug(format!("It is {:?}", fty));
+
+                match fty.kind() {
+                    TyKind::Fn(arg_tys, ret_ty) => {
+                        // We subtract one to account for the receiver
+                        if args.len() != arg_tys.len() - 1 {
+                            todo!()
+                        }
+
+                        let args = std::iter::once(receiver).chain(args.iter());
+
+                        for (expected, expr) in arg_tys.iter().zip(args) {
+                            let actual = self.check_expr(context, expr)?;
+
+                            if !actual.satisfies(expected) {
+                                let msg = format!("Expected {expected}, found {actual}");
+                                self.tcx.dcx().span_err(expr.span, msg);
+                            }
+                        }
+
+                        Ok(*ret_ty)
+                    }
+
+                    _ => todo!(),
+                }
+            }
+            DefKind::Fn => {
+                unreachable!()
+            }
             _ => todo!(),
         }
     }
@@ -638,5 +727,21 @@ fn qpath_string<'tcx>(tcx: TyCtxt<'tcx>, qpath: &QPath<'_>) -> String {
             // Language items can be printed directly by their known name
             format!("LangItem QPath: {:?}", lang_item)
         }
+    }
+}
+
+fn qpath_is_self(qpath: &QPath<'_>) -> bool {
+    match qpath {
+        QPath::Resolved(_, path) => {
+            // Check if the first segment of the path is `Self`
+            path.segments
+                .first()
+                .map_or(false, |segment| segment.ident.name == kw::SelfUpper)
+        }
+        QPath::TypeRelative(_, segment) => {
+            // In TypeRelative, check if it resolves to `Self`
+            segment.ident.name == kw::SelfUpper
+        }
+        _ => false,
     }
 }

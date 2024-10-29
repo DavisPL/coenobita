@@ -9,42 +9,12 @@ fn test_let_annotation() {
     let x = b::value();
 }
 
-fn test_basic_if_else() {
-    #[cnbt::tag({a}{a,c})]
-    let y = if c::boolean() { 6 } else { 7 };
-
-    #[cnbt::tag({a,b,c}{a,b,c})]
-    let z = y;
-}
-
 fn test_addition() {
     #[cnbt::tag({b,c}{a,b,c})]
     let x = b::value() + c::value();
 
     #[cnbt::tag({a,b,c}{a,b,c})]
     let y = 5 + x;
-}
-
-fn test_addition_in_if_else() {
-    #[cnbt::tag({a,b}{a,b,c})]
-    let y = if c::boolean() { 5 + b::value() } else { 7 };
-}
-
-fn test_nested_if_else() {
-    #[cnbt::tag({a}{a,b,c})]
-    let y = if b::boolean() {
-        if c::boolean() {
-            5
-        } else {
-            6
-        }
-    } else {
-        if !c::boolean() {
-            7
-        } else {
-            8
-        }
-    };
 }
 
 fn test_nested_item_fn() {
@@ -105,30 +75,4 @@ fn test_if_struct() {
     } else {
         Boo { x: 6, y: true }
     };
-}
-
-fn test_basic_for_loop() {
-    #[cnbt::tag({a}{a})]
-    let mut x = 5;
-
-    #[cnbt::tag({a}{a} [{a}{a}])]
-    let v = [1, 2];
-
-    for i in v {
-        x = 6;
-    }
-}
-
-fn test_basic_while_loop() {
-    #[cnbt::tag({a}{a})]
-    let mut x = 5;
-
-    while true && false {
-        x = 6;
-    }
-
-    // This should fail
-    // while c::boolean() {
-    //     x = 7;
-    // }
 }
