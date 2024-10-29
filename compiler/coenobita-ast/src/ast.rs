@@ -3,31 +3,29 @@ use std::fmt::Display;
 use itertools::Itertools;
 use rustc_span::Span;
 
-use crate::flow::FlowPair;
-
 #[derive(Clone)]
-pub struct Ty {
-    pub fpair: FlowPair,
+pub struct Ty<T> {
+    pub property: T,
 
-    pub kind: TyKind,
+    pub kind: TyKind<T>,
 
     pub span: Span,
 }
 
-impl Display for Ty {
+impl<T: Display> Display for Ty<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}{}", self.fpair, self.kind)
+        write!(f, "{}{}", self.property, self.kind)
     }
 }
 
 #[derive(Clone)]
-pub enum TyKind {
-    Fn(Vec<Ty>, Box<Ty>),
-    Tup(Vec<Ty>),
+pub enum TyKind<T> {
+    Fn(Vec<Ty<T>>, Box<Ty<T>>),
+    Tup(Vec<Ty<T>>),
     Abstract,
 }
 
-impl Display for TyKind {
+impl<T: Display> Display for TyKind<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Fn(arg_tys, ret_ty) => {

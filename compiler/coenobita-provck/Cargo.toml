@@ -1,0 +1,13 @@
+[package]
+name = "coenobita-provck"
+version = "0.1.0"
+edition.workspace = true
+
+[package.metadata.rust-analyzer]
+rustc_private = true
+
+[dependencies]
+coenobita-ast.workspace = true
+coenobita-log.workspace = true
+coenobita-middle.workspace = true
+coenobita-parse.workspace = true

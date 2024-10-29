@@ -11,5 +11,6 @@ path = "src/main.rs"
 rustc_private = true
 
 [dependencies]
-coenobita-typeck.workspace = true
+coenobita-integrityck.workspace = true
+coenobita-provck.workspace = true
 coenobita-log.workspace = true

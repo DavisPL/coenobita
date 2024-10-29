@@ -3,7 +3,8 @@ use rustc_hir::{intravisit::Visitor, Item};
 use rustc_interface::{interface::Compiler, Queries};
 use rustc_middle::{hir::nested_filter::OnlyBodies, ty::TyCtxt};
 
-use coenobita_typeck::{checker::Checker, context::Context};
+use coenobita_integrityck::{checker::Checker as IChecker, context::Context};
+use coenobita_provck::checker::Checker as PChecker;
 
 pub struct CoenobitaCallbacks {
     crate_name: String,
@@ -37,7 +38,8 @@ impl Callbacks for CoenobitaCallbacks {
 struct CoenobitaVisitor<'cnbt, 'tcx> {
     crate_name: &'cnbt str,
     tcx: TyCtxt<'tcx>,
-    checker: Checker<'cnbt, 'tcx>,
+    ichecker: IChecker<'cnbt, 'tcx>,
+    pchecker: PChecker<'cnbt, 'tcx>,
 }
 
 impl<'c, 'tcx> CoenobitaVisitor<'c, 'tcx> {
@@ -45,7 +47,8 @@ impl<'c, 'tcx> CoenobitaVisitor<'c, 'tcx> {
         CoenobitaVisitor {
             crate_name,
             tcx,
-            checker: Checker::new(crate_name, tcx),
+            ichecker: IChecker::new(crate_name, tcx),
+            pchecker: PChecker::new(crate_name, tcx),
         }
     }
 }
@@ -59,6 +62,11 @@ impl<'c, 'tcx> Visitor<'tcx> for CoenobitaVisitor<'c, 'tcx> {
 
     fn visit_item(&mut self, item: &'tcx Item<'tcx>) -> Self::Result {
         let mut context = Context::new(self.crate_name);
-        let _ = self.checker.check_item(&mut context, item);
+
+        // Check integrity
+        let _ = self.ichecker.check_item(&mut context, item);
+
+        // Check provenance
+        let _ = self.pchecker.check_item(item);
     }
 }

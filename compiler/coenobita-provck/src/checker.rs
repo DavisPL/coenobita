@@ -1,16 +1,13 @@
 use std::collections::HashMap;
 
 use coenobita_ast::ast::TyKind as ATyKind;
-use coenobita_middle::map::Map;
-use coenobita_middle::ty::{Ty, TyKind};
-
 use coenobita_log::debug;
+use coenobita_middle::map::Map;
+use coenobita_middle::provenance::{Provenance, ProvenancePair};
+use coenobita_middle::ty::{Ty as _Ty, TyKind};
+use coenobita_parse::{create_parser, create_psess};
 
-use coenobita_parse::CoenobitaParser;
-use rustc_ast::tokenstream::TokenStream;
 use rustc_ast::AttrKind;
-use rustc_driver::DEFAULT_LOCALE_RESOURCES;
-use rustc_errors::fallback_fluent_bundle;
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::def_id::DefId;
 use rustc_hir::{
@@ -18,12 +15,9 @@ use rustc_hir::{
     Stmt, StmtKind,
 };
 use rustc_middle::ty::{self, FieldDef, TyCtxt};
-use rustc_parse::parser::Parser;
-use rustc_session::parse::ParseSess;
 use rustc_span::{ErrorGuaranteed, Symbol};
 
-use crate::context::Context;
-use crate::utilities::emitter;
+type Ty = _Ty<ProvenancePair>;
 
 pub struct Checker<'cnbt, 'tcx> {
     crate_name: &'cnbt str,
@@ -39,27 +33,27 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     pub fn new(crate_name: &'cnbt str, tcx: TyCtxt<'tcx>) -> Self {
         Checker {
             crate_name,
-            attr: vec![Symbol::intern("cnbt"), Symbol::intern("tag")],
+            attr: vec![Symbol::intern("cnbt"), Symbol::intern("provenance")],
             tcx,
             def_map: Map::new(),
             hir_map: Map::new(),
         }
     }
 
-    pub fn function_ty(&mut self, context: &mut Context, def_id: DefId) -> Ty {
+    pub fn function_ty(&mut self, def_id: DefId) -> Ty {
         debug(format!("Trying to get type of function {:#?}", def_id));
 
         match self.def_map.get(&def_id) {
             Some(ty) => ty.clone(),
             None => {
                 // We haven't processed the definition of this function yet
-                let _ = self.new_check_item_fn(context, def_id);
+                let _ = self.new_check_item_fn(def_id);
                 self.def_map.get(&def_id).unwrap().clone()
             }
         }
     }
 
-    pub fn adt_ty(&mut self, context: &mut Context, def_id: DefId) -> Ty {
+    pub fn adt_ty(&mut self, def_id: DefId) -> Ty {
         debug(format!("Trying to get type of adt (struct) {:#?}", def_id));
 
         match self.def_map.get(&def_id) {
@@ -76,25 +70,47 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     .fields
                     .raw;
 
-                let _ = self.check_item_struct(context, def_id, field_defs);
+                let _ = self.check_item_struct(def_id, field_defs);
                 self.def_map.get(&def_id).unwrap().clone()
             }
         }
     }
 
-    pub fn local_ty(&mut self, context: &mut Context, hir_id: HirId) -> Result<Ty> {
+    pub fn local_ty(&mut self, hir_id: HirId) -> Result<Ty> {
         match self.hir_map.get(&hir_id) {
             Some(ty) => Ok(ty.clone()),
             None => {
                 // We haven't processed this variable yet, which means it has no annotation
-                let default = context.universal();
+                let default = self.universal();
                 self.hir_map.insert(hir_id, default.clone());
                 Ok(default)
             }
         }
     }
 
-    pub fn check_item(&mut self, context: &mut Context, item: &Item) -> Result {
+    pub fn universal(&self) -> Ty {
+        Ty::new(
+            ProvenancePair(Provenance::Universal, Provenance::Universal),
+            TyKind::Abs,
+        )
+    }
+
+    pub fn introduce(&self) -> Ty {
+        Ty::new(
+            ProvenancePair(
+                Provenance::Specific(self.crate_name.to_owned()),
+                Provenance::Specific(self.crate_name.to_owned()),
+            ),
+            TyKind::Abs,
+        )
+    }
+
+    pub fn provide(&self, mut ty: Ty) -> Ty {
+        ty.property.1 = Provenance::Specific(self.crate_name.to_owned());
+        ty
+    }
+
+    pub fn check_item(&mut self, item: &Item) -> Result {
         debug(format!("Checking item {:?}", item.kind));
         let did = item.owner_id.to_def_id();
 
@@ -103,7 +119,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         }
 
         match item.kind {
-            ItemKind::Fn(signature, _, body_id) => self.check_item_fn(context, &signature, body_id),
+            ItemKind::Fn(signature, _, body_id) => self.check_item_fn(&signature, body_id),
             ItemKind::Struct(var_data, _) => {
                 let fields: Vec<FieldDef> = var_data
                     .fields()
@@ -115,21 +131,16 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     })
                     .collect();
 
-                self.check_item_struct(context, did, &fields)
+                self.check_item_struct(did, &fields)
             }
             _ => Ok(()),
         }
     }
 
-    pub fn check_item_fn(
-        &mut self,
-        context: &mut Context,
-        signature: &FnSig,
-        body_id: BodyId,
-    ) -> Result {
+    pub fn check_item_fn(&mut self, signature: &FnSig, body_id: BodyId) -> Result {
         let def_id = body_id.hir_id.owner.to_def_id();
         let expected = signature.decl.inputs.len();
-        let default = context.influence(Ty::ty_fn(expected));
+        let default = Ty::ty_fn(expected);
 
         match self.tcx.get_attrs_by_path(def_id, &self.attr).next() {
             Some(attr) => {
@@ -141,7 +152,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 let psess = create_psess(&self.tcx);
                 let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
 
-                if let Ok(ty) = parser.parse_ty() {
+                if let Ok(ty) = parser.parse_pty() {
                     match ty.kind {
                         ATyKind::Fn(ref arg_tys, _) => {
                             // Make sure the number of arguments matches
@@ -149,7 +160,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
                             if actual == expected {
                                 // Note that we currently don't check whether types have the correct shape
-                                self.def_map.insert(def_id, context.influence(ty.into()));
+                                self.def_map.insert(def_id, ty.into());
                             } else {
                                 self.def_map.insert(def_id, default);
 
@@ -173,14 +184,18 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             }
         }
 
-        debug("Preapring to check item fn body...");
-        let expr = self.tcx.hir().body(body_id).value;
-        let actual = self.check_expr(context, expr)?;
-        debug("Done checking item fn body");
-
-        let TyKind::Fn(_, expected) = self.function_ty(context, def_id).kind else {
+        let TyKind::Fn(args, expected) = self.function_ty(def_id).kind else {
             panic!()
         };
+
+        let body = self.tcx.hir().body(body_id);
+
+        for (param, arg) in body.params.iter().zip(args) {
+            self.hir_map.insert(param.pat.hir_id, arg);
+        }
+
+        let expr = body.value;
+        let actual = self.check_expr(&body.value)?;
 
         if !actual.satisfies(&expected) {
             let msg = format!("Expected {expected}, found {actual}");
@@ -190,12 +205,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         Ok(())
     }
 
-    pub fn check_item_struct(
-        &mut self,
-        context: &mut Context,
-        def_id: DefId,
-        field_defs: &[FieldDef],
-    ) -> Result {
+    pub fn check_item_struct(&mut self, def_id: DefId, field_defs: &[FieldDef]) -> Result {
         let mut fields = HashMap::new();
 
         for field in field_defs {
@@ -209,19 +219,19 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     let psess = create_psess(&self.tcx);
                     let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
 
-                    if let Ok(ty) = parser.parse_ty() {
+                    if let Ok(ty) = parser.parse_pty() {
                         fields.insert(field.name, ty.into());
                     };
                 }
 
                 _ => {
-                    fields.insert(field.name, context.universal());
+                    fields.insert(field.name, self.universal());
                 }
             };
         }
 
         // Since this type is a struct definition, its flow pair will never be used and is only here for consistency
-        let mut ty = context.universal();
+        let mut ty = self.universal();
         ty.kind = TyKind::Adt(fields);
 
         self.def_map.insert(def_id, ty);
@@ -230,7 +240,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     }
 
     // TODO: Change the name of this function
-    pub fn new_check_item_fn(&mut self, context: &mut Context, def_id: DefId) -> Result {
+    pub fn new_check_item_fn(&mut self, def_id: DefId) -> Result {
         let expected = self
             .tcx
             .fn_sig(def_id)
@@ -239,7 +249,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             .iter()
             .count();
 
-        let default = context.influence(Ty::ty_fn(expected));
+        let default = Ty::ty_fn(expected);
 
         match self.tcx.get_attrs_by_path(def_id, &self.attr).next() {
             Some(attr) => {
@@ -251,7 +261,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 let psess = create_psess(&self.tcx);
                 let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
 
-                if let Ok(ty) = parser.parse_ty() {
+                if let Ok(ty) = parser.parse_pty() {
                     self.def_map.insert(def_id, ty.into());
                 };
             }
@@ -264,12 +274,9 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         Ok(())
     }
 
-    pub fn check_let_stmt(&mut self, context: &mut Context, local: &LetStmt) {
-        debug("Checking a let stmt!");
-
+    pub fn check_let_stmt(&mut self, local: &LetStmt) {
         for attr in self.tcx.hir().attrs(local.hir_id) {
             if attr.path_matches(&self.attr) {
-                // SAFETY - The `coenobita::tag` is guaranteed to be a normal attribute
                 let AttrKind::Normal(normal) = &attr.kind else {
                     unreachable!()
                 };
@@ -277,12 +284,12 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 let psess = create_psess(&self.tcx);
                 let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
 
-                if let Ok(ty) = parser.parse_ty() {
+                if let Ok(ty) = parser.parse_pty() {
                     let expected: Ty = ty.into();
                     self.hir_map.insert(local.pat.hir_id, expected.clone());
 
                     if let Some(expr) = local.init {
-                        if let Ok(actual) = self.check_expr(context, expr) {
+                        if let Ok(actual) = self.check_expr(expr) {
                             if !actual.satisfies(&expected) {
                                 let msg = format!("Expected {expected}, found {actual}");
                                 self.tcx.dcx().span_err(expr.span, msg);
@@ -294,29 +301,36 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         }
     }
 
-    pub fn check_expr(&mut self, context: &mut Context, expr: &Expr) -> Result<Ty> {
+    pub fn check_expr(&mut self, expr: &Expr) -> Result<Ty> {
         debug(format!("> expr kind is {:?}", expr.kind));
 
         match expr.kind {
-            ExprKind::Lit(_) => Ok(context.introduce()),
-            ExprKind::Path(qpath) => self.check_expr_path(context, expr.hir_id, &qpath),
-            ExprKind::Call(func, args) => self.check_expr_call(context, func, args),
+            ExprKind::Lit(_) => Ok(self.introduce()),
+            ExprKind::Path(qpath) => self.check_expr_path(expr.hir_id, &qpath),
+            ExprKind::Call(func, args) => self.check_expr_call(func, args),
             ExprKind::If(guard, then_expr, else_expr) => {
-                self.check_expr_if(context, guard, then_expr, else_expr)
+                self.check_expr_if(guard, then_expr, else_expr)
             }
-            ExprKind::Match(guard, arms, _) => self.check_expr_match(context, guard, arms),
-            ExprKind::Binary(_, lhs, rhs) => self.check_expr_binary(context, lhs, rhs),
-            ExprKind::Unary(_, expr) => self.check_expr(context, expr),
-            ExprKind::Block(block, _) => self.check_expr_block(context, block),
-            ExprKind::Assign(dest, expr, _) => self.check_expr_assign(context, dest, expr),
-            ExprKind::AssignOp(_, dest, expr) => self.check_expr_assign(context, dest, expr),
+            ExprKind::Match(guard, arms, _) => self.check_expr_match(guard, arms),
+            ExprKind::Binary(_, lhs, rhs) => self.check_expr_binary(lhs, rhs),
+            ExprKind::Unary(_, expr) => self.check_expr(expr),
+            ExprKind::Block(block, _) => self.check_expr_block(block),
+            ExprKind::Assign(dest, expr, _) => self.check_expr_assign(dest, expr),
+            ExprKind::AssignOp(_, dest, expr) => self.check_expr_assign(dest, expr),
+            ExprKind::AddrOf(_, _, expr) => self.check_expr(expr),
             ExprKind::Struct(qpath, fields, _) => {
                 // TODO: Account for `..base` (the last field of the tuple above)
-                self.check_expr_struct(context, expr.hir_id, qpath, fields)
+                self.check_expr_struct(expr.hir_id, qpath, fields)
             }
 
             // This kind of expression is typically generated by the compiler
-            ExprKind::DropTemps(expr) => self.check_expr(context, expr),
+            ExprKind::DropTemps(expr) => self.check_expr(expr),
+
+            // Loops with conditions, like `for i in 0..10 { ... }` are desugared into unconditional loops with match statements inside
+            ExprKind::Loop(block, _, _, _) => self.check_expr_block(block),
+
+            // Nothing needs to happen here but `Ty` must be returned, so we pretend `break` has a type
+            ExprKind::Break(_, _) => Ok(self.introduce()),
 
             _ => {
                 debug(format!("Skipping expr of kind {:#?}", expr.kind));
@@ -325,22 +339,17 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         }
     }
 
-    pub fn check_expr_path(
-        &mut self,
-        context: &mut Context,
-        hir_id: HirId,
-        qpath: &QPath,
-    ) -> Result<Ty> {
+    pub fn check_expr_path(&mut self, hir_id: HirId, qpath: &QPath) -> Result<Ty> {
         let local_def_id = hir_id.owner.to_def_id().as_local().unwrap();
 
         match self.tcx.typeck(local_def_id).qpath_res(qpath, hir_id) {
-            Res::Local(hir_id) => self.local_ty(context, hir_id),
+            Res::Local(hir_id) => self.local_ty(hir_id),
             Res::Def(def_kind, def_id) => match def_kind {
-                DefKind::Fn => Ok(self.function_ty(context, def_id)),
+                DefKind::Fn => Ok(self.function_ty(def_id)),
 
                 DefKind::AssocFn => {
                     // TODO: Associated functions are not actually tracked yet
-                    Ok(self.function_ty(context, def_id))
+                    Ok(self.function_ty(def_id))
                 }
 
                 _ => {
@@ -354,13 +363,8 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         }
     }
 
-    pub fn check_expr_call(
-        &mut self,
-        context: &mut Context,
-        func: &Expr,
-        args: &[Expr],
-    ) -> Result<Ty> {
-        let fty = self.check_expr(context, func)?;
+    pub fn check_expr_call(&mut self, func: &Expr, args: &[Expr]) -> Result<Ty> {
+        let fty = self.check_expr(func)?;
 
         match fty.kind() {
             TyKind::Fn(arg_tys, ret_ty) => {
@@ -369,7 +373,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 }
 
                 for (expected, expr) in arg_tys.iter().zip(args) {
-                    let actual = self.check_expr(context, expr)?;
+                    let actual = self.check_expr(expr)?;
 
                     if !actual.satisfies(expected) {
                         let msg = format!("Expected {expected}, found {actual}");
@@ -377,7 +381,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     }
                 }
 
-                Ok(*ret_ty)
+                Ok(self.provide(*ret_ty))
             }
 
             _ => todo!(),
@@ -386,86 +390,83 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
     pub fn check_expr_if(
         &mut self,
-        context: &mut Context,
         guard: &Expr,
         then_expr: &Expr,
         else_expr: Option<&Expr>,
     ) -> Result<Ty> {
-        let ity = self.check_expr(context, guard)?;
-        context.enter(&ity);
+        self.check_expr(guard)?;
 
-        let mut rty = self.check_expr(context, then_expr)?;
+        let tty = self.check_expr(then_expr)?;
+        let ety = match else_expr {
+            Some(expr) => self.check_expr(expr)?,
+            None => tty.clone(),
+        };
 
-        if let Some(else_expr) = else_expr {
-            rty = rty.merge(self.check_expr(context, else_expr)?);
+        if !ety.satisfies(&tty) {
+            let l1 = "`if` and `else` have incompatible types";
+            let msg = format!("{l1}\nexpected {tty}, found {ety}");
+            Err(self.tcx.dcx().span_err(else_expr.unwrap().span, msg))
+        } else {
+            Ok(tty)
         }
-
-        context.exit();
-        Ok(rty)
     }
 
-    pub fn check_expr_match(
-        &mut self,
-        context: &mut Context,
-        guard: &Expr,
-        arms: &[Arm],
-    ) -> Result<Ty> {
-        let ity = self.check_expr(context, guard)?;
-        context.enter(&ity);
+    pub fn check_expr_match(&mut self, guard: &Expr, arms: &[Arm]) -> Result<Ty> {
+        self.check_expr(guard)?;
 
-        let mut result = context.introduce();
-
-        for arm in arms {
-            result = result.merge(self.check_expr(context, arm.body)?)
+        if arms.is_empty() {
+            todo!()
         }
 
-        context.exit();
+        let mut arms = arms.iter();
+        let result = self.check_expr(arms.next().unwrap().body)?;
+
+        loop {
+            match arms.next() {
+                Some(arm) => {
+                    let branch = self.check_expr(arm.body)?;
+
+                    if !branch.satisfies(&result) {
+                        let l1 = "arms have incompatible types";
+                        let msg = format!("{l1}\nexpected {result}, found {branch}");
+                        return Err(self.tcx.dcx().span_err(arm.body.span, msg));
+                    }
+                }
+
+                None => break,
+            }
+        }
+
         Ok(result)
     }
 
-    pub fn check_expr_binary(
-        &mut self,
-        context: &mut Context,
-        lhs: &Expr,
-        rhs: &Expr,
-    ) -> Result<Ty> {
-        let ty = self
-            .check_expr(context, lhs)?
-            .merge(self.check_expr(context, rhs)?);
+    pub fn check_expr_binary(&mut self, lhs: &Expr, rhs: &Expr) -> Result<Ty> {
+        self.check_expr(lhs)?;
+        self.check_expr(rhs)?;
 
-        Ok(context.influence(ty))
+        Ok(self.introduce())
     }
 
-    pub fn check_expr_block(&mut self, context: &mut Context, block: &Block) -> Result<Ty> {
+    pub fn check_expr_block(&mut self, block: &Block) -> Result<Ty> {
         for stmt in block.stmts {
-            debug("Checking a statement...");
-            self.check_stmt(context, stmt)?;
+            self.check_stmt(stmt)?;
         }
 
         match block.expr {
             Some(expr) => {
-                debug("The last stmt is an expr");
                 // This expression occurs at the very end without a semicolon
-                self.check_expr(context, expr)
+                self.check_expr(expr)
             }
 
-            None if block.stmts.len() > 0 => {
-                debug("The last stmt is NOT an expr");
-                self.check_stmt(context, &block.stmts[block.stmts.len() - 1])
-            }
+            None if block.stmts.len() > 0 => self.check_stmt(&block.stmts[block.stmts.len() - 1]),
 
-            _ => Ok(context.introduce()),
+            _ => Ok(self.introduce()),
         }
     }
 
-    pub fn check_expr_assign(
-        &mut self,
-        context: &mut Context,
-        dest: &Expr,
-        expr: &Expr,
-    ) -> Result<Ty> {
-        let expected = self.check_expr(context, dest)?;
-        let actual = self.check_expr(context, expr)?;
+    pub fn check_expr_assign(&mut self, dest: &Expr, expr: &Expr) -> Result<Ty> {
+        let expected = self.check_expr(dest)?;
+        let actual = self.check_expr(expr)?;
 
         if actual.satisfies(&expected) {
             Ok(expected)
@@ -477,7 +478,6 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
     pub fn check_expr_struct(
         &mut self,
-        context: &mut Context,
         hir_id: HirId,
         qpath: &QPath,
         fields: &[ExprField],
@@ -487,13 +487,13 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         match self.tcx.typeck(local_def_id).qpath_res(qpath, hir_id) {
             Res::Def(def_kind, def_id) => match def_kind {
                 DefKind::Struct => {
-                    let sty = self.adt_ty(context, def_id);
+                    let sty = self.adt_ty(def_id);
 
                     match sty.kind() {
                         TyKind::Adt(field_tys) => {
                             for field in fields {
                                 let expected = &field_tys[&field.ident.name];
-                                let actual = self.check_expr(context, field.expr)?;
+                                let actual = self.check_expr(field.expr)?;
 
                                 if !actual.satisfies(expected) {
                                     let msg = format!("Expected {expected}, found {actual}");
@@ -502,7 +502,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                             }
 
                             // We need to replace the flow pair of `ty` with the introduction pair
-                            let mut ty = context.introduce();
+                            let mut ty = self.introduce();
                             ty.kind = TyKind::Adt(field_tys);
 
                             Ok(ty)
@@ -523,40 +523,22 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         }
     }
 
-    pub fn check_stmt(&mut self, context: &mut Context, stmt: &Stmt) -> Result<Ty> {
+    pub fn check_stmt(&mut self, stmt: &Stmt) -> Result<Ty> {
         match stmt.kind {
             StmtKind::Expr(expr) => {
-                let _ = self.check_expr(context, expr);
+                let _ = self.check_expr(expr);
             }
             StmtKind::Semi(expr) => {
-                let _ = self.check_expr(context, expr);
+                let _ = self.check_expr(expr);
             }
-            StmtKind::Let(local) => self.check_let_stmt(context, local),
+            StmtKind::Let(local) => self.check_let_stmt(local),
             StmtKind::Item(item_id) => {
-                let _ = self.check_item(context, self.tcx.hir().item(item_id));
+                let _ = self.check_item(self.tcx.hir().item(item_id));
             }
         };
 
-        Ok(context.universal())
+        Ok(self.universal())
     }
-}
-
-fn create_psess(tcx: &TyCtxt) -> ParseSess {
-    let opts = tcx.sess.opts.clone();
-    let source_map = tcx.sess.psess.clone_source_map();
-    let fallback_bundle = fallback_fluent_bundle(DEFAULT_LOCALE_RESOURCES.to_vec(), false);
-    let emitter = emitter(opts, source_map.clone(), fallback_bundle);
-    let dcx = rustc_errors::DiagCtxt::new(emitter);
-
-    ParseSess::with_dcx(dcx, source_map)
-}
-
-fn create_parser<'cnbt>(psess: &'cnbt ParseSess, stream: TokenStream) -> CoenobitaParser<'cnbt> {
-    // Set up the rustc parser and the custom CnbtParser
-    let rustc_parser = Parser::new(&psess, stream, None);
-    let parser = CoenobitaParser::new(rustc_parser);
-
-    parser
 }
 
 fn qpath_string<'tcx>(tcx: TyCtxt<'tcx>, qpath: &QPath<'_>) -> String {
