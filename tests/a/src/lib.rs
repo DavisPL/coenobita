@@ -94,7 +94,7 @@ fn test_struct() {
 
 fn test_if_struct() {
     struct Boo {
-        #[cnbt::tag({a}{a,c})]
+        #[cnbt::tag({b}{a,c})]
         x: i32,
         y: bool,
     }
@@ -106,6 +106,14 @@ fn test_if_struct() {
         Boo { x: 6, y: true }
     };
 }
+
+// fn check() {
+//     let x = if true {
+//         "boo"
+//     } else {
+//         6
+//     };
+// }
 
 // fn test_basic_fn_args() {
 //     #[cnbt::tag({*}{*} fn({a}{a}) -> {a}{a})]

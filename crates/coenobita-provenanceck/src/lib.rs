@@ -1,14 +1,13 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+#![feature(rustc_private)]
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+extern crate rustc_ast;
+extern crate rustc_data_structures;
+extern crate rustc_driver;
+extern crate rustc_errors;
+extern crate rustc_hir;
+extern crate rustc_middle;
+extern crate rustc_parse;
+extern crate rustc_session;
+extern crate rustc_span;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+mod checker;

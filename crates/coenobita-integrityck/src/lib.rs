@@ -12,4 +12,3 @@ extern crate rustc_span;
 
 pub mod checker;
 pub mod context;
-pub mod utilities;

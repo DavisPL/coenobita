@@ -1,9 +1,7 @@
 use std::collections::HashSet;
 
-use coenobita_middle::{
-    flow::{FlowPair, FlowSet},
-    ty::{Ty as _Ty, TyKind},
-};
+use coenobita_middle::flow::{FlowPair, FlowSet};
+use coenobita_middle::ty::{Ty as _Ty, TyKind};
 
 type Ty = _Ty<FlowPair>;
 

@@ -52,6 +52,12 @@ dependencies = [
 [[package]]
 name = "coenobita-provenanceck"
 version = "0.1.0"
+dependencies = [
+ "coenobita-ast",
+ "coenobita-log",
+ "coenobita-middle",
+ "coenobita-parse",
+]
 
 [[package]]
 name = "either"
