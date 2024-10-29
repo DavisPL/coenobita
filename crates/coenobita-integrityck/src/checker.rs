@@ -1,8 +1,9 @@
 use std::collections::HashMap;
 
 use coenobita_ast::ast::TyKind as ATyKind;
+use coenobita_middle::flow::FlowPair;
 use coenobita_middle::map::Map;
-use coenobita_middle::ty::{Ty, TyKind};
+use coenobita_middle::ty::{Ty as _Ty, TyKind};
 
 use coenobita_log::debug;
 
@@ -33,6 +34,7 @@ pub struct Checker<'cnbt, 'tcx> {
     hir_map: Map<HirId, Ty>,
 }
 
+type Ty = _Ty<FlowPair>;
 type Result<T = ()> = std::result::Result<T, ErrorGuaranteed>;
 
 impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {

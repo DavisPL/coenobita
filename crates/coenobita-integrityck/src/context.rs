@@ -2,8 +2,10 @@ use std::collections::HashSet;
 
 use coenobita_middle::{
     flow::{FlowPair, FlowSet},
-    ty::{Ty, TyKind},
+    ty::{Ty as _Ty, TyKind},
 };
+
+type Ty = _Ty<FlowPair>;
 
 pub struct Context<'cnbt> {
     crate_name: &'cnbt str,
@@ -42,8 +44,8 @@ impl<'cnbt> Context<'cnbt> {
             .fold(self.levels[0].clone(), |acc, elem| acc.union(elem));
 
         let fpair = FlowPair(
-            ty.fpair.explicit().clone(),
-            ty.fpair.implicit().clone().union(&implicit),
+            ty.property.explicit().clone(),
+            ty.property.implicit().clone().union(&implicit),
         );
 
         Ty::new(fpair, ty.kind)
@@ -54,7 +56,7 @@ impl<'cnbt> Context<'cnbt> {
     }
 
     pub fn enter(&mut self, ty: &Ty) {
-        let fset = ty.fpair.explicit().clone().union(ty.fpair.implicit());
+        let fset = ty.property.explicit().clone().union(ty.property.implicit());
         self.levels.push(fset);
     }
 

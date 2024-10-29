@@ -7,82 +7,90 @@ use itertools::Itertools;
 use rustc_span::Symbol;
 
 #[derive(Debug, Clone)]
-pub struct Ty {
-    pub fpair: FlowPair,
+pub struct Ty<T> {
+    pub property: T,
 
-    pub kind: TyKind,
+    pub kind: TyKind<T>,
 }
 
-impl Ty {
-    pub fn new(fpair: FlowPair, kind: TyKind) -> Self {
-        Ty { fpair, kind }
+impl Ty<FlowPair> {
+    pub fn new(fpair: FlowPair, kind: TyKind<FlowPair>) -> Self {
+        Ty {
+            property: fpair,
+            kind,
+        }
     }
 
     pub fn with_explicit(mut self, explicit: FlowSet) -> Self {
-        self.fpair.0 = explicit;
+        self.property.0 = explicit;
         self
     }
 
-    pub fn merge(self, other: Ty) -> Ty {
-        let explicit = self.fpair.explicit().union(other.fpair.explicit());
-        let implicit = self.fpair.implicit().union(other.fpair.implicit());
+    pub fn merge(self, other: Ty<FlowPair>) -> Ty<FlowPair> {
+        let explicit = self.property.explicit().union(other.property.explicit());
+        let implicit = self.property.implicit().union(other.property.implicit());
 
         // We assume both types have the same shape
         Ty::new(FlowPair(explicit, implicit), self.kind())
     }
 
-    pub fn kind(self) -> TyKind {
+    pub fn kind(self) -> TyKind<FlowPair> {
         self.kind
     }
 
-    pub fn ty_fn(n: usize) -> Ty {
+    pub fn ty_fn(n: usize) -> Ty<FlowPair> {
         let default_flow_pair = FlowPair::new(FlowSet::Universal, FlowSet::Universal);
         let default_ty = Ty::new(default_flow_pair.clone(), TyKind::Infer);
 
         let args = vec![default_ty.clone(); n]; // Create `n` copies of `default_ty`
 
         Ty {
-            fpair: default_flow_pair,
+            property: default_flow_pair,
             kind: TyKind::Fn(args, Box::new(default_ty)),
         }
     }
 
-    pub fn satisfies(&self, other: &Ty) -> bool {
+    pub fn satisfies(&self, other: &Ty<FlowPair>) -> bool {
         // TODO: Take type shape (kind) into account
-        self.fpair.explicit().is_subset(other.fpair.explicit())
-            && self.fpair.implicit().is_subset(other.fpair.implicit())
+        self.property
+            .explicit()
+            .is_subset(other.property.explicit())
+            && self
+                .property
+                .implicit()
+                .is_subset(other.property.implicit())
     }
 
     pub fn origins(&self) -> Vec<String> {
-        self.fpair.origins()
+        self.property.origins()
     }
 }
 
-impl Display for Ty {
+impl<T: Display> Display for Ty<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}{}", self.fpair, self.kind)
+        write!(f, "{}{}", self.property, self.kind)
     }
 }
 
-impl From<ATy<AFlowPair>> for Ty {
+impl From<ATy<AFlowPair>> for Ty<FlowPair> {
     fn from(value: ATy<AFlowPair>) -> Self {
         Ty {
-            fpair: value.property.into(),
+            property: value.property.into(),
             kind: value.kind.into(),
         }
     }
 }
 
 #[derive(Debug, Clone)]
-pub enum TyKind {
+pub enum TyKind<T> {
     Abs,
-    Fn(Vec<Ty>, Box<Ty>),
-    Tup(Vec<Ty>),
-    Adt(HashMap<Symbol, Ty>),
+    Fn(Vec<Ty<T>>, Box<Ty<T>>),
+    Tup(Vec<Ty<T>>),
+    Adt(HashMap<Symbol, Ty<T>>),
     Infer,
 }
 
-impl Display for TyKind {
+impl<T: Display> Display for TyKind<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Fn(arg_tys, ret_ty) => {
@@ -117,7 +125,7 @@ impl Display for TyKind {
     }
 }
 
-impl From<ATyKind<AFlowPair>> for TyKind {
+impl From<ATyKind<AFlowPair>> for TyKind<FlowPair> {
     fn from(value: ATyKind<AFlowPair>) -> Self {
         match value {
             ast::TyKind::Abstract => Self::Abs,

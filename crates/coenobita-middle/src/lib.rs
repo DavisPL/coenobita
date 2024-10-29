@@ -2,5 +2,8 @@
 extern crate rustc_span;
 
 pub mod flow;
-pub mod map;
+pub mod provenance;
+
 pub mod ty;
+
+pub mod map;
