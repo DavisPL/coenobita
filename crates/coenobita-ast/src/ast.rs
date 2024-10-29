@@ -3,8 +3,6 @@ use std::fmt::Display;
 use itertools::Itertools;
 use rustc_span::Span;
 
-use crate::flow::FlowPair;
-
 #[derive(Clone)]
 pub struct Ty<T> {
     pub property: T,

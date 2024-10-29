@@ -1,5 +1,5 @@
 [package]
-name = "coenobita-typeck"
+name = "coenobita-integrityck"
 version = "0.1.0"
 edition = "2021"
 

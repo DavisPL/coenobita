@@ -13,8 +13,18 @@ dependencies = [
 name = "coenobita-bin"
 version = "0.1.0"
 dependencies = [
+ "coenobita-integrityck",
  "coenobita-log",
- "coenobita-typeck",
+]
+
+[[package]]
+name = "coenobita-integrityck"
+version = "0.1.0"
+dependencies = [
+ "coenobita-ast",
+ "coenobita-log",
+ "coenobita-middle",
+ "coenobita-parse",
 ]
 
 [[package]]
@@ -37,16 +47,6 @@ name = "coenobita-parse"
 version = "0.1.0"
 dependencies = [
  "coenobita-ast",
-]
-
-[[package]]
-name = "coenobita-typeck"
-version = "0.1.0"
-dependencies = [
- "coenobita-ast",
- "coenobita-log",
- "coenobita-middle",
- "coenobita-parse",
 ]
 
 [[package]]

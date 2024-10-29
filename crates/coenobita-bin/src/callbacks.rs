@@ -3,7 +3,7 @@ use rustc_hir::{intravisit::Visitor, Item};
 use rustc_interface::{interface::Compiler, Queries};
 use rustc_middle::{hir::nested_filter::OnlyBodies, ty::TyCtxt};
 
-use coenobita_typeck::{checker::Checker, context::Context};
+use coenobita_integrityck::{checker::Checker, context::Context};
 
 pub struct CoenobitaCallbacks {
     crate_name: String,

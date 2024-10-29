@@ -7,7 +7,7 @@ name = "coenobita-middle"
 version = "0.1.0"
 
 [[package]]
-name = "coenobita-typeck"
+name = "coenobita-integrityck"
 version = "0.1.0"
 dependencies = [
  "coenobita-middle",
