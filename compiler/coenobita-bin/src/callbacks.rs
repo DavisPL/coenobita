@@ -4,7 +4,7 @@ use rustc_interface::{interface::Compiler, Queries};
 use rustc_middle::{hir::nested_filter::OnlyBodies, ty::TyCtxt};
 
 use coenobita_integrityck::{checker::Checker as IChecker, context::Context};
-use coenobita_provenanceck::checker::Checker as PChecker;
+use coenobita_provck::checker::Checker as PChecker;
 
 pub struct CoenobitaCallbacks {
     crate_name: String,
@@ -64,7 +64,7 @@ impl<'c, 'tcx> Visitor<'tcx> for CoenobitaVisitor<'c, 'tcx> {
         let mut context = Context::new(self.crate_name);
 
         // Check integrity
-        // let _ = self.ichecker.check_item(&mut context, item);
+        let _ = self.ichecker.check_item(&mut context, item);
 
         // Check provenance
         let _ = self.pchecker.check_item(item);

@@ -12,5 +12,5 @@ rustc_private = true
 
 [dependencies]
 coenobita-integrityck.workspace = true
-coenobita-provenanceck.workspace = true
+coenobita-provck.workspace = true
 coenobita-log.workspace = true

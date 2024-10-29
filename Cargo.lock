@@ -15,7 +15,7 @@ version = "0.1.0"
 dependencies = [
  "coenobita-integrityck",
  "coenobita-log",
- "coenobita-provenanceck",
+ "coenobita-provck",
 ]
 
 [[package]]
@@ -51,7 +51,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "coenobita-provenanceck"
+name = "coenobita-provck"
 version = "0.1.0"
 dependencies = [
  "coenobita-ast",
@@ -80,7 +80,3 @@ name = "once_cell"
 version = "1.20.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1261fe7e33c73b354eab43b1273a57c8f967d0391e80353e51f764ac02cf6775"
-
-[[package]]
-name = "std"
-version = "0.1.0"

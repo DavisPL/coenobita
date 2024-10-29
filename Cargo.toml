@@ -1,6 +1,6 @@
 [workspace]
-members = ["compiler/*", "library/std"]
-exclude = ["tests"]
+members = ["compiler/*"]
+exclude = ["tests", "library"]
 resolver = "2"
 
 [workspace.package]
@@ -13,6 +13,6 @@ coenobita-log = { path = "./compiler/coenobita-log" }
 coenobita-middle = { path = "./compiler/coenobita-middle" }
 coenobita-parse = { path = "./compiler/coenobita-parse" }
 coenobita-integrityck = { path = "./compiler/coenobita-integrityck" }
-coenobita-provenanceck = { path = "./compiler/coenobita-provenanceck" }
+coenobita-provck = { path = "./compiler/coenobita-provck" }
 
 itertools = "0.13.0"

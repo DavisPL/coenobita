@@ -1,3 +1,5 @@
+use core::range::Range;
+
 
 fn test_let_annotation() {
     #[cnbt::tag({b}{b})]
@@ -102,65 +104,3 @@ fn test_if_struct() {
         Boo { x: 6, y: true }
     };
 }
-
-// fn check() {
-//     let x = if true {
-//         "boo"
-//     } else {
-//         6
-//     };
-// }
-
-// fn test_basic_fn_args() {
-//     #[cnbt::tag({*}{*} fn({a}{a}) -> {a}{a})]
-
-//     #[coenobita::i({*}{*} fn({a}{a}) -> {a}{a})]
-//     #[coenobita::p((a, b) fn((b, *)) -> (a, a))]
-//     fn foo(x: i32) -> i32 {
-//         5
-//     }
-
-//     foo(5);
-// }
-
-fn test_fn_args_in_loop() {
-    let s = String::from("far");
-
-    let itr = 0..10;
-
-{
-    let _t = match (Range { start: 0, end: 10 }).into_iter() {
-        mut iter => loop {
-            match (&mut iter).next() {
-                None => break,
-                Some { 0: i } => {
-                    #[cnbt::tag({ * }{ * } fn({ a }{ a }) -> { a }{ a })]
-                    fn foo(x: i32) -> i32 {
-                        5
-                    }
-                    foo(5);
-                }
-            }
-        },
-    };
-    _t
-}
-
-    // for i in 0..10 {
-    //     #[cnbt::tag({*}{*} fn({a}{a}) -> {a}{a})]
-    //     fn foo(x: i32) -> i32 {
-    //         5
-    //     }
-
-    //     foo(5);
-    // }
-}
-
-// fn test_loop_with_pattern() {
-//     #[cnbt::tag({a}{a,c})]
-//     let mut x = 5;
-
-//     for i in 0..c::value() {
-//         x += 1;
-//     }
-// }
