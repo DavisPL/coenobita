@@ -24,12 +24,12 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
         CoenobitaParser { parser }
     }
 
-    pub fn parse_ty(&mut self) -> PResult<'cnbt, Ty> {
+    pub fn parse_ity(&mut self) -> PResult<'cnbt, Ty<FlowPair>> {
         let start = self.start();
 
         Ok(Ty {
-            fpair: self.parse_flow_pair()?,
-            kind: self.parse_ty_kind()?,
+            property: self.parse_flow_pair()?,
+            kind: self.parse_ity_kind()?,
             span: self.end(start),
         })
     }
@@ -66,7 +66,7 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
         }
     }
 
-    pub fn parse_ty_kind(&mut self) -> PResult<'cnbt, TyKind> {
+    pub fn parse_ity_kind(&mut self) -> PResult<'cnbt, TyKind<FlowPair>> {
         if self.parser.eat_keyword(kw::Fn) {
             // We are parsing a function type
             self.parser
@@ -74,7 +74,7 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
 
             let mut args = vec![];
             while self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                args.push(self.parse_ty()?);
+                args.push(self.parse_ity()?);
 
                 if self.parser.token != CloseDelim(Delimiter::Parenthesis) {
                     self.parser.expect(&Comma)?;
@@ -84,12 +84,12 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
             self.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
             self.parser.expect(&TokenKind::RArrow)?;
 
-            Ok(TyKind::Fn(args, Box::new(self.parse_ty()?)))
+            Ok(TyKind::Fn(args, Box::new(self.parse_ity()?)))
         } else if self.parser.eat(&OpenDelim(Delimiter::Parenthesis)) {
             // We are parsing a tuple type
             let mut items = vec![];
             while self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                items.push(self.parse_ty()?);
+                items.push(self.parse_ity()?);
 
                 if self.parser.token != CloseDelim(Delimiter::Parenthesis) {
                     self.parser.expect(&Comma)?;

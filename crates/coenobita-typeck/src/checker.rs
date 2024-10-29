@@ -141,7 +141,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 let psess = create_psess(&self.tcx);
                 let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
 
-                if let Ok(ty) = parser.parse_ty() {
+                if let Ok(ty) = parser.parse_ity() {
                     match ty.kind {
                         ATyKind::Fn(ref arg_tys, _) => {
                             // Make sure the number of arguments matches
@@ -209,7 +209,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     let psess = create_psess(&self.tcx);
                     let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
 
-                    if let Ok(ty) = parser.parse_ty() {
+                    if let Ok(ty) = parser.parse_ity() {
                         fields.insert(field.name, ty.into());
                     };
                 }
@@ -251,7 +251,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 let psess = create_psess(&self.tcx);
                 let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
 
-                if let Ok(ty) = parser.parse_ty() {
+                if let Ok(ty) = parser.parse_ity() {
                     self.def_map.insert(def_id, ty.into());
                 };
             }
@@ -277,7 +277,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 let psess = create_psess(&self.tcx);
                 let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
 
-                if let Ok(ty) = parser.parse_ty() {
+                if let Ok(ty) = parser.parse_ity() {
                     let expected: Ty = ty.into();
                     self.hir_map.insert(local.pat.hir_id, expected.clone());
 

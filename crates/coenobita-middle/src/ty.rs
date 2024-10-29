@@ -1,7 +1,8 @@
-use std::{cmp, collections::HashMap, fmt::Display};
+use std::{collections::HashMap, fmt::Display};
 
 use crate::flow::{FlowPair, FlowSet};
 use coenobita_ast::ast::{self, Ty as ATy, TyKind as ATyKind};
+use coenobita_ast::flow::FlowPair as AFlowPair;
 use itertools::Itertools;
 use rustc_span::Symbol;
 
@@ -63,10 +64,10 @@ impl Display for Ty {
     }
 }
 
-impl From<ATy> for Ty {
-    fn from(value: ATy) -> Self {
+impl From<ATy<AFlowPair>> for Ty {
+    fn from(value: ATy<AFlowPair>) -> Self {
         Ty {
-            fpair: value.fpair.into(),
+            fpair: value.property.into(),
             kind: value.kind.into(),
         }
     }
@@ -116,8 +117,8 @@ impl Display for TyKind {
     }
 }
 
-impl From<ATyKind> for TyKind {
-    fn from(value: ATyKind) -> Self {
+impl From<ATyKind<AFlowPair>> for TyKind {
+    fn from(value: ATyKind<AFlowPair>) -> Self {
         match value {
             ast::TyKind::Abstract => Self::Abs,
             ast::TyKind::Fn(arg_tys, ret_ty) => Self::Fn(

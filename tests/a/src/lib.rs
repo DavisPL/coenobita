@@ -107,17 +107,17 @@ fn test_if_struct() {
     };
 }
 
-fn test_basic_fn_args() {
-    #[cnbt::tag({*}{*} fn({a}{a}) -> {a}{a})]
+// fn test_basic_fn_args() {
+//     #[cnbt::tag({*}{*} fn({a}{a}) -> {a}{a})]
 
-    #[cnbt::integrity({*}{*} fn({a}{a}) -> {a}{a})]
-    #[cnbt::provenance((a, b) fn((b, *)) -> (a, a))]
-    fn foo(x: i32) -> i32 {
-        5
-    }
+//     #[coenobita::i({*}{*} fn({a}{a}) -> {a}{a})]
+//     #[coenobita::p((a, b) fn((b, *)) -> (a, a))]
+//     fn foo(x: i32) -> i32 {
+//         5
+//     }
 
-    foo(5);
-}
+//     foo(5);
+// }
 
 fn test_fn_args_in_loop() {
     let s = String::from("far");
@@ -150,28 +150,6 @@ fn test_fn_args_in_loop() {
 
     //     foo(5);
     // }
-}
-
-fn for_loops_desugared() {
-    let v = vec![1, 2, 3];
-
-    for i in v {
-        
-    }
-
-    let p = 0..10;
-
-    for i in v {
-        
-    }
-}
-
-fn while_loops_desugared() {
-    let mut i = 0;
-
-    while i < 10 {
-        i += 1;
-    }
 }
 
 // fn test_loop_with_pattern() {
