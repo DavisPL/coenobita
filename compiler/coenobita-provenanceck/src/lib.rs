@@ -10,4 +10,4 @@ extern crate rustc_parse;
 extern crate rustc_session;
 extern crate rustc_span;
 
-mod checker;
+pub mod checker;

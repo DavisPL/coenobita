@@ -77,7 +77,7 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
         self.parser.expect(&TokenKind::Comma)?;
         let last = self.parse_provenance()?;
 
-        self.parser.expect(&OpenDelim(Delimiter::Parenthesis))?;
+        self.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
 
         Ok(ProvenancePair {
             first,

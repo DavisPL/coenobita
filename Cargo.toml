@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/*"]
+members = ["compiler/*", "library/std"]
 exclude = ["tests"]
 resolver = "2"
 
@@ -7,12 +7,12 @@ resolver = "2"
 edition = "2021"
 
 [workspace.dependencies]
-coenobita-ast = { path = "./crates/coenobita-ast" }
-coenobita-bin = { path = "./crates/coenobita-bin" }
-coenobita-log = { path = "./crates/coenobita-log" }
-coenobita-middle = { path = "./crates/coenobita-middle" }
-coenobita-parse = { path = "./crates/coenobita-parse" }
-coenobita-integrityck = { path = "./crates/coenobita-integrityck" }
-coenobita-provenanceck = { path = "./crates/coenobita-provenanceck" }
+coenobita-ast = { path = "./compiler/coenobita-ast" }
+coenobita-bin = { path = "./compiler/coenobita-bin" }
+coenobita-log = { path = "./compiler/coenobita-log" }
+coenobita-middle = { path = "./compiler/coenobita-middle" }
+coenobita-parse = { path = "./compiler/coenobita-parse" }
+coenobita-integrityck = { path = "./compiler/coenobita-integrityck" }
+coenobita-provenanceck = { path = "./compiler/coenobita-provenanceck" }
 
 itertools = "0.13.0"

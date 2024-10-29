@@ -105,6 +105,11 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         )
     }
 
+    pub fn provide(&self, mut ty: Ty) -> Ty {
+        ty.property.1 = Provenance::Specific(self.crate_name.to_owned());
+        ty
+    }
+
     pub fn check_item(&mut self, item: &Item) -> Result {
         debug(format!("Checking item {:?}", item.kind));
         let did = item.owner_id.to_def_id();
@@ -179,14 +184,18 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             }
         }
 
-        debug("Preapring to check item fn body...");
-        let expr = self.tcx.hir().body(body_id).value;
-        let actual = self.check_expr(expr)?;
-        debug("Done checking item fn body");
-
-        let TyKind::Fn(_, expected) = self.function_ty(def_id).kind else {
+        let TyKind::Fn(args, expected) = self.function_ty(def_id).kind else {
             panic!()
         };
+
+        let body = self.tcx.hir().body(body_id);
+
+        for (param, arg) in body.params.iter().zip(args) {
+            self.hir_map.insert(param.pat.hir_id, arg);
+        }
+
+        let expr = body.value;
+        let actual = self.check_expr(&body.value)?;
 
         if !actual.satisfies(&expected) {
             let msg = format!("Expected {expected}, found {actual}");
@@ -372,7 +381,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     }
                 }
 
-                Ok(*ret_ty)
+                Ok(self.provide(*ret_ty))
             }
 
             _ => todo!(),
