@@ -91,7 +91,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     pub fn universal(&self) -> Ty {
         Ty::new(
             ProvenancePair(Provenance::Universal, Provenance::Universal),
-            TyKind::Abs,
+            TyKind::Opaque,
         )
     }
 
@@ -101,7 +101,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 Provenance::Specific(self.crate_name.to_owned()),
                 Provenance::Specific(self.crate_name.to_owned()),
             ),
-            TyKind::Abs,
+            TyKind::Opaque,
         )
     }
 

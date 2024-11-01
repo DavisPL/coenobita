@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use itertools::Itertools;
-use rustc_span::Span;
+use rustc_span::{symbol::Ident, Span};
 
 #[derive(Clone)]
 pub struct Ty<T> {
@@ -20,33 +20,66 @@ impl<T: Display> Display for Ty<T> {
 
 #[derive(Clone)]
 pub enum TyKind<T> {
+    /// Type with shape `fn(S, T) -> U`.
     Fn(Vec<Ty<T>>, Box<Ty<T>>),
-    Tup(Vec<Ty<T>>),
-    Arr(Box<Ty<T>>),
-    Abstract,
+
+    /// Type with shape `struct { x: T, y: U }`.
+    Struct(Vec<(Ident, Ty<T>)>),
+
+    /// Type with shape `struct (T, U)`.
+    StructTuple(Vec<Ty<T>>),
+
+    /// Type with shape `(S, T, U)`.
+    Tuple(Vec<Ty<T>>),
+
+    /// Type with shape `[T]`.
+    Array(Box<Ty<T>>),
+
+    /// Type with unknown (opaque) shape.
+    Opaque,
 }
 
 impl<T: Display> Display for TyKind<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Fn(arg_tys, ret_ty) => {
-                let args = arg_tys.iter().map(|ty| ty.to_string()).sorted().join(",");
-
-                write!(f, " fn({}) -> {}", args, ret_ty)
+            Self::Fn(args, ret) => {
+                let args = args.iter().map(|ty| ty.to_string()).sorted().join(",");
+                write!(f, " fn({args}) -> {ret}")
             }
 
-            Self::Tup(item_tys) => {
-                let items = item_tys
+            Self::Struct(fields) => {
+                let fields = fields
+                    .iter()
+                    .map(|(name, ty)| format!("{name}:{ty}"))
+                    .collect::<Vec<_>>()
+                    .join(",");
+
+                write!(f, " struct {{ {fields} }}")
+            }
+
+            Self::StructTuple(elements) => {
+                let elements = elements
                     .iter()
                     .map(|ty| ty.to_string())
                     .collect::<Vec<_>>()
                     .join(",");
-                write!(f, " ({})", items)
+
+                write!(f, " struct ({elements})")
             }
 
-            Self::Arr(item_ty) => write!(f, " [{}]", item_ty),
+            Self::Tuple(elements) => {
+                let elements = elements
+                    .iter()
+                    .map(|ty| ty.to_string())
+                    .collect::<Vec<_>>()
+                    .join(",");
 
-            Self::Abstract => write!(f, ""),
+                write!(f, " ({elements})")
+            }
+
+            Self::Array(element) => write!(f, " [{element}]"),
+
+            Self::Opaque => write!(f, ""),
         }
     }
 }

@@ -44,10 +44,12 @@ struct CoenobitaVisitor<'cnbt, 'tcx> {
 
 impl<'c, 'tcx> CoenobitaVisitor<'c, 'tcx> {
     pub fn new(crate_name: &'c str, tcx: TyCtxt<'tcx>) -> Self {
+        let context = Context::new(crate_name);
+
         CoenobitaVisitor {
             crate_name,
             tcx,
-            ichecker: IChecker::new(crate_name, tcx),
+            ichecker: IChecker::new(crate_name, tcx, context),
             pchecker: PChecker::new(crate_name, tcx),
         }
     }
@@ -61,10 +63,8 @@ impl<'c, 'tcx> Visitor<'tcx> for CoenobitaVisitor<'c, 'tcx> {
     }
 
     fn visit_item(&mut self, item: &'tcx Item<'tcx>) -> Self::Result {
-        let mut context = Context::new(self.crate_name);
-
         // Check integrity
-        let _ = self.ichecker.check_item(&mut context, item);
+        let _ = self.ichecker.check_item(item);
 
         // Check provenance
         // let _ = self.pchecker.check_item(item);

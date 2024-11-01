@@ -134,8 +134,7 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
     pub fn parse_ity_kind(&mut self) -> PResult<'cnbt, TyKind<FlowPair>> {
         if self.parser.eat_keyword(kw::Fn) {
             // We are parsing a function type
-            self.parser
-                .expect(&TokenKind::OpenDelim(Delimiter::Parenthesis))?;
+            self.parser.expect(&OpenDelim(Delimiter::Parenthesis))?;
 
             let mut args = vec![];
             while self.parser.token != CloseDelim(Delimiter::Parenthesis) {
@@ -150,11 +149,44 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
             self.parser.expect(&TokenKind::RArrow)?;
 
             Ok(TyKind::Fn(args, Box::new(self.parse_ity()?)))
+        } else if self.parser.eat_keyword(kw::Struct) {
+            // We are parsing a struct type
+            if self.parser.token.kind == OpenDelim(Delimiter::Brace) {
+                // We are parsing a `{ ... }` struct
+                self.parser.expect(&OpenDelim(Delimiter::Brace))?;
+
+                let mut fields = vec![];
+                while self.parser.token != CloseDelim(Delimiter::Brace) {
+                    fields.push((self.parser.parse_ident()?, self.parse_ity()?));
+
+                    if self.parser.token != CloseDelim(Delimiter::Brace) {
+                        self.parser.expect(&TokenKind::Comma)?;
+                    }
+                }
+
+                self.parser.expect(&CloseDelim(Delimiter::Brace))?;
+                Ok(TyKind::Struct(fields))
+            } else {
+                // We are parsing a `( ... )` struct
+                self.parser.expect(&OpenDelim(Delimiter::Parenthesis))?;
+
+                let mut elements = vec![];
+                while self.parser.token != CloseDelim(Delimiter::Parenthesis) {
+                    elements.push(self.parse_ity()?);
+
+                    if self.parser.token != CloseDelim(Delimiter::Parenthesis) {
+                        self.parser.expect(&TokenKind::Comma)?;
+                    }
+                }
+
+                self.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
+                Ok(TyKind::StructTuple(elements))
+            }
         } else if self.parser.eat(&OpenDelim(Delimiter::Parenthesis)) {
             // We are parsing a tuple type
-            let mut items = vec![];
+            let mut elements = vec![];
             while self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                items.push(self.parse_ity()?);
+                elements.push(self.parse_ity()?);
 
                 if self.parser.token != CloseDelim(Delimiter::Parenthesis) {
                     self.parser.expect(&Comma)?;
@@ -162,14 +194,14 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
             }
 
             self.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
-            Ok(TyKind::Tup(items))
+            Ok(TyKind::Tuple(elements))
         } else if self.parser.eat(&OpenDelim(Delimiter::Bracket)) {
             // We are parsing an array type
-            let item = self.parse_ity()?;
+            let element = self.parse_ity()?;
             self.parser.expect(&CloseDelim(Delimiter::Bracket))?;
-            Ok(TyKind::Arr(Box::new(item)))
+            Ok(TyKind::Array(Box::new(element)))
         } else {
-            Ok(TyKind::Abstract)
+            Ok(TyKind::Opaque)
         }
     }
 
@@ -204,12 +236,12 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
             }
 
             self.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
-            Ok(TyKind::Tup(items))
+            Ok(TyKind::Tuple(items))
         } else if self.parser.eat(&OpenDelim(Delimiter::Bracket)) {
             // We are parsing an array type
             todo!()
         } else {
-            Ok(TyKind::Abstract)
+            Ok(TyKind::Opaque)
         }
     }
 
