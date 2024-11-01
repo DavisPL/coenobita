@@ -35,6 +35,8 @@ impl<'cnbt> Context<'cnbt> {
         Ty::new(FlowPair(explicit, implicit), TyKind::Infer)
     }
 
+    /// Adds implicit contributors to the given type. This is only necessary when "creating"
+    /// new values that aren't introduced (like the results of binary expressions).
     pub fn influence(&self, ty: Ty) -> Ty {
         let implicit = self
             .levels

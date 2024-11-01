@@ -49,7 +49,7 @@ impl<'c, 'tcx> CoenobitaVisitor<'c, 'tcx> {
         CoenobitaVisitor {
             crate_name,
             tcx,
-            ichecker: IChecker::new(crate_name, tcx, context),
+            ichecker: IChecker::new(tcx, context),
             pchecker: PChecker::new(crate_name, tcx),
         }
     }

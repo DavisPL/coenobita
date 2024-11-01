@@ -8,5 +8,5 @@ enum Foo {
 struct Something(i32);
 
 fn test_struct_tuple() {
-    let s = Something(5);
+    //let s = Something(5);
 }

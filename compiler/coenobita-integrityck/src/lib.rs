@@ -12,3 +12,5 @@ extern crate rustc_span;
 
 pub mod checker;
 pub mod context;
+pub mod expectation;
+pub mod shared;
