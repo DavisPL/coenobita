@@ -9,6 +9,7 @@ extern crate rustc_middle;
 extern crate rustc_parse;
 extern crate rustc_session;
 extern crate rustc_span;
+extern crate rustc_target;
 
 pub mod checker;
 pub mod context;

@@ -4,7 +4,7 @@ use itertools::Itertools;
 use rustc_span::symbol::Ident;
 use rustc_span::Span;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct FlowPair {
     pub explicit: FlowSet,
 
@@ -19,7 +19,7 @@ impl Display for FlowPair {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum FlowSet {
     Specific(Vec<Ident>, Span),
     Universal(Span),

@@ -51,6 +51,23 @@ impl Ty<FlowPair> {
         }
     }
 
+    pub fn ty_adt(n: usize) -> Ty<FlowPair> {
+        let default_flow_pair = FlowPair::new(FlowSet::Universal, FlowSet::Universal);
+        let default_ty = Ty::new(default_flow_pair.clone(), TyKind::Infer);
+
+        let args = vec![default_ty.clone(); n]; // Create `n` copies of `default_ty`
+        let mut map = HashMap::new();
+
+        for (i, arg) in (0..n).zip(args) {
+            map.insert(Symbol::intern(&i.to_string()), arg);
+        }
+
+        Ty {
+            property: default_flow_pair,
+            kind: TyKind::Adt(map),
+        }
+    }
+
     pub fn satisfies(&self, other: &Ty<FlowPair>) -> bool {
         let explicit = self
             .property

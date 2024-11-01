@@ -11,3 +11,4 @@ coenobita-ast.workspace = true
 coenobita-log.workspace = true
 coenobita-middle.workspace = true
 coenobita-parse.workspace = true
+itertools.workspace = true

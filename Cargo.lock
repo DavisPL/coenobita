@@ -26,6 +26,7 @@ dependencies = [
  "coenobita-log",
  "coenobita-middle",
  "coenobita-parse",
+ "itertools",
 ]
 
 [[package]]

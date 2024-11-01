@@ -3,3 +3,4 @@ mod loops;
 mod unorganized;
 mod methods;
 mod enums;
+mod closures;

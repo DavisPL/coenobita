@@ -3,7 +3,7 @@ use std::fmt::Display;
 use itertools::Itertools;
 use rustc_span::{symbol::Ident, Span};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Ty<T> {
     pub property: T,
 
@@ -18,7 +18,7 @@ impl<T: Display> Display for Ty<T> {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum TyKind<T> {
     /// Type with shape `fn(S, T) -> U`.
     Fn(Vec<Ty<T>>, Box<Ty<T>>),

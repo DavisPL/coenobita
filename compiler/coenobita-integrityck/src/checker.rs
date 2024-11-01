@@ -6,8 +6,9 @@ use coenobita_middle::map::Map;
 use coenobita_middle::ty::TyKind;
 
 use coenobita_parse::{create_parser, create_psess};
+use itertools::Itertools;
 use rustc_ast::AttrKind;
-use rustc_hir::def::{DefKind, Res};
+use rustc_hir::def::{CtorOf, DefKind, Res};
 use rustc_hir::def_id::DefId;
 use rustc_hir::{
     Arm, Block, BodyId, Closure, Expr, ExprField, ExprKind, FnSig, HirId, Impl, ImplItem,
@@ -16,6 +17,7 @@ use rustc_hir::{
 use rustc_middle::ty::{self, FieldDef, TyCtxt};
 use rustc_span::symbol::Ident;
 use rustc_span::{Span, Symbol};
+use rustc_target::abi::{VariantIdx, FIRST_VARIANT};
 
 use crate::context::Context;
 use crate::expectation::Expectation;
@@ -53,32 +55,41 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         }
     }
 
-    pub fn adt_ty(&mut self, def_id: DefId) -> Ty {
-        debug(format!("Trying to get type of adt (struct) {:#?}", def_id));
+    pub fn adt_ty(&mut self, def_id_parent: DefId, def_id_variant: DefId, index: VariantIdx) -> Ty {
+        debug(format!(
+            "Trying to get type of adt (struct) {:#?}",
+            def_id_variant
+        ));
 
-        match self.def_map.get(&def_id) {
+        match self.def_map.get(&def_id_variant) {
             Some(ty) => ty.clone(),
             None => {
                 // We haven't processed the definition of this function yet
                 let field_defs = &self
                     .tcx
-                    .adt_def(def_id)
+                    .adt_def(def_id_parent)
                     .variants()
-                    .iter()
-                    .next()
+                    .get(index)
                     .unwrap()
                     .fields
                     .raw;
 
-                let _ = self.check_item_struct(def_id, field_defs);
-                self.def_map.get(&def_id).unwrap().clone()
+                let _ = self.check_item_struct(def_id_variant, field_defs);
+                self.def_map.get(&def_id_variant).unwrap().clone()
             }
         }
     }
 
     /// Fetches the type of a local variable. Panics if it hasn't been processed, which should be impossible.
     pub fn local(&mut self, hir_id: HirId) -> Ty {
-        self.hir_map.get(&hir_id).cloned().unwrap()
+        debug(format!("trying to get ty of local w/hir id {:#?}", hir_id));
+        match self.hir_map.get(&hir_id) {
+            Some(ty) => ty.clone(),
+            None => {
+                debug("[WARN] Silently failed to get type of local var");
+                self.context.introduce()
+            }
+        }
     }
 
     // TODO: Rename to something more informative
@@ -95,18 +106,54 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
                 let res = self.tcx.typeck(ldid).qpath_res(&qpath, hir_id);
                 match res {
-                    Res::Def(_, def_id) => {
-                        let TyKind::Adt(tys) = self.adt_ty(def_id).kind() else {
-                            todo!()
-                        };
+                    Res::Def(def_kind, def_id) => match def_kind {
+                        DefKind::Struct => {
+                            let TyKind::Adt(tys) =
+                                self.adt_ty(def_id, def_id, FIRST_VARIANT).kind()
+                            else {
+                                todo!()
+                            };
 
-                        for field in fields {
-                            self.hir_map.insert(
-                                field.pat.hir_id,
-                                tys.get(&field.ident.name).cloned().unwrap(),
-                            );
+                            for field in fields {
+                                self.hir_map.insert(
+                                    field.pat.hir_id,
+                                    tys.get(&field.ident.name).cloned().unwrap(),
+                                );
+                            }
                         }
-                    }
+                        DefKind::Variant => {
+                            // The variant DefId
+                            let id = def_id;
+
+                            // The parent DefId
+                            let def_id = self.tcx.parent(def_id);
+
+                            // The parent ADT definition
+                            let adt = self.tcx.adt_def(def_id);
+
+                            // The index of this variant in particular
+                            let idx = adt
+                                .variants()
+                                .iter()
+                                .enumerate()
+                                .find(|(_, vdef)| vdef.def_id == id)
+                                .unwrap()
+                                .0;
+
+                            let TyKind::Adt(tys) = self.adt_ty(def_id, id, idx.into()).kind else {
+                                todo!()
+                            };
+
+                            for field in fields {
+                                self.hir_map.insert(
+                                    field.pat.hir_id,
+                                    tys.get(&field.ident.name).cloned().unwrap(),
+                                );
+                            }
+                        }
+                        DefKind::Ctor(_, _) => todo!(),
+                        _ => todo!(),
+                    },
 
                     Res::Err => {}
 
@@ -123,39 +170,82 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
             PatKind::TupleStruct(qpath, pats, _) => {
                 match self.tcx.typeck(ldid).qpath_res(&qpath, hir_id) {
-                    Res::Def(def_kind, def_id) => {
-                        debug("Checknig a res def...");
+                    Res::Def(def_kind, def_id) => match def_kind {
+                        // TODO: Basically rewrite all of this logic. It's incorrect!
+                        DefKind::Ctor(_, _) => {
+                            debug("Looking at ctor");
 
-                        match def_kind {
-                            DefKind::Ctor(ctor_of, ctor_kind) => {
-                                debug(format!(
-                                    "Checking constructor of {:?}, kind {:?}",
-                                    ctor_of, ctor_kind
-                                ));
-                                todo!()
-                            }
+                            // Get the DefId of the variant
+                            let def_id_variant = self.tcx.parent(def_id);
 
-                            DefKind::Struct => {
-                                let TyKind::Adt(tys) = self.adt_ty(def_id).kind() else {
-                                    todo!()
-                                };
+                            // Get the DefId of the parent
+                            let def_id = self.tcx.parent(def_id_variant);
 
-                                for (i, pat) in pats.iter().enumerate() {
-                                    let key = Symbol::intern(&i.to_string());
-                                    let ty = self.context.influence(tys[&key].clone());
-                                    self.process_pattern(pat_kind, ty, pat.hir_id);
+                            let ty = self.adt_ty(def_id, def_id, FIRST_VARIANT);
+
+                            match ty.kind {
+                                TyKind::Adt(map) => {
+                                    let fields =
+                                        map.iter().sorted_by_key(|(key, _)| key.to_string());
+
+                                    for (pat, (_, fty)) in pats.iter().zip(fields) {
+                                        self.process_pattern(pat.kind, fty.clone(), pat.hir_id);
+                                    }
                                 }
-                            }
 
-                            _ => todo!(),
+                                _ => todo!(),
+                            }
                         }
-                    }
+
+                        DefKind::Struct => {
+                            let TyKind::Adt(tys) =
+                                self.adt_ty(def_id, def_id, FIRST_VARIANT).kind()
+                            else {
+                                todo!()
+                            };
+
+                            for (i, pat) in pats.iter().enumerate() {
+                                let key = Symbol::intern(&i.to_string());
+                                let ty = self.context.influence(tys[&key].clone());
+                                self.process_pattern(pat_kind, ty, pat.hir_id);
+                            }
+                        }
+
+                        _ => todo!(),
+                    },
 
                     _ => todo!(),
                 }
             }
 
-            _ => todo!(),
+            PatKind::Tuple(pats, _) => {
+                match ty.kind {
+                    TyKind::Tuple(elements) => {
+                        for (pat, ty) in pats.iter().zip(elements) {
+                            self.process_pattern(pat.kind, ty, pat.hir_id);
+                        }
+                    }
+
+                    _ => {
+                        // Either the type is opaque or it's simply incorrect
+                        for pat in pats.iter() {
+                            self.process_pattern(pat.kind, self.context.universal(), pat.hir_id);
+                        }
+                    }
+                }
+            }
+
+            PatKind::Ref(pat, _) => self.process_pattern(pat.kind, ty, pat.hir_id),
+
+            // Nothing to process
+            PatKind::Path(_) => {}
+            PatKind::Wild => {}
+            PatKind::Never => {}
+
+            _ => {
+                debug(format!("Unsupported pattern kind {:#?}", pat_kind));
+                todo!()
+            }
         }
     }
 
@@ -286,32 +376,79 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     }
 
     pub fn check_item_struct(&mut self, def_id: DefId, field_defs: &[FieldDef]) -> Result {
-        let mut fields = HashMap::new();
+        let default = self.context.influence(Ty::ty_adt(field_defs.len()));
 
-        for field in field_defs {
-            match self.tcx.get_attrs_by_path(field.did, &self.attr).next() {
-                Some(attr) => {
-                    // The `coenobita::tag` is guaranteed to be a normal attribute
-                    let AttrKind::Normal(normal) = &attr.kind else {
-                        unreachable!()
-                    };
+        let fields = match self.tcx.get_attrs_by_path(def_id, &self.attr).next() {
+            Some(attr) => {
+                // The `coenobita::tag` is guaranteed to be a normal attribute
+                let AttrKind::Normal(normal) = &attr.kind else {
+                    unreachable!()
+                };
 
-                    let psess = create_psess(&self.tcx);
-                    let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
+                debug("preparing to parse struct attr");
 
-                    if let Ok(ty) = parser.parse_ity() {
-                        fields.insert(field.name, ty.into());
+                let psess = create_psess(&self.tcx);
+                let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
+
+                let mut map = HashMap::new();
+
+                if let Ok(ty) = parser.parse_ity() {
+                    match ty.kind {
+                        ATyKind::Struct(ref elements) => {
+                            debug(format!("We parsed a struct with elements {:#?}", elements));
+                            for (name, ty) in elements {
+                                map.insert(name.name, ty.clone().into());
+                            }
+                        }
+
+                        ATyKind::StructTuple(ref elements) => {
+                            let len = elements.len();
+                            for (i, ty) in (0..len).zip(elements) {
+                                map.insert(Symbol::intern(&i.to_string()), ty.clone().into());
+                            }
+                        }
+
+                        _ => {}
+                    }
+                };
+
+                map
+            }
+
+            None => {
+                // There is no attribute on the struct as a whole, so we will check for attributes on its fields
+                let mut fields = HashMap::new();
+
+                for field in field_defs {
+                    match self.tcx.get_attrs_by_path(field.did, &self.attr).next() {
+                        Some(attr) => {
+                            // The `coenobita::tag` is guaranteed to be a normal attribute
+                            let AttrKind::Normal(normal) = &attr.kind else {
+                                unreachable!()
+                            };
+
+                            let psess = create_psess(&self.tcx);
+                            let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
+
+                            if let Ok(ty) = parser.parse_ity() {
+                                fields.insert(field.name, ty.into());
+                            };
+                        }
+
+                        _ => {
+                            fields.insert(field.name, self.context.universal());
+                        }
                     };
                 }
 
-                _ => {
-                    fields.insert(field.name, self.context.universal());
-                }
-            };
-        }
+                fields
+            }
+        };
+
+        debug(format!("the map for struct is {:#?}", fields));
 
         // Since this type is a struct definition, its flow pair will never be used and is only here for consistency
-        let mut ty = self.context.universal();
+        let mut ty = self.context.introduce();
         ty.kind = TyKind::Adt(fields);
 
         self.def_map.insert(def_id, ty);
@@ -400,6 +537,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         let ty = match expr.kind {
             ExprKind::Lit(_) => self.context.introduce(),
             ExprKind::Break(_, _) => self.context.introduce(),
+            ExprKind::Continue(_) => self.context.introduce(),
 
             ExprKind::Unary(_, expr) => self.check_expr(expr, expectation)?,
             ExprKind::DropTemps(expr) => self.check_expr(expr, expectation)?,
@@ -463,6 +601,41 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             Res::Def(def_kind, def_id) => match def_kind {
                 // TODO: Check that `AssocFn` is handled properly
                 DefKind::Fn | DefKind::AssocFn => self.fn_ty(def_id),
+
+                // TODO: Test this thoroughly
+                DefKind::Ctor(ctor_of, ctor_kind) => match ctor_of {
+                    CtorOf::Struct => {
+                        let def_id = self.tcx.parent(def_id);
+                        self.adt_ty(def_id, def_id, FIRST_VARIANT)
+                    }
+
+                    CtorOf::Variant => {
+                        // Get the DefId of the variant
+                        let id = self.tcx.parent(def_id);
+
+                        // Get the DefId of the enum holding this variant
+                        let def_id = self.tcx.parent(id);
+
+                        let adt = self.tcx.adt_def(def_id);
+
+                        let idx = adt
+                            .variants()
+                            .iter()
+                            .enumerate()
+                            .find(|(_, vdef)| vdef.def_id == id)
+                            .unwrap()
+                            .0;
+
+                        self.adt_ty(def_id, id, idx.into())
+                    }
+                },
+
+                // TODO: Implement actual logic
+                DefKind::Static { .. } => self.context.introduce(),
+
+                // TODO: Implement actual logic
+                DefKind::AssocConst | DefKind::Const => self.context.introduce(),
+
                 _ => todo!(),
             },
 
@@ -494,6 +667,11 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 }
 
                 Ok(*ret_ty)
+            }
+
+            TyKind::Adt(_) => {
+                // We don't really know whether the underlying ADT has named or unnamed fields, so pretend we're good
+                Ok(fty)
             }
 
             _ => {
@@ -679,7 +857,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         match self.tcx.typeck(local_def_id).qpath_res(qpath, hir_id) {
             Res::Def(def_kind, def_id) => match def_kind {
                 DefKind::Struct => {
-                    let sty = self.adt_ty(def_id);
+                    let sty = self.adt_ty(def_id, def_id, FIRST_VARIANT);
 
                     match sty.kind() {
                         TyKind::Adt(field_tys) => {
@@ -704,7 +882,41 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     }
                 }
 
-                _ => todo!(),
+                DefKind::Variant => {
+                    // The variant DefId
+                    let id = def_id;
+
+                    // The parent DefId
+                    let def_id = self.tcx.parent(def_id);
+
+                    // The parent ADT definition
+                    let adt = self.tcx.adt_def(def_id);
+
+                    // The index of this variant in particular
+                    let idx = adt
+                        .variants()
+                        .iter()
+                        .enumerate()
+                        .find(|(_, vdef)| vdef.def_id == id)
+                        .unwrap()
+                        .0;
+
+                    let ty = self.adt_ty(def_id, id, idx.into());
+                    let TyKind::Adt(tys) = &ty.kind else { todo!() };
+
+                    for field in fields {
+                        let ty = tys[&field.ident.name].clone();
+                        let expectation = Expectation::ExpectHasType(ty);
+                        self.check_expr(field.expr, &expectation)?;
+                    }
+
+                    Ok(ty)
+                }
+
+                _ => {
+                    debug(format!("Unsupported def kind {:#?}", def_kind));
+                    todo!()
+                }
             },
 
             _ => todo!(),
