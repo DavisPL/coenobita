@@ -28,7 +28,6 @@ fn main() {
     // Add some extra arguments
     args.push("-Zcrate-attr=feature(register_tool)".to_string());
     args.push("-Zcrate-attr=register_tool(cnbt)".to_string());
-    args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/debug/libstd.rlib".to_string());
 
     let crate_name = crate_name(&args)
         .and_then(|s| {
@@ -36,6 +35,10 @@ fn main() {
             Some(s)
         })
         .unwrap_or("-".into());
+
+    // if crate_name != "cstd" {
+    //     args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/debug/libcstd.rlib".to_string());
+    // }
 
     // Create callbacks and run the compiler
     let mut callbacks = CoenobitaCallbacks::new(crate_name);

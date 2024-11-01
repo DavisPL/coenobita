@@ -20,7 +20,7 @@ use rustc_span::{Span, Symbol};
 use rustc_target::abi::{VariantIdx, FIRST_VARIANT};
 
 use crate::context::Context;
-use crate::expectation::Expectation;
+use crate::expectation::{self, Expectation};
 use crate::shared::{Result, Ty};
 
 pub struct Checker<'cnbt, 'tcx> {
@@ -607,6 +607,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     CtorOf::Struct => {
                         debug(format!("checking CTOR of defid {:?}", def_id));
                         let def_id = self.tcx.parent(def_id);
+
                         self.adt_ty(def_id, def_id, FIRST_VARIANT)
                     }
 
@@ -672,8 +673,13 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 Ok(*ret_ty)
             }
 
-            TyKind::Adt(_) => {
-                // We don't really know whether the underlying ADT has named or unnamed fields, so pretend we're good
+            TyKind::Adt(elements) => {
+                for (i, arg) in args.iter().enumerate() {
+                    let ty = elements[&Symbol::intern(&i.to_string())].clone();
+                    let expectation = Expectation::ExpectHasType(ty);
+                    self.check_expr(arg, &expectation)?;
+                }
+
                 Ok(fty)
             }
 
@@ -791,6 +797,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
     /// Checks the type of a `let` expression. These typically appear as the guards of `if` expressions.
     pub fn check_expr_let(&mut self, let_expr: &LetExpr, expectation: &Expectation) -> Result<Ty> {
+        debug(format!("chekcing let {:#?}", let_expr));
         let ty = self.check_expr(let_expr.init, expectation)?;
         self.process_pattern(let_expr.pat.kind, ty.clone(), let_expr.pat.hir_id);
         Ok(ty)

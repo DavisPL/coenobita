@@ -15,6 +15,7 @@ pub use std::result;
 pub use std::sync;
 pub use std::usize;
 pub use std::vec;
+pub use std::process;
 
 // These are macros required by `walkdir`
 pub use std::assert;
@@ -22,6 +23,11 @@ pub use std::assert_eq;
 pub use std::format;
 pub use std::panic;
 pub use std::write;
+pub use std::println;
 
 // These are all required by `same-file`
 pub use std::hash;
+
+// This stuff is entirely new
+pub mod cap;
+
