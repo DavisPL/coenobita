@@ -28,7 +28,7 @@ fn main() {
     // Add some extra arguments
     args.push("-Zcrate-attr=feature(register_tool)".to_string());
     args.push("-Zcrate-attr=register_tool(cnbt)".to_string());
-    //args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/debug/libstd.rlib".to_string());
+    args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/debug/libstd.rlib".to_string());
 
     let crate_name = crate_name(&args)
         .and_then(|s| {

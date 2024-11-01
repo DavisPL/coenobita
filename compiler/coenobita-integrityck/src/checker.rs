@@ -605,11 +605,14 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 // TODO: Test this thoroughly
                 DefKind::Ctor(ctor_of, ctor_kind) => match ctor_of {
                     CtorOf::Struct => {
+                        debug(format!("checking CTOR of defid {:?}", def_id));
                         let def_id = self.tcx.parent(def_id);
                         self.adt_ty(def_id, def_id, FIRST_VARIANT)
                     }
 
                     CtorOf::Variant => {
+                        debug(format!("checking CTOR variatn of defid {:?}", def_id));
+
                         // Get the DefId of the variant
                         let id = self.tcx.parent(def_id);
 
@@ -675,8 +678,10 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             }
 
             _ => {
-                let msg = "call expression requires function";
-                Err(self.tcx.dcx().span_err(func.span, msg))
+                let msg = "Coenobita cannot tell if this is a function";
+                self.tcx.dcx().span_warn(func.span, msg);
+
+                Ok(fty)
             }
         }
     }
