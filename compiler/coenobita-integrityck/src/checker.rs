@@ -11,7 +11,9 @@ use rustc_ast::AttrKind;
 use rustc_hir::def::{CtorOf, DefKind, Res};
 use rustc_hir::def_id::DefId;
 use rustc_hir::{
-    Arm, Block, BodyId, Closure, Expr, ExprField, ExprKind, FnSig, HirId, Impl, ImplItem, ImplItemKind, Item, ItemKind, LangItem, LetExpr, LetStmt, MatchSource, PatKind, QPath, Stmt, StmtKind
+    Arm, Block, BodyId, Closure, Expr, ExprField, ExprKind, FnSig, HirId, Impl, ImplItem,
+    ImplItemKind, Item, ItemKind, LangItem, LetExpr, LetStmt, MatchSource, PatKind, QPath, Stmt,
+    StmtKind,
 };
 use rustc_middle::ty::{self, FieldDef, TyCtxt};
 use rustc_span::symbol::Ident;
@@ -19,7 +21,7 @@ use rustc_span::{Span, Symbol};
 use rustc_target::abi::{VariantIdx, FIRST_VARIANT};
 
 use crate::context::Context;
-use crate::expectation::{self, Expectation};
+use crate::expectation::Expectation;
 use crate::shared::{Result, Ty};
 
 pub struct Checker<'cnbt, 'tcx> {
@@ -86,7 +88,6 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         }
     }
 
-    // TODO: Rename to something more informative
     pub fn process_pattern(&mut self, pat_kind: PatKind, ty: Ty, hir_id: HirId) {
         let ldid = hir_id.owner.to_def_id().as_local().unwrap();
 
@@ -149,11 +150,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
                     Res::Err => {}
 
-                    Res::SelfTyAlias {
-                        alias_to,
-                        forbid_generic,
-                        is_trait_impl,
-                    } => {
+                    Res::SelfTyAlias { alias_to, .. } => {
                         let self_ty = self.tcx.type_of(alias_to).skip_binder().kind();
 
                         if let ty::TyKind::Adt(adt_def, _) = self_ty {
@@ -298,11 +295,6 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             PatKind::Path(_) => {}
             PatKind::Wild => {}
             PatKind::Never => {}
-
-            _ => {
-                debug(format!("Unsupported pattern kind {:#?}", pat_kind));
-                todo!()
-            }
         }
     }
 
@@ -676,7 +668,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 DefKind::Fn | DefKind::AssocFn => self.fn_ty(def_id),
 
                 // TODO: Test this thoroughly
-                DefKind::Ctor(ctor_of, ctor_kind) => match ctor_of {
+                DefKind::Ctor(ctor_of, _) => match ctor_of {
                     CtorOf::Struct => {
                         let def_id = self.tcx.parent(def_id);
 
@@ -965,10 +957,11 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     let mut result = self.context.introduce();
 
                     for field in fields {
-                        result = result.merge(self.check_expr(field.expr, &Expectation::NoExpectation)?);
+                        result =
+                            result.merge(self.check_expr(field.expr, &Expectation::NoExpectation)?);
                     }
 
-                    return Ok(result)
+                    return Ok(result);
                 }
 
                 _ => {}
@@ -1048,11 +1041,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 }
             },
 
-            Res::SelfTyAlias {
-                alias_to,
-                forbid_generic,
-                is_trait_impl,
-            } => {
+            Res::SelfTyAlias { alias_to, .. } => {
                 let self_ty = self.tcx.type_of(alias_to).skip_binder().kind();
 
                 if let ty::TyKind::Adt(adt_def, _) = self_ty {
@@ -1226,7 +1215,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         // TODO: Think more about what type should be returned by a statement
         match stmt.kind {
             StmtKind::Let(local) => {
-                self.check_let_stmt(local);
+                self.check_let_stmt(local)?;
                 Ok(self.context.introduce())
             }
             StmtKind::Expr(expr) => self.check_expr(expr, expectation),

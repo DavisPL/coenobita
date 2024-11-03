@@ -2,7 +2,6 @@ pub use std::prelude;
 
 // These are all required by `walkdir`
 pub use std::cmp;
-pub use std::env;
 pub use std::error;
 pub use std::ffi;
 pub use std::fmt;
@@ -27,6 +26,7 @@ pub use std::write;
 pub use std::hash;
 
 // This stuff has been modified
+pub mod env;
 pub mod fs;
 pub mod path;
 
