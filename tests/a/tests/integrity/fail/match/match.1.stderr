@@ -1,5 +1,5 @@
-error: expected {bin}{bin}, found {b}{b}
-  --> tests/integrity/fail/match/match.1.rs:25:22
+error: expected {a}{a}, found {a}{a,bin}
+  --> tests/integrity/fail/match/match.1.rs:24:22
    |
-25 |             let z_ = z;
+24 |             let y_ = y;
    |                      ^

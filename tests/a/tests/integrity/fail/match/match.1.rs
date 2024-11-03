@@ -2,7 +2,7 @@
 #![allow(unused_assignments)]
 
 enum Foo {
-    #[cnbt::tag({bin}{bin} struct ({bin}{bin}))]
+    #[cnbt::tag({bin}{bin} struct ({bin}{bin,c}))]
     Bar(i32),
     
     #[cnbt::tag({bin}{bin} struct ({a}{a}, {b}{b}))]
@@ -10,10 +10,12 @@ enum Foo {
 }
 
 fn main() {
+    #[cnbt::tag({bin}{bin})]
     let f = Foo::Bar(5);
 
     match f {
         Foo::Bar(x) => {
+            #[cnbt::tag({bin}{bin,c})]
             let x_ = x;
         }
 
@@ -21,7 +23,7 @@ fn main() {
             #[cnbt::tag({a}{a})]
             let y_ = y;
 
-            #[cnbt::tag({bin}{bin})]
+            #[cnbt::tag({b}{b})]
             let z_ = z;
         }
     }

@@ -1,0 +1,5 @@
+error: expected {bin}{bin}, found {*}{*}
+  --> tests/integrity/fail/struct/struct.1.rs:25:13
+   |
+25 |     let y = b.string;
+   |             ^^^^^^^^

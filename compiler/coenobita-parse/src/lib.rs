@@ -157,7 +157,10 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
 
                 let mut fields = vec![];
                 while self.parser.token != CloseDelim(Delimiter::Brace) {
-                    fields.push((self.parser.parse_ident()?, self.parse_ity()?));
+                    let ident = self.parser.parse_ident()?;
+                    self.parser.expect(&TokenKind::Colon)?;
+
+                    fields.push((ident, self.parse_ity()?));
 
                     if self.parser.token != CloseDelim(Delimiter::Brace) {
                         self.parser.expect(&TokenKind::Comma)?;

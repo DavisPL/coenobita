@@ -1,0 +1,5 @@
+error: expected {bin}{bin}, found {bin}{bin,c}
+  --> tests/integrity/fail/struct/struct.0.rs:21:9
+   |
+21 |         string
+   |         ^^^^^^

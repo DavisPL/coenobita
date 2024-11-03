@@ -1,0 +1,5 @@
+error: expected {b}{b}, found {bin}{bin}
+ --> tests/integrity/fail/closure/closure.2.rs:9:13
+  |
+9 |     let y = f(5);
+  |             ^^^^

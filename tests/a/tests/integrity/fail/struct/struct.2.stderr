@@ -1,0 +1,9 @@
+error: expected {bin}{bin} struct {number:{*}{*},string:{bin}{bin}}, found {bin}{bin} struct {number:{*}{*},string:{bin}{bin,c}}
+  --> tests/integrity/fail/struct/struct.2.rs:20:13
+   |
+20 |       let b = BarBar {
+   |  _____________^
+21 | |         number: b::value(),
+22 | |         string
+23 | |     };
+   | |_____^

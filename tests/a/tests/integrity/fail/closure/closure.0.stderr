@@ -1,0 +1,11 @@
+warning: Coenobita cannot tell if this is a function
+ --> tests/integrity/fail/closure/closure.0.rs:8:13
+  |
+8 |     let y = f(5);
+  |             ^
+
+error: expected {bin}{bin}, found {*}{*}
+ --> tests/integrity/fail/closure/closure.0.rs:8:13
+  |
+8 |     let y = f(5);
+  |             ^^^^

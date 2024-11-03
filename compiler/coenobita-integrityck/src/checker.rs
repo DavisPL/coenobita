@@ -140,7 +140,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                             for field in fields {
                                 self.hir_map.insert(
                                     field.pat.hir_id,
-                                    tys.get(&field.ident.name).cloned().unwrap(),
+                                    self.context.influence(tys.get(&field.ident.name).cloned().unwrap()),
                                 );
                             }
                         }
@@ -214,6 +214,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                                         map.iter().sorted_by_key(|(key, _)| key.to_string());
 
                                     for (pat, (_, fty)) in pats.iter().zip(fields) {
+                                        let fty = self.context.influence(fty.clone());
                                         self.process_pattern(pat.kind, fty.clone(), pat.hir_id);
                                     }
                                 }
@@ -418,7 +419,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
         let expr = body.value;
         let actual =
-            self.check_expr(&body.value, &Expectation::ExpectHasType(*expected.clone()))?;
+            self.check_expr(&body.value, &Expectation::ExpectHasType(*expected.clone()), false)?;
 
         if !actual.satisfies(&expected) {
             let msg = format!("Expected {expected}, found {actual}");
@@ -569,7 +570,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     self.process_pattern(local.pat.kind, expected.clone(), local.pat.hir_id);
 
                     if let Some(expr) = local.init {
-                        self.check_expr(expr, &Expectation::ExpectHasType(expected.clone()))?;
+                        self.check_expr(expr, &Expectation::ExpectHasType(expected.clone()), false)?;
                     }
                 };
 
@@ -580,7 +581,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         if !processed {
             // There was no tag, so we cannot make any assumptions about the intended type
             if let Some(expr) = local.init {
-                self.check_expr(expr, &Expectation::NoExpectation)?;
+                self.check_expr(expr, &Expectation::NoExpectation, false)?;
                 self.process_pattern(local.pat.kind, self.context.universal(), local.pat.hir_id);
             } else {
                 // TODO: Think about what should happen here
@@ -593,20 +594,20 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     }
 
     /// Serves as the type checking entrypoint for all expressions.
-    pub fn check_expr(&mut self, expr: &Expr, expectation: &Expectation) -> Result<Ty> {
+    pub fn check_expr(&mut self, expr: &Expr, expectation: &Expectation, is_lvalue: bool) -> Result<Ty> {
         let ty = match expr.kind {
             ExprKind::Lit(_) => self.context.introduce(),
             ExprKind::Break(_, _) => self.context.introduce(),
             ExprKind::Continue(_) => self.context.introduce(),
 
             // TODO: Think about the typing rules for `Unary`, `AddrOf`, and `Index`
-            ExprKind::Unary(_, expr) => self.check_expr(expr, expectation)?,
-            ExprKind::DropTemps(expr) => self.check_expr(expr, expectation)?,
-            ExprKind::Cast(expr, _) => self.check_expr(expr, expectation)?,
-            ExprKind::Repeat(expr, _) => self.check_expr(expr, expectation)?,
-            ExprKind::Yield(expr, _) => self.check_expr(expr, expectation)?,
-            ExprKind::AddrOf(_, _, expr) => self.check_expr(expr, expectation)?,
-            ExprKind::Index(expr, _, _) => self.check_expr(expr, expectation)?,
+            ExprKind::Unary(_, expr) => self.check_expr(expr, expectation, is_lvalue)?,
+            ExprKind::DropTemps(expr) => self.check_expr(expr, expectation, is_lvalue)?,
+            ExprKind::Cast(expr, _) => self.check_expr(expr, expectation, is_lvalue)?,
+            ExprKind::Repeat(expr, _) => self.check_expr(expr, expectation, is_lvalue)?,
+            ExprKind::Yield(expr, _) => self.check_expr(expr, expectation, is_lvalue)?,
+            ExprKind::AddrOf(_, _, expr) => self.check_expr(expr, expectation, is_lvalue)?,
+            ExprKind::Index(expr, _, _) => self.check_expr(expr, expectation, is_lvalue)?,
 
             ExprKind::Assign(dest, expr, _) => self.check_expr_assign(dest, expr)?,
             ExprKind::AssignOp(_, dest, expr) => self.check_expr_assign(dest, expr)?,
@@ -648,7 +649,11 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             }
         };
 
-        expectation.check(self.tcx, ty, expr.span)
+        if is_lvalue {
+            expectation.check(self.tcx, ty, expr.span)
+        } else {
+            expectation.check(self.tcx, self.context.influence(ty), expr.span)
+        }
     }
 
     /// Checks the type of a path expression.
@@ -733,7 +738,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
     /// Checks the type of a call expression.
     pub fn check_expr_call(&mut self, func: &Expr, args: &[Expr], span: Span) -> Result<Ty> {
-        let fty = self.check_expr(func, &Expectation::NoExpectation)?;
+        let fty = self.check_expr(func, &Expectation::NoExpectation, true)?;
 
         match fty.kind() {
             TyKind::Fn(arg_tys, ret_ty) => {
@@ -750,7 +755,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
                 for (ty, expr) in arg_tys.into_iter().zip(args) {
                     let expectation = Expectation::ExpectHasType(ty);
-                    self.check_expr(expr, &expectation)?;
+                    self.check_expr(expr, &expectation, false)?;
                 }
 
                 Ok(*ret_ty)
@@ -760,7 +765,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 for (i, arg) in args.iter().enumerate() {
                     let ty = elements[&Symbol::intern(&i.to_string())].clone();
                     let expectation = Expectation::ExpectHasType(ty);
-                    self.check_expr(arg, &expectation)?;
+                    self.check_expr(arg, &expectation, false)?;
                 }
 
                 Ok(fty)
@@ -810,7 +815,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                         let args = std::iter::once(receiver).chain(args.iter());
                         for (ty, expr) in arg_tys.into_iter().zip(args) {
                             let expectation = Expectation::ExpectHasType(ty);
-                            self.check_expr(expr, &expectation)?;
+                            self.check_expr(expr, &expectation, false)?;
                         }
 
                         Ok(*ret_ty)
@@ -832,13 +837,13 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         else_expr: Option<&Expr>,
         expectation: &Expectation,
     ) -> Result<Ty> {
-        let ity = self.check_expr(guard, &Expectation::NoExpectation)?;
+        let ity = self.check_expr(guard, &Expectation::NoExpectation, false)?;
         self.context.enter(&ity);
 
-        let mut rty = self.check_expr(then_expr, expectation)?;
+        let mut rty = self.check_expr(then_expr, expectation, false)?;
 
         if let Some(else_expr) = else_expr {
-            rty = rty.merge(self.check_expr(else_expr, expectation)?);
+            rty = rty.merge(self.check_expr(else_expr, expectation, false)?);
         }
 
         self.context.exit();
@@ -862,10 +867,10 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
                 debug("Checking the guard of a desugared for loop match");
                 debug(format!("expr is {:#?}", &args[0]));
-                self.check_expr(&args[0], &Expectation::NoExpectation)?
+                self.check_expr(&args[0], &Expectation::NoExpectation, false)?
             }
 
-            _ => self.check_expr(guard, &Expectation::NoExpectation)?,
+            _ => self.check_expr(guard, &Expectation::NoExpectation, false)?,
         };
 
         debug(format!("done checking the guard. ty is {:#?}", ity));
@@ -876,7 +881,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
         for arm in arms {
             self.process_pattern(arm.pat.kind, ity.clone(), arm.pat.hir_id);
-            result = result.merge(self.check_expr(arm.body, expectation)?)
+            result = result.merge(self.check_expr(arm.body, expectation, false)?)
         }
 
         self.context.exit();
@@ -885,7 +890,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
     /// Checks the type of a `let` expression. These typically appear as the guards of `if` expressions.
     pub fn check_expr_let(&mut self, let_expr: &LetExpr, expectation: &Expectation) -> Result<Ty> {
-        let ty = self.check_expr(let_expr.init, expectation)?;
+        let ty = self.check_expr(let_expr.init, expectation, false)?;
         self.process_pattern(let_expr.pat.kind, ty.clone(), let_expr.pat.hir_id);
         Ok(ty)
     }
@@ -898,8 +903,8 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         expectation: &Expectation,
     ) -> Result<Ty> {
         let ty = self
-            .check_expr(lhs, expectation)?
-            .merge(self.check_expr(rhs, expectation)?);
+            .check_expr(lhs, expectation, false)?
+            .merge(self.check_expr(rhs, expectation, false)?);
 
         Ok(ty)
     }
@@ -916,7 +921,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 }
 
                 // This expression occurs at the very end without a semicolon
-                self.check_expr(expr, expectation)
+                self.check_expr(expr, expectation, false)
             }
 
             None if !block.stmts.is_empty() => {
@@ -935,12 +940,12 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     /// Checks the type of an assignment expression.
     pub fn check_expr_assign(&mut self, dest: &Expr, expr: &Expr) -> Result<Ty> {
         debug(format!("prepring to check assign term"));
-        let expected = self.check_expr(dest, &Expectation::NoExpectation)?;
+        let expected = self.check_expr(dest, &Expectation::NoExpectation, true)?;
 
         debug(format!("expected is {:#?}", expected));
 
         let expectation = &Expectation::ExpectHasType(expected.clone());
-        self.check_expr(expr, expectation)
+        self.check_expr(expr, expectation, false)
     }
 
     /// Checks the type of a struct expression.
@@ -958,7 +963,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
                     for field in fields {
                         result =
-                            result.merge(self.check_expr(field.expr, &Expectation::NoExpectation)?);
+                            result.merge(self.check_expr(field.expr, &Expectation::NoExpectation, false)?);
                     }
 
                     return Ok(result);
@@ -981,7 +986,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                             for field in fields {
                                 let ty = field_tys[&field.ident.name].clone();
                                 let expectation = &Expectation::ExpectHasType(ty);
-                                self.check_expr(field.expr, expectation)?;
+                                self.check_expr(field.expr, expectation, false)?;
                             }
 
                             // We need to replace the flow pair of `ty` with the introduction pair
@@ -1024,7 +1029,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     for field in fields {
                         let ty = tys[&field.ident.name].clone();
                         let expectation = Expectation::ExpectHasType(ty);
-                        self.check_expr(field.expr, &expectation)?;
+                        self.check_expr(field.expr, &expectation, false)?;
                     }
 
                     Ok(ty)
@@ -1053,7 +1058,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                             for field in fields {
                                 let ty = field_tys[&field.ident.name].clone();
                                 let expectation = &Expectation::ExpectHasType(ty);
-                                self.check_expr(field.expr, expectation)?;
+                                self.check_expr(field.expr, expectation, false)?;
                             }
 
                             // We need to replace the flow pair of `ty` with the introduction pair
@@ -1087,7 +1092,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         let mut item = self.context.introduce();
 
         for expr in exprs {
-            item = item.merge(self.check_expr(expr, &Expectation::NoExpectation)?);
+            item = item.merge(self.check_expr(expr, &Expectation::NoExpectation, false)?);
         }
 
         result.kind = TyKind::Array(Box::new(item));
@@ -1102,7 +1107,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         let mut items = vec![];
 
         for expr in exprs {
-            items.push(self.check_expr(expr, &Expectation::NoExpectation)?);
+            items.push(self.check_expr(expr, &Expectation::NoExpectation, false)?);
         }
 
         result.kind = TyKind::Tuple(items);
@@ -1112,7 +1117,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     /// Checks the type of a return expression.
     pub fn check_expr_ret(&mut self, expr: Option<&Expr>, expectation: &Expectation) -> Result<Ty> {
         match expr {
-            Some(expr) => Ok(self.check_expr(expr, expectation)?),
+            Some(expr) => Ok(self.check_expr(expr, expectation, false)?),
             None => Ok(self.context.introduce()),
         }
     }
@@ -1145,7 +1150,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 }
 
                 let expectation = Expectation::ExpectHasType(*ret.clone());
-                let ret = self.check_expr(&body.value, &expectation)?;
+                let ret = self.check_expr(&body.value, &expectation, false)?;
 
                 // Finally, return the expected type
                 Ok(Ty {
@@ -1167,7 +1172,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     self.hir_map.insert(param.pat.hir_id, arg);
                 }
 
-                let ret = self.check_expr(&body.value, &Expectation::NoExpectation)?;
+                let ret = self.check_expr(&body.value, &Expectation::NoExpectation, false)?;
 
                 let mut ty = self.context.introduce();
                 ty.kind = TyKind::Fn(args, Box::new(ret));
@@ -1179,7 +1184,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
     /// Checks the type of a projection.
     pub fn check_expr_field(&mut self, object: &Expr, field: Ident) -> Result<Ty> {
-        match self.check_expr(object, &Expectation::NoExpectation)?.kind {
+        match self.check_expr(object, &Expectation::NoExpectation, false)?.kind {
             TyKind::Adt(field_map) => {
                 if !field_map.contains_key(&field.name) {
                     let msg = format!("unknown field '{}'", field.name);
@@ -1218,8 +1223,8 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 self.check_let_stmt(local)?;
                 Ok(self.context.introduce())
             }
-            StmtKind::Expr(expr) => self.check_expr(expr, expectation),
-            StmtKind::Semi(expr) => self.check_expr(expr, expectation),
+            StmtKind::Expr(expr) => self.check_expr(expr, expectation, false),
+            StmtKind::Semi(expr) => self.check_expr(expr, expectation, false),
             StmtKind::Item(item_id) => {
                 self.check_item(self.tcx.hir().item(item_id))?;
                 Ok(self.context.introduce())

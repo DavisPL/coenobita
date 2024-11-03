@@ -1,0 +1,5 @@
+error: expected {b}{b}, found {a}{a}
+ --> tests/integrity/fail/closure/closure.1.rs:6:22
+  |
+6 |     let f = |x: i32| x;
+  |                      ^
