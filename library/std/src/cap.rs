@@ -1,2 +1,4 @@
-#[cnbt::tag({*}{*} struct ({bin}{bin}))]
-pub struct Capability<T>(pub T);
+pub(crate) trait Capability<T> {
+    fn extract(self) -> T;
+    fn peek(&self) -> &T;
+}
