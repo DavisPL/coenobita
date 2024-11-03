@@ -2,12 +2,12 @@
 #![allow(unused_assignments)]
 
 fn main() {
-    #[cnbt::tag({bin}{bin})]
+    #[cnbt::tag({bin}{*})]
     let mut x = 5;
 
-    if b::boolean() {
-        x = 6;
-    } else {
-        x = 7;
+    let items = [1, 2, 3];
+
+    for i in items {
+        x = 1;
     }
 }

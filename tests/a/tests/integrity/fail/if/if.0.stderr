@@ -1,5 +1,5 @@
 error: expected {bin}{bin}, found {bin}{bin,c}
-  --> tests/integrity/fail/if/if.0.rs:11:9
-   |
-11 |         5
-   |         ^
+ --> tests/integrity/fail/if/if.0.rs:9:9
+  |
+9 |         5
+  |         ^

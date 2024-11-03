@@ -1,4 +1,4 @@
-#[allow(unused_variables)]
+#![allow(unused_variables)]
 
 fn main() {
     #[cnbt::tag({bin}{b,bin})]

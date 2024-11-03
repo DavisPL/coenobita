@@ -13,7 +13,6 @@
 // // //     Baz(char)
 // // // }
 
-
 // // // fn test_ok() {
 // // //     let ok = Foo::Bar(b::boolean());
 

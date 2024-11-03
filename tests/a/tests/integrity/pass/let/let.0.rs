@@ -1,9 +1,9 @@
-#[allow(unused_variables)]
+#![allow(unused_variables)]
 
 fn main() {
     #[cnbt::tag({bin}{bin})]
     let x = 5;
 
-    #[cnbt::tag({bin}{bin})]
+    #[cnbt::tag({bin}{b,bin})]
     let y = x;
 }

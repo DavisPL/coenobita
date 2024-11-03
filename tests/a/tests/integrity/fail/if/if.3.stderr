@@ -1,0 +1,5 @@
+error: expected {bin}{bin}, found {bin}{b,bin,c}
+  --> tests/integrity/fail/if/if.3.rs:11:13
+   |
+11 |         x = 6;
+   |             ^

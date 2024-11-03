@@ -1,8 +1,6 @@
 #![allow(unused_variables)]
 #![allow(unused_assignments)]
 
-use c;
-
 fn main() {
     // Since the value assigned to `x` is implicitly affected by
     // crate `c`, this example should fail to type check

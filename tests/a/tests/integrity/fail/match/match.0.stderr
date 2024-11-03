@@ -1,0 +1,5 @@
+error: expected {b}{b,c}, found {bin}{bin}
+  --> tests/integrity/fail/match/match.0.rs:18:22
+   |
+18 |             let x_ = x;
+   |                      ^

@@ -11,8 +11,7 @@ use rustc_ast::AttrKind;
 use rustc_hir::def::{CtorOf, DefKind, Res};
 use rustc_hir::def_id::DefId;
 use rustc_hir::{
-    Arm, Block, BodyId, Closure, Expr, ExprField, ExprKind, FnSig, HirId, Impl, ImplItem,
-    ImplItemKind, Item, ItemKind, LetExpr, LetStmt, MatchSource, PatKind, QPath, Stmt, StmtKind,
+    Arm, Block, BodyId, Closure, Expr, ExprField, ExprKind, FnSig, HirId, Impl, ImplItem, ImplItemKind, Item, ItemKind, LangItem, LetExpr, LetStmt, MatchSource, PatKind, QPath, Stmt, StmtKind
 };
 use rustc_middle::ty::{self, FieldDef, TyCtxt};
 use rustc_span::symbol::Ident;
@@ -43,14 +42,17 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     }
 
     pub fn fn_ty(&mut self, def_id: DefId) -> Ty {
-        match self.def_map.get(&def_id) {
+        let ty = match self.def_map.get(&def_id) {
             Some(ty) => ty.clone(),
             None => {
                 // We haven't processed the definition of this function yet
                 let _ = self.check_external_item_fn(def_id);
                 self.def_map.get(&def_id).unwrap().clone()
             }
-        }
+        };
+
+        debug(format!("fn ty is {:#?}", ty));
+        ty
     }
 
     pub fn adt_ty(&mut self, def_id_parent: DefId, def_id_variant: DefId, index: VariantIdx) -> Ty {
@@ -605,13 +607,12 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             ExprKind::Break(_, _) => self.context.introduce(),
             ExprKind::Continue(_) => self.context.introduce(),
 
+            // TODO: Think about the typing rules for `Unary`, `AddrOf`, and `Index`
             ExprKind::Unary(_, expr) => self.check_expr(expr, expectation)?,
             ExprKind::DropTemps(expr) => self.check_expr(expr, expectation)?,
             ExprKind::Cast(expr, _) => self.check_expr(expr, expectation)?,
             ExprKind::Repeat(expr, _) => self.check_expr(expr, expectation)?,
             ExprKind::Yield(expr, _) => self.check_expr(expr, expectation)?,
-
-            // TODO: Think about the typing rules for dereferencing and array indexing
             ExprKind::AddrOf(_, _, expr) => self.check_expr(expr, expectation)?,
             ExprKind::Index(expr, _, _) => self.check_expr(expr, expectation)?,
 
@@ -868,13 +869,14 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 };
 
                 debug("Checking the guard of a desugared for loop match");
+                debug(format!("expr is {:#?}", &args[0]));
                 self.check_expr(&args[0], &Expectation::NoExpectation)?
             }
 
             _ => self.check_expr(guard, &Expectation::NoExpectation)?,
         };
 
-        debug("done checking the guard");
+        debug(format!("done checking the guard. ty is {:#?}", ity));
 
         self.context.enter(&ity);
 
@@ -956,6 +958,23 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         qpath: &QPath,
         fields: &[ExprField],
     ) -> Result<Ty> {
+        if let QPath::LangItem(item, _) = qpath {
+            match item {
+                LangItem::Range => {
+                    // NOTE: We handle ranges in a special manner for the time being
+                    let mut result = self.context.introduce();
+
+                    for field in fields {
+                        result = result.merge(self.check_expr(field.expr, &Expectation::NoExpectation)?);
+                    }
+
+                    return Ok(result)
+                }
+
+                _ => {}
+            }
+        }
+
         let local_def_id = hir_id.owner.to_def_id().as_local().unwrap();
 
         let res = self.tcx.typeck(local_def_id).qpath_res(qpath, hir_id);

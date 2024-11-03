@@ -1,0 +1,5 @@
+error: expected {bin}{bin}, found {bin}{*}
+  --> tests/integrity/fail/loop/for.1.rs:11:13
+   |
+11 |         x = 1;
+   |             ^
