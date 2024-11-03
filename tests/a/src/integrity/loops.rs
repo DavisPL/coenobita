@@ -23,3 +23,19 @@ fn test_basic_while_loop() {
     //     x = 7;
     // }
 }
+
+fn ret() -> [i32; 3] {
+    [1, 2, 3]
+}
+
+fn test_deref() {
+    #[cnbt::tag({*}{*})]
+    let v = 5;
+
+    for some in &mut ret() {
+        match Ok::<i32, i32>(5) {
+            Ok(x) => *some = v,
+            Err(_) => *some = v
+        }
+    }
+}

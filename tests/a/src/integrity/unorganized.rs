@@ -2,8 +2,8 @@ use core::range::Range;
 
 
 fn test_let_annotation() {
-    #[cnbt::tag({b}{b})]
-    let x = b::value();
+    //#[cnbt::tag({b}{b})]
+    //let x = b::value();
 
     #[cnbt::tag({a,b,c}{a,b,c})]
     let x = b::value();

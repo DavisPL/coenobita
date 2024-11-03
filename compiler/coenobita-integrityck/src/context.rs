@@ -14,7 +14,7 @@ impl<'cnbt> Context<'cnbt> {
     pub fn new(crate_name: &'cnbt str) -> Self {
         Context {
             crate_name,
-            levels: vec![FlowSet::Specific(HashSet::from([crate_name.to_owned()]))],
+            levels: vec![],
         }
     }
 
@@ -27,10 +27,11 @@ impl<'cnbt> Context<'cnbt> {
 
     pub fn introduce(&self) -> Ty {
         let explicit = self.origin();
+
         let implicit = self
             .levels
             .iter()
-            .fold(self.levels[0].clone(), |acc, elem| acc.union(elem));
+            .fold(self.origin(), |acc, elem| acc.union(elem));
 
         Ty::new(FlowPair(explicit, implicit), TyKind::Infer)
     }
@@ -38,17 +39,21 @@ impl<'cnbt> Context<'cnbt> {
     /// Adds implicit contributors to the given type. This is only necessary when "creating"
     /// new values that aren't introduced (like the results of binary expressions).
     pub fn influence(&self, ty: Ty) -> Ty {
-        let implicit = self
-            .levels
-            .iter()
-            .fold(self.levels[0].clone(), |acc, elem| acc.union(elem));
+        if self.levels.is_empty() {
+            ty
+        } else {
+            let implicit = self
+                .levels
+                .iter()
+                .fold(self.levels[0].clone(), |acc, elem| acc.union(elem));
 
-        let fpair = FlowPair(
-            ty.property.explicit().clone(),
-            ty.property.implicit().clone().union(&implicit),
-        );
+            let fpair = FlowPair(
+                ty.property.explicit().clone(),
+                ty.property.implicit().clone().union(&implicit),
+            );
 
-        Ty::new(fpair, ty.kind)
+            Ty::new(fpair, ty.kind)
+        }
     }
 
     pub fn origin(&self) -> FlowSet {
@@ -61,8 +66,6 @@ impl<'cnbt> Context<'cnbt> {
     }
 
     pub fn exit(&mut self) {
-        if self.levels.len() > 1 {
-            self.levels.pop();
-        }
+        self.levels.pop();
     }
 }

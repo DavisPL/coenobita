@@ -43,8 +43,6 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     }
 
     pub fn fn_ty(&mut self, def_id: DefId) -> Ty {
-        debug(format!("Trying to get type of function {:#?}", def_id));
-
         match self.def_map.get(&def_id) {
             Some(ty) => ty.clone(),
             None => {
@@ -56,11 +54,6 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     }
 
     pub fn adt_ty(&mut self, def_id_parent: DefId, def_id_variant: DefId, index: VariantIdx) -> Ty {
-        debug(format!(
-            "Trying to get type of adt (struct) {:#?}",
-            def_id_variant
-        ));
-
         match self.def_map.get(&def_id_variant) {
             Some(ty) => ty.clone(),
             None => {
@@ -82,7 +75,6 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
     /// Fetches the type of a local variable. Panics if it hasn't been processed, which should be impossible.
     pub fn local(&mut self, hir_id: HirId) -> Ty {
-        debug(format!("trying to get ty of local w/hir id {:#?}", hir_id));
         match self.hir_map.get(&hir_id) {
             Some(ty) => ty.clone(),
             None => {
@@ -102,8 +94,6 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             }
 
             PatKind::Struct(qpath, fields, _) => {
-                debug("Checking patkind struct...");
-
                 let res = self.tcx.typeck(ldid).qpath_res(&qpath, hir_id);
                 match res {
                     Res::Def(def_kind, def_id) => match def_kind {
@@ -157,6 +147,34 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
                     Res::Err => {}
 
+                    Res::SelfTyAlias {
+                        alias_to,
+                        forbid_generic,
+                        is_trait_impl,
+                    } => {
+                        let self_ty = self.tcx.type_of(alias_to).skip_binder().kind();
+
+                        if let ty::TyKind::Adt(adt_def, _) = self_ty {
+                            let did = adt_def.did();
+                            let sty = self.adt_ty(did, did, FIRST_VARIANT);
+
+                            match sty.kind() {
+                                TyKind::Adt(field_tys) => {
+                                    for field in fields {
+                                        let ty = field_tys[&field.ident.name].clone();
+                                        self.process_pattern(field.pat.kind, ty, field.pat.hir_id);
+                                    }
+                                }
+
+                                _ => {
+                                    todo!()
+                                }
+                            }
+                        } else {
+                            todo!()
+                        }
+                    }
+
                     _ => {
                         debug(format!("Unsupported res {:#?}", res));
                         todo!()
@@ -169,19 +187,27 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             PatKind::Err(_) | PatKind::Lit(_) => {}
 
             PatKind::TupleStruct(qpath, pats, _) => {
-                match self.tcx.typeck(ldid).qpath_res(&qpath, hir_id) {
+                let res = self.tcx.typeck(ldid).qpath_res(&qpath, hir_id);
+                match res {
                     Res::Def(def_kind, def_id) => match def_kind {
                         // TODO: Basically rewrite all of this logic. It's incorrect!
                         DefKind::Ctor(_, _) => {
-                            debug("Looking at ctor");
-
                             // Get the DefId of the variant
                             let def_id_variant = self.tcx.parent(def_id);
 
                             // Get the DefId of the parent
                             let def_id = self.tcx.parent(def_id_variant);
+                            let adt = self.tcx.adt_def(def_id);
 
-                            let ty = self.adt_ty(def_id, def_id, FIRST_VARIANT);
+                            let idx = adt
+                                .variants()
+                                .iter()
+                                .enumerate()
+                                .find(|(_, vdef)| vdef.def_id == def_id_variant)
+                                .unwrap()
+                                .0;
+
+                            let ty = self.adt_ty(def_id, def_id_variant, idx.into());
 
                             match ty.kind {
                                 TyKind::Adt(map) => {
@@ -214,7 +240,14 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                         _ => todo!(),
                     },
 
-                    _ => todo!(),
+                    Res::Err => {
+                        debug("[WARN] Name resolution during pattern processing silently failed");
+                    }
+
+                    _ => {
+                        debug(format!("cant process tupstruct pattern: def is {:#?}", res));
+                        todo!()
+                    }
                 }
             }
 
@@ -237,7 +270,29 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
             PatKind::Ref(pat, _) => self.process_pattern(pat.kind, ty, pat.hir_id),
 
+            PatKind::Or(pats) => {
+                for pat in pats {
+                    self.process_pattern(pat.kind, ty.clone(), pat.hir_id);
+                }
+            }
+
+            // TODO: Test thoroughly, and see what happens when the type isn't an array type
+            PatKind::Slice(before_pats, pat, after_pats) => {
+                for pat in before_pats {
+                    self.process_pattern(pat.kind, ty.clone(), pat.hir_id);
+                }
+
+                if let Some(pat) = pat {
+                    self.process_pattern(pat.kind, ty.clone(), pat.hir_id);
+                }
+
+                for pat in after_pats {
+                    self.process_pattern(pat.kind, ty.clone(), pat.hir_id);
+                }
+            }
+
             // Nothing to process
+            PatKind::Range(_, _, _) => {}
             PatKind::Path(_) => {}
             PatKind::Wild => {}
             PatKind::Never => {}
@@ -250,7 +305,6 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     }
 
     pub fn check_item(&mut self, item: &Item) -> Result {
-        debug(format!("Checking item {:?}", item.kind));
         let did = item.owner_id.to_def_id();
 
         if self.tcx.get_attr(did, Symbol::intern("ignore")).is_some() {
@@ -260,8 +314,26 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         match item.kind {
             ItemKind::Fn(signature, _, body_id) => self.check_item_fn(&signature, body_id),
             ItemKind::Impl(impl_) => self.check_item_impl(impl_),
+            ItemKind::Enum(enum_def, _) => {
+                for variant in enum_def.variants {
+                    let fields: Vec<FieldDef> = variant
+                        .data
+                        .fields()
+                        .iter()
+                        .map(|f| ty::FieldDef {
+                            did: f.def_id.to_def_id(),
+                            name: f.ident.name,
+                            vis: self.tcx.visibility(f.def_id),
+                        })
+                        .collect();
+
+                    self.check_item_struct(did, &fields)?
+                }
+
+                Ok(())
+            }
+
             ItemKind::Struct(var_data, _) => {
-                debug("checking struct ...");
                 let fields: Vec<FieldDef> = var_data
                     .fields()
                     .iter()
@@ -340,7 +412,6 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             }
         }
 
-        debug("Preapring to check item fn body...");
         let TyKind::Fn(args, expected) = self.fn_ty(def_id).kind else {
             panic!()
         };
@@ -354,8 +425,6 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         let expr = body.value;
         let actual =
             self.check_expr(&body.value, &Expectation::ExpectHasType(*expected.clone()))?;
-
-        debug("Done checking item fn body");
 
         if !actual.satisfies(&expected) {
             let msg = format!("Expected {expected}, found {actual}");
@@ -376,16 +445,12 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     }
 
     pub fn check_item_struct(&mut self, def_id: DefId, field_defs: &[FieldDef]) -> Result {
-        let default = self.context.influence(Ty::ty_adt(field_defs.len()));
-
         let fields = match self.tcx.get_attrs_by_path(def_id, &self.attr).next() {
             Some(attr) => {
                 // The `coenobita::tag` is guaranteed to be a normal attribute
                 let AttrKind::Normal(normal) = &attr.kind else {
                     unreachable!()
                 };
-
-                debug("preparing to parse struct attr");
 
                 let psess = create_psess(&self.tcx);
                 let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
@@ -395,9 +460,8 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 if let Ok(ty) = parser.parse_ity() {
                     match ty.kind {
                         ATyKind::Struct(ref elements) => {
-                            debug(format!("We parsed a struct with elements {:#?}", elements));
                             for (name, ty) in elements {
-                                map.insert(name.name, ty.clone().into());
+                                map.insert(name.name, self.context.influence(ty.clone().into()));
                             }
                         }
 
@@ -444,8 +508,6 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 fields
             }
         };
-
-        debug(format!("the map for struct is {:#?}", fields));
 
         // Since this type is a struct definition, its flow pair will never be used and is only here for consistency
         let mut ty = self.context.introduce();
@@ -506,8 +568,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
                 if let Ok(ty) = parser.parse_ity() {
                     let expected: Ty = ty.into();
-                    // TODO: Use `process_pattern`
-                    self.hir_map.insert(local.pat.hir_id, expected.clone());
+                    self.process_pattern(local.pat.kind, expected.clone(), local.pat.hir_id);
 
                     if let Some(expr) = local.init {
                         self.check_expr(expr, &Expectation::ExpectHasType(expected.clone()))?;
@@ -519,9 +580,10 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         }
 
         if !processed {
+            // There was no tag, so we cannot make any assumptions about the intended type
             if let Some(expr) = local.init {
-                let actual = self.check_expr(expr, &Expectation::NoExpectation)?;
-                self.hir_map.insert(local.pat.hir_id, actual);
+                self.check_expr(expr, &Expectation::NoExpectation)?;
+                self.process_pattern(local.pat.kind, self.context.universal(), local.pat.hir_id);
             } else {
                 // TODO: Think about what should happen here
                 self.hir_map
@@ -542,6 +604,8 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             ExprKind::Unary(_, expr) => self.check_expr(expr, expectation)?,
             ExprKind::DropTemps(expr) => self.check_expr(expr, expectation)?,
             ExprKind::Cast(expr, _) => self.check_expr(expr, expectation)?,
+            ExprKind::Repeat(expr, _) => self.check_expr(expr, expectation)?,
+            ExprKind::Yield(expr, _) => self.check_expr(expr, expectation)?,
 
             // TODO: Think about the typing rules for dereferencing and array indexing
             ExprKind::AddrOf(_, _, expr) => self.check_expr(expr, expectation)?,
@@ -553,7 +617,10 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             ExprKind::Block(block, _) => self.check_expr_block(block, expectation)?,
             ExprKind::Loop(block, _, _, _) => self.check_expr_block(block, expectation)?,
 
-            ExprKind::Path(qpath) => self.check_expr_path(expr.hir_id, &qpath, expectation)?,
+            ExprKind::Path(qpath) => {
+                debug(format!("Checking path {:?}", qpath));
+                self.check_expr_path(expr.hir_id, &qpath, expectation)?
+            }
             ExprKind::Call(func, args) => self.check_expr_call(func, args, expr.span)?,
             ExprKind::Let(let_expr) => self.check_expr_let(let_expr, expectation)?,
             ExprKind::Binary(_, lhs, rhs) => self.check_expr_binary(lhs, rhs, expectation)?,
@@ -584,7 +651,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             }
         };
 
-        expectation.check(self.tcx, ty, expr.span)
+        expectation.check(self.tcx, self.context.influence(ty), expr.span)
     }
 
     /// Checks the type of a path expression.
@@ -596,7 +663,8 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     ) -> Result<Ty> {
         let local_def_id = hir_id.owner.to_def_id().as_local().unwrap();
 
-        let ty = match self.tcx.typeck(local_def_id).qpath_res(qpath, hir_id) {
+        let res = self.tcx.typeck(local_def_id).qpath_res(qpath, hir_id);
+        let ty = match res {
             Res::Local(hir_id) => self.local(hir_id),
             Res::Def(def_kind, def_id) => match def_kind {
                 // TODO: Check that `AssocFn` is handled properly
@@ -605,21 +673,17 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 // TODO: Test this thoroughly
                 DefKind::Ctor(ctor_of, ctor_kind) => match ctor_of {
                     CtorOf::Struct => {
-                        debug(format!("checking CTOR of defid {:?}", def_id));
                         let def_id = self.tcx.parent(def_id);
 
                         self.adt_ty(def_id, def_id, FIRST_VARIANT)
                     }
 
                     CtorOf::Variant => {
-                        debug(format!("checking CTOR variatn of defid {:?}", def_id));
-
                         // Get the DefId of the variant
                         let id = self.tcx.parent(def_id);
 
                         // Get the DefId of the enum holding this variant
                         let def_id = self.tcx.parent(id);
-
                         let adt = self.tcx.adt_def(def_id);
 
                         let idx = adt
@@ -638,12 +702,33 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 DefKind::Static { .. } => self.context.introduce(),
 
                 // TODO: Implement actual logic
-                DefKind::AssocConst | DefKind::Const => self.context.introduce(),
+                DefKind::AssocConst | DefKind::Const | DefKind::ConstParam => {
+                    self.context.introduce()
+                }
 
-                _ => todo!(),
+                _ => {
+                    debug(format!("unsupported def kind {:#?}", res));
+                    todo!()
+                }
             },
 
-            _ => todo!(),
+            Res::SelfCtor(def_id) => {
+                let self_ty = self.tcx.type_of(def_id).skip_binder().kind();
+
+                if let ty::TyKind::Adt(adt_def, _) = self_ty {
+                    let did = adt_def.did();
+                    let sty = self.adt_ty(did, did, FIRST_VARIANT);
+
+                    sty
+                } else {
+                    todo!()
+                }
+            }
+
+            _ => {
+                debug(format!("unsupported res {:#?}", res));
+                todo!()
+            }
         };
 
         expectation.check(self.tcx, ty, qpath.span())
@@ -656,13 +741,14 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         match fty.kind() {
             TyKind::Fn(arg_tys, ret_ty) => {
                 if args.len() != arg_tys.len() {
-                    let msg = format!(
-                        "expected {} argument(s), found {}",
-                        arg_tys.len(),
-                        args.len()
-                    );
+                    // let msg = format!(
+                    //     "expected {} argument(s), found {}",
+                    //     arg_tys.len(),
+                    //     args.len()
+                    // );
 
-                    return Err(self.tcx.dcx().span_err(span, msg));
+                    // return Err(self.tcx.dcx().span_err(span, msg));
+                    debug("[WARN] arg ct doesnt match up");
                 }
 
                 for (ty, expr) in arg_tys.into_iter().zip(args) {
@@ -714,13 +800,14 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     TyKind::Fn(arg_tys, ret_ty) => {
                         // We subtract one to account for the receiver
                         if args.len() != arg_tys.len() - 1 {
-                            let msg = format!(
-                                "expected {} argument(s), found {}",
-                                arg_tys.len(),
-                                args.len()
-                            );
+                            // let msg = format!(
+                            //     "expected {} argument(s), found {}",
+                            //     arg_tys.len(),
+                            //     args.len()
+                            // );
 
-                            return Err(self.tcx.dcx().span_err(span, msg));
+                            // return Err(self.tcx.dcx().span_err(span, msg));
+                            debug("[WARN] arg ct doesnt match up");
                         }
 
                         let args = std::iter::once(receiver).chain(args.iter());
@@ -776,18 +863,21 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     unreachable!()
                 };
 
+                debug("Checking the guard of a desugared for loop match");
                 self.check_expr(&args[0], &Expectation::NoExpectation)?
             }
 
             _ => self.check_expr(guard, &Expectation::NoExpectation)?,
         };
 
+        debug("done checking the guard");
+
         self.context.enter(&ity);
 
         let mut result = self.context.introduce();
 
         for arm in arms {
-            self.process_pattern(arm.pat.kind, ity.clone(), arm.hir_id);
+            self.process_pattern(arm.pat.kind, ity.clone(), arm.pat.hir_id);
             result = result.merge(self.check_expr(arm.body, expectation)?)
         }
 
@@ -797,7 +887,6 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
     /// Checks the type of a `let` expression. These typically appear as the guards of `if` expressions.
     pub fn check_expr_let(&mut self, let_expr: &LetExpr, expectation: &Expectation) -> Result<Ty> {
-        debug(format!("chekcing let {:#?}", let_expr));
         let ty = self.check_expr(let_expr.init, expectation)?;
         self.process_pattern(let_expr.pat.kind, ty.clone(), let_expr.pat.hir_id);
         Ok(ty)
@@ -814,7 +903,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             .check_expr(lhs, expectation)?
             .merge(self.check_expr(rhs, expectation)?);
 
-        Ok(self.context.influence(ty))
+        Ok(ty)
     }
 
     /// Checks the type of a block.
@@ -866,7 +955,8 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     ) -> Result<Ty> {
         let local_def_id = hir_id.owner.to_def_id().as_local().unwrap();
 
-        match self.tcx.typeck(local_def_id).qpath_res(qpath, hir_id) {
+        let res = self.tcx.typeck(local_def_id).qpath_res(qpath, hir_id);
+        match res {
             Res::Def(def_kind, def_id) => match def_kind {
                 DefKind::Struct => {
                     let sty = self.adt_ty(def_id, def_id, FIRST_VARIANT);
@@ -925,13 +1015,58 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     Ok(ty)
                 }
 
+                DefKind::Union => {
+                    debug("[WARN] Silently skipping union usage");
+                    Ok(self.context.introduce())
+                }
+
                 _ => {
                     debug(format!("Unsupported def kind {:#?}", def_kind));
                     todo!()
                 }
             },
 
-            _ => todo!(),
+            Res::SelfTyAlias {
+                alias_to,
+                forbid_generic,
+                is_trait_impl,
+            } => {
+                let self_ty = self.tcx.type_of(alias_to).skip_binder().kind();
+
+                if let ty::TyKind::Adt(adt_def, _) = self_ty {
+                    let did = adt_def.did();
+                    let sty = self.adt_ty(did, did, FIRST_VARIANT);
+
+                    match sty.kind() {
+                        TyKind::Adt(field_tys) => {
+                            for field in fields {
+                                let ty = field_tys[&field.ident.name].clone();
+                                let expectation = &Expectation::ExpectHasType(ty);
+                                self.check_expr(field.expr, expectation)?;
+                            }
+
+                            // We need to replace the flow pair of `ty` with the introduction pair
+                            let mut ty = self.context.introduce();
+                            ty.kind = TyKind::Adt(field_tys);
+
+                            Ok(ty)
+                        }
+
+                        _ => {
+                            let msg =
+                                format!("'{}' is not a struct", qpath_string(self.tcx, qpath));
+                            Err(self.tcx.dcx().span_err(qpath.span(), msg))
+                        }
+                    }
+                } else {
+                    todo!()
+                }
+            }
+
+            _ => {
+                debug(format!("unsupported res of kind {:#?}", res));
+                todo!()
+            }
         }
     }
 
