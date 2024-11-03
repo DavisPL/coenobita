@@ -1,0 +1,4150 @@
+[DEBUG] Coenobita invoked for crate 'a'
+=========
+[DEBUG] Crate type is lib
+[DEBUG] Coenobita invoked for crate 'a'
+=========
+[DEBUG] settig local var Binding(BindingMode(No, Mut), HirId(DefId(0:4 ~ a[c74b]::integrity::test_some).4), x#0, None) to have type Ty { property: FlowPair(Specific({"a"}), Specific({"a"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: src/integrity/mod.rs:61:8: 61:18 (#0), res: Def(Fn, DefId(20:4 ~ c[3801]::boolean)), segments: [PathSegment { ident: c#0, hir_id: HirId(DefId(0:4 ~ a[c74b]::integrity::test_some).8), res: Def(Mod, DefId(20:0 ~ c[3801])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ a[c74b]::integrity::test_some).9), res: Def(Fn, DefId(20:4 ~ c[3801]::boolean)), args: None, infer_args: true }] })
+[DEBUG] settig local var Binding(BindingMode(No, Mut), HirId(DefId(0:4 ~ a[af30]::integrity::test_some).4), x#0, None) to have type Ty { property: FlowPair(Specific({"a"}), Specific({"a"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: src/integrity/mod.rs:61:8: 61:18 (#0), res: Def(Fn, DefId(24:4 ~ c[3801]::boolean)), segments: [PathSegment { ident: c#0, hir_id: HirId(DefId(0:4 ~ a[af30]::integrity::test_some).8), res: Def(Mod, DefId(24:0 ~ c[3801])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ a[af30]::integrity::test_some).9), res: Def(Fn, DefId(24:4 ~ c[3801]::boolean)), args: None, infer_args: true }] })
+[DEBUG] prepring to check assign term
+[DEBUG] Checking path Resolved(None, Path { span: src/integrity/mod.rs:62:9: 62:10 (#0), res: Local(HirId(DefId(0:4 ~ a[c74b]::integrity::test_some).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:4 ~ a[c74b]::integrity::test_some).13), res: Local(HirId(DefId(0:4 ~ a[c74b]::integrity::test_some).4)), args: None, infer_args: true }] })
+[DEBUG] expected is Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+                "c",
+            },
+        ),
+    ),
+    kind: Opaque,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+                "c",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] prepring to check assign term
+[DEBUG] Checking path Resolved(None, Path { span: src/integrity/mod.rs:64:9: 64:10 (#0), res: Local(HirId(DefId(0:4 ~ a[c74b]::integrity::test_some).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:4 ~ a[c74b]::integrity::test_some).21), res: Local(HirId(DefId(0:4 ~ a[c74b]::integrity::test_some).4)), args: None, infer_args: true }] })
+[DEBUG] expected is Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "c",
+                "a",
+            },
+        ),
+    ),
+    kind: Opaque,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+                "c",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] prepring to check assign term
+[DEBUG] Checking path Resolved(None, Path { span: src/integrity/mod.rs:62:9: 62:10 (#0), res: Local(HirId(DefId(0:4 ~ a[af30]::integrity::test_some).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:4 ~ a[af30]::integrity::test_some).13), res: Local(HirId(DefId(0:4 ~ a[af30]::integrity::test_some).4)), args: None, infer_args: true }] })
+[DEBUG] expected is Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+                "c",
+            },
+        ),
+    ),
+    kind: Opaque,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+                "c",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] prepring to check assign term
+[DEBUG] Checking path Resolved(None, Path { span: src/integrity/mod.rs:64:9: 64:10 (#0), res: Local(HirId(DefId(0:4 ~ a[af30]::integrity::test_some).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:4 ~ a[af30]::integrity::test_some).21), res: Local(HirId(DefId(0:4 ~ a[af30]::integrity::test_some).4)), args: None, infer_args: true }] })
+[DEBUG] expected is Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "c",
+                "a",
+            },
+        ),
+    ),
+    kind: Opaque,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+                "c",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: no-location (#4), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), segments: [PathSegment { ident: test#4, hir_id: HirId(DefId(0:5 ~ a[af30]::main).4), res: Def(Mod, DefId(20:0 ~ test[522f])), args: None, infer_args: true }, PathSegment { ident: test_main_static#4, hir_id: HirId(DefId(0:5 ~ a[af30]::main).5), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'test'
+=========
+[DEBUG] Checking path TypeRelative(Ty { hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).6), kind: Path(Resolved(None, Path { span: tests/test.rs:3:13: 3:32 (#0), res: Def(Struct, DefId(24:1872 ~ trybuild[1643]::TestCases)), segments: [PathSegment { ident: trybuild#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).4), res: Def(Mod, DefId(24:0 ~ trybuild[1643])), args: None, infer_args: true }, PathSegment { ident: TestCases#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).5), res: Def(Struct, DefId(24:1872 ~ trybuild[1643]::TestCases)), args: None, infer_args: true }] })), span: tests/test.rs:3:13: 3:32 (#0) }, PathSegment { ident: new#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).7), res: Err, args: None, infer_args: true })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:5:5: 5:6 (#0), res: Local(HirId(DefId(0:6 ~ test[9ab2]::test#1).9)), segments: [PathSegment { ident: t#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).13), res: Local(HirId(DefId(0:6 ~ test[9ab2]::test#1).9)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:6:5: 6:6 (#0), res: Local(HirId(DefId(0:6 ~ test[9ab2]::test#1).9)), segments: [PathSegment { ident: t#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).19), res: Local(HirId(DefId(0:6 ~ test[9ab2]::test#1).9)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: no-location (#5), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), segments: [PathSegment { ident: test#5, hir_id: HirId(DefId(0:7 ~ test[9ab2]::main).4), res: Def(Mod, DefId(20:0 ~ test[522f])), args: None, infer_args: true }, PathSegment { ident: test_main_static#5, hir_id: HirId(DefId(0:7 ~ test[9ab2]::main).5), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:2:1: 2:1 (#4), res: Def(Const, DefId(0:4 ~ test[9ab2]::test)), segments: [PathSegment { ident: test#6, hir_id: HirId(DefId(0:7 ~ test[9ab2]::main).10), res: Def(Const, DefId(0:4 ~ test[9ab2]::test)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate 'a'
+=========
+[DEBUG] Coenobita invoked for crate 'a'
+=========
+[DEBUG] Crate type is lib
+[DEBUG] settig local var Binding(BindingMode(No, Mut), HirId(DefId(0:4 ~ a[c74b]::integrity::test_some).4), x#0, None) to have type Ty { property: FlowPair(Specific({"a"}), Specific({"a"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Mut), HirId(DefId(0:4 ~ a[af30]::integrity::test_some).4), x#0, None) to have type Ty { property: FlowPair(Specific({"a"}), Specific({"a"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: src/integrity/mod.rs:61:8: 61:18 (#0), res: Def(Fn, DefId(20:4 ~ c[3801]::boolean)), segments: [PathSegment { ident: c#0, hir_id: HirId(DefId(0:4 ~ a[c74b]::integrity::test_some).8), res: Def(Mod, DefId(20:0 ~ c[3801])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ a[c74b]::integrity::test_some).9), res: Def(Fn, DefId(20:4 ~ c[3801]::boolean)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: src/integrity/mod.rs:61:8: 61:18 (#0), res: Def(Fn, DefId(24:4 ~ c[3801]::boolean)), segments: [PathSegment { ident: c#0, hir_id: HirId(DefId(0:4 ~ a[af30]::integrity::test_some).8), res: Def(Mod, DefId(24:0 ~ c[3801])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ a[af30]::integrity::test_some).9), res: Def(Fn, DefId(24:4 ~ c[3801]::boolean)), args: None, infer_args: true }] })
+[DEBUG] prepring to check assign term
+[DEBUG] Checking path Resolved(None, Path { span: src/integrity/mod.rs:62:9: 62:10 (#0), res: Local(HirId(DefId(0:4 ~ a[c74b]::integrity::test_some).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:4 ~ a[c74b]::integrity::test_some).13), res: Local(HirId(DefId(0:4 ~ a[c74b]::integrity::test_some).4)), args: None, infer_args: true }] })
+[DEBUG] prepring to check assign term
+[DEBUG] expected is Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+            },
+        ),
+    ),
+    kind: Opaque,
+}
+[DEBUG] Checking path Resolved(None, Path { span: src/integrity/mod.rs:62:9: 62:10 (#0), res: Local(HirId(DefId(0:4 ~ a[af30]::integrity::test_some).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:4 ~ a[af30]::integrity::test_some).13), res: Local(HirId(DefId(0:4 ~ a[af30]::integrity::test_some).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "c",
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] expected is Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+            },
+        ),
+    ),
+    kind: Opaque,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "c",
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "c",
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: no-location (#4), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), segments: [PathSegment { ident: test#4, hir_id: HirId(DefId(0:5 ~ a[af30]::main).4), res: Def(Mod, DefId(20:0 ~ test[522f])), args: None, infer_args: true }, PathSegment { ident: test_main_static#4, hir_id: HirId(DefId(0:5 ~ a[af30]::main).5), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+                "c",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "c",
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'a'
+=========
+[DEBUG] Crate type is lib
+[DEBUG] Coenobita invoked for crate 'a'
+=========
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: no-location (#4), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), segments: [PathSegment { ident: test#4, hir_id: HirId(DefId(0:4 ~ a[af30]::main).4), res: Def(Mod, DefId(20:0 ~ test[522f])), args: None, infer_args: true }, PathSegment { ident: test_main_static#4, hir_id: HirId(DefId(0:4 ~ a[af30]::main).5), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'test'
+=========
+[DEBUG] Checking path TypeRelative(Ty { hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).6), kind: Path(Resolved(None, Path { span: tests/test.rs:3:13: 3:32 (#0), res: Def(Struct, DefId(24:1872 ~ trybuild[1643]::TestCases)), segments: [PathSegment { ident: trybuild#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).4), res: Def(Mod, DefId(24:0 ~ trybuild[1643])), args: None, infer_args: true }, PathSegment { ident: TestCases#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).5), res: Def(Struct, DefId(24:1872 ~ trybuild[1643]::TestCases)), args: None, infer_args: true }] })), span: tests/test.rs:3:13: 3:32 (#0) }, PathSegment { ident: new#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).7), res: Err, args: None, infer_args: true })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:5:5: 5:6 (#0), res: Local(HirId(DefId(0:6 ~ test[9ab2]::test#1).9)), segments: [PathSegment { ident: t#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).13), res: Local(HirId(DefId(0:6 ~ test[9ab2]::test#1).9)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:6:5: 6:6 (#0), res: Local(HirId(DefId(0:6 ~ test[9ab2]::test#1).9)), segments: [PathSegment { ident: t#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).19), res: Local(HirId(DefId(0:6 ~ test[9ab2]::test#1).9)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: no-location (#5), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), segments: [PathSegment { ident: test#5, hir_id: HirId(DefId(0:7 ~ test[9ab2]::main).4), res: Def(Mod, DefId(20:0 ~ test[522f])), args: None, infer_args: true }, PathSegment { ident: test_main_static#5, hir_id: HirId(DefId(0:7 ~ test[9ab2]::main).5), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:2:1: 2:1 (#4), res: Def(Const, DefId(0:4 ~ test[9ab2]::test)), segments: [PathSegment { ident: test#6, hir_id: HirId(DefId(0:7 ~ test[9ab2]::main).10), res: Def(Const, DefId(0:4 ~ test[9ab2]::test)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate 'a'
+=========
+[DEBUG] Coenobita invoked for crate 'a'
+=========
+[DEBUG] Crate type is lib
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: no-location (#4), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), segments: [PathSegment { ident: test#4, hir_id: HirId(DefId(0:4 ~ a[f4a4]::main).4), res: Def(Mod, DefId(20:0 ~ test[522f])), args: None, infer_args: true }, PathSegment { ident: test_main_static#4, hir_id: HirId(DefId(0:4 ~ a[f4a4]::main).5), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "a",
+            },
+        ),
+        Specific(
+            {
+                "a",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'test'
+=========
+[DEBUG] Checking path TypeRelative(Ty { hir_id: HirId(DefId(0:6 ~ test[3e02]::test#1).6), kind: Path(Resolved(None, Path { span: tests/test.rs:3:13: 3:32 (#0), res: Def(Struct, DefId(24:1872 ~ trybuild[c2d8]::TestCases)), segments: [PathSegment { ident: trybuild#0, hir_id: HirId(DefId(0:6 ~ test[3e02]::test#1).4), res: Def(Mod, DefId(24:0 ~ trybuild[c2d8])), args: None, infer_args: true }, PathSegment { ident: TestCases#0, hir_id: HirId(DefId(0:6 ~ test[3e02]::test#1).5), res: Def(Struct, DefId(24:1872 ~ trybuild[c2d8]::TestCases)), args: None, infer_args: true }] })), span: tests/test.rs:3:13: 3:32 (#0) }, PathSegment { ident: new#0, hir_id: HirId(DefId(0:6 ~ test[3e02]::test#1).7), res: Err, args: None, infer_args: true })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:5:5: 5:6 (#0), res: Local(HirId(DefId(0:6 ~ test[3e02]::test#1).9)), segments: [PathSegment { ident: t#0, hir_id: HirId(DefId(0:6 ~ test[3e02]::test#1).13), res: Local(HirId(DefId(0:6 ~ test[3e02]::test#1).9)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:6:5: 6:6 (#0), res: Local(HirId(DefId(0:6 ~ test[3e02]::test#1).9)), segments: [PathSegment { ident: t#0, hir_id: HirId(DefId(0:6 ~ test[3e02]::test#1).19), res: Local(HirId(DefId(0:6 ~ test[3e02]::test#1).9)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: no-location (#5), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), segments: [PathSegment { ident: test#5, hir_id: HirId(DefId(0:7 ~ test[3e02]::main).4), res: Def(Mod, DefId(20:0 ~ test[522f])), args: None, infer_args: true }, PathSegment { ident: test_main_static#5, hir_id: HirId(DefId(0:7 ~ test[3e02]::main).5), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:2:1: 2:1 (#4), res: Def(Const, DefId(0:4 ~ test[3e02]::test)), segments: [PathSegment { ident: test#6, hir_id: HirId(DefId(0:7 ~ test[3e02]::main).10), res: Def(Const, DefId(0:4 ~ test[3e02]::test)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate 'a'
+=========
+[DEBUG] Crate type is lib
+[DEBUG] Coenobita invoked for crate 'a_tests'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate 'trybuild000'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:4 ~ trybuild000[884f]::main).15), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.0.rs:7:16: 7:26 (#0), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), segments: [PathSegment { ident: c#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).5), res: Def(Mod, DefId(20:0 ~ c[c472])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).6), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "c",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "c",
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild001'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Mut), HirId(DefId(0:4 ~ trybuild001[42ca]::main).3), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.1.rs:9:8: 9:18 (#0), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), segments: [PathSegment { ident: b#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).7), res: Def(Mod, DefId(20:0 ~ b[bbfe])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).8), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), args: None, infer_args: true }] })
+[DEBUG] prepring to check assign term
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.1.rs:10:9: 10:10 (#0), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).3)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).12), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).3)), args: None, infer_args: true }] })
+[DEBUG] expected is Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Opaque,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "b",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild002'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin", "b"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let.0.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild002[178e]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild003'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"c", "bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let.1.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild003[5eda]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild004'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild004[b74d]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild004[b74d]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/pass/let.0.rs:8:13: 8:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild004[b74d]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild004[b74d]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild004[b74d]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate 'a_tests'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild000'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:4 ~ trybuild000[884f]::main).15), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.0.rs:7:16: 7:26 (#0), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), segments: [PathSegment { ident: c#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).5), res: Def(Mod, DefId(20:0 ~ c[c472])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).6), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "c",
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "c",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild001'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Mut), HirId(DefId(0:4 ~ trybuild001[42ca]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.1.rs:9:8: 9:18 (#0), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), segments: [PathSegment { ident: b#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).8), res: Def(Mod, DefId(20:0 ~ b[bbfe])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).9), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), args: None, infer_args: true }] })
+[DEBUG] prepring to check assign term
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.1.rs:10:9: 10:10 (#0), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).13), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).4)), args: None, infer_args: true }] })
+[DEBUG] expected is Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Opaque,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "b",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild002'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin", "b"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let.0.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild002[178e]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild003'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"c", "bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let.1.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild003[5eda]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate 'a_tests'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild000'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:4 ~ trybuild000[884f]::main).15), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.0.rs:8:16: 8:26 (#0), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), segments: [PathSegment { ident: c#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).5), res: Def(Mod, DefId(20:0 ~ c[c472])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).6), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "c",
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "c",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild001'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Mut), HirId(DefId(0:4 ~ trybuild001[42ca]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.1.rs:10:8: 10:18 (#0), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), segments: [PathSegment { ident: b#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).8), res: Def(Mod, DefId(20:0 ~ b[bbfe])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).9), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), args: None, infer_args: true }] })
+[DEBUG] prepring to check assign term
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.1.rs:11:9: 11:10 (#0), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).13), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).4)), args: None, infer_args: true }] })
+[DEBUG] expected is Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Opaque,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "b",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild002'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"b", "bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let.0.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild002[178e]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild003'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"c", "bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let.1.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild003[5eda]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate 'a_tests'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild000'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:4 ~ trybuild000[884f]::main).15), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.0.rs:8:16: 8:26 (#0), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), segments: [PathSegment { ident: c#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).5), res: Def(Mod, DefId(20:0 ~ c[c472])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).6), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "c",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "c",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild001'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Mut), HirId(DefId(0:4 ~ trybuild001[42ca]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.1.rs:11:8: 11:18 (#0), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), segments: [PathSegment { ident: b#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).8), res: Def(Mod, DefId(20:0 ~ b[bbfe])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).9), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), args: None, infer_args: true }] })
+[DEBUG] prepring to check assign term
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.1.rs:12:9: 12:10 (#0), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).13), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).4)), args: None, infer_args: true }] })
+[DEBUG] expected is Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Opaque,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "b",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild002'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin", "b"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let.0.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild002[178e]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild003'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"c", "bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let.1.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild003[5eda]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate 'a_tests'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild000'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:4 ~ trybuild000[884f]::main).15), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.0.rs:10:16: 10:26 (#0), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), segments: [PathSegment { ident: c#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).5), res: Def(Mod, DefId(20:0 ~ c[c472])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).6), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "c",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "c",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild001'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Mut), HirId(DefId(0:4 ~ trybuild001[42ca]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.1.rs:12:8: 12:18 (#0), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), segments: [PathSegment { ident: b#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).8), res: Def(Mod, DefId(20:0 ~ b[bbfe])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).9), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), args: None, infer_args: true }] })
+[DEBUG] prepring to check assign term
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.1.rs:13:9: 13:10 (#0), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).13), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).4)), args: None, infer_args: true }] })
+[DEBUG] expected is Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Opaque,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "b",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild002'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"b", "bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let.0.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild002[178e]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild003'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"c", "bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let.1.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild003[5eda]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate 'a_tests'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild000'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:4 ~ trybuild000[884f]::main).15), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.0.rs:10:16: 10:26 (#0), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), segments: [PathSegment { ident: c#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).5), res: Def(Mod, DefId(20:0 ~ c[c472])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).6), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "c",
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "c",
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild001'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Mut), HirId(DefId(0:4 ~ trybuild001[42ca]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.1.rs:12:8: 12:18 (#0), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), segments: [PathSegment { ident: b#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).8), res: Def(Mod, DefId(20:0 ~ b[bbfe])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).9), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), args: None, infer_args: true }] })
+[DEBUG] prepring to check assign term
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.1.rs:13:9: 13:10 (#0), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).13), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).4)), args: None, infer_args: true }] })
+[DEBUG] expected is Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Opaque,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "b",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild002'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"b", "bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let.0.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild002[178e]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild003'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin", "c"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let.1.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild003[5eda]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'a_tests'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild000'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:4 ~ trybuild000[884f]::main).15), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.0.rs:10:16: 10:26 (#0), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), segments: [PathSegment { ident: c#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).5), res: Def(Mod, DefId(20:0 ~ c[c472])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).6), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "c",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "c",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild001'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Mut), HirId(DefId(0:4 ~ trybuild001[42ca]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.1.rs:12:8: 12:18 (#0), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), segments: [PathSegment { ident: b#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).8), res: Def(Mod, DefId(20:0 ~ b[bbfe])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).9), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), args: None, infer_args: true }] })
+[DEBUG] prepring to check assign term
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.1.rs:13:9: 13:10 (#0), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).13), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).4)), args: None, infer_args: true }] })
+[DEBUG] expected is Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Opaque,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "b",
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild002'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"b", "bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let.0.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild002[178e]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild003'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin", "c"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let.1.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild003[5eda]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'a_tests'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild000'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:4 ~ trybuild000[884f]::main).15), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.0.rs:10:16: 10:26 (#0), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), segments: [PathSegment { ident: c#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).5), res: Def(Mod, DefId(20:0 ~ c[c472])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).6), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "c",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "c",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild001'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Mut), HirId(DefId(0:4 ~ trybuild001[42ca]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.1.rs:12:8: 12:18 (#0), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), segments: [PathSegment { ident: b#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).8), res: Def(Mod, DefId(20:0 ~ b[bbfe])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).9), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), args: None, infer_args: true }] })
+[DEBUG] prepring to check assign term
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if.1.rs:13:9: 13:10 (#0), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).13), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).4)), args: None, infer_args: true }] })
+[DEBUG] expected is Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Opaque,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "b",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild002'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"b", "bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let.0.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild002[178e]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild003'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"c", "bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let.1.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild003[5eda]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate 'c'
+=========
+[DEBUG] Coenobita invoked for crate 'b'
+=========
+[DEBUG] Crate type is lib
+[DEBUG] Crate type is lib
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "c",
+            },
+        ),
+        Specific(
+            {
+                "c",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "b",
+            },
+        ),
+        Specific(
+            {
+                "b",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "c",
+            },
+        ),
+        Specific(
+            {
+                "c",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "b",
+            },
+        ),
+        Specific(
+            {
+                "b",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'a'
+=========
+[DEBUG] Crate type is lib
+[DEBUG] Coenobita invoked for crate 'a_tests'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate 'test'
+=========
+[DEBUG] Checking path TypeRelative(Ty { hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).6), kind: Path(Resolved(None, Path { span: tests/test.rs:3:13: 3:32 (#0), res: Def(Struct, DefId(24:1872 ~ trybuild[1643]::TestCases)), segments: [PathSegment { ident: trybuild#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).4), res: Def(Mod, DefId(24:0 ~ trybuild[1643])), args: None, infer_args: true }, PathSegment { ident: TestCases#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).5), res: Def(Struct, DefId(24:1872 ~ trybuild[1643]::TestCases)), args: None, infer_args: true }] })), span: tests/test.rs:3:13: 3:32 (#0) }, PathSegment { ident: new#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).7), res: Err, args: None, infer_args: true })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:5:5: 5:6 (#0), res: Local(HirId(DefId(0:6 ~ test[9ab2]::test#1).9)), segments: [PathSegment { ident: t#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).13), res: Local(HirId(DefId(0:6 ~ test[9ab2]::test#1).9)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:6:5: 6:6 (#0), res: Local(HirId(DefId(0:6 ~ test[9ab2]::test#1).9)), segments: [PathSegment { ident: t#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).19), res: Local(HirId(DefId(0:6 ~ test[9ab2]::test#1).9)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: no-location (#5), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), segments: [PathSegment { ident: test#5, hir_id: HirId(DefId(0:7 ~ test[9ab2]::main).4), res: Def(Mod, DefId(20:0 ~ test[522f])), args: None, infer_args: true }, PathSegment { ident: test_main_static#5, hir_id: HirId(DefId(0:7 ~ test[9ab2]::main).5), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:2:1: 2:1 (#4), res: Def(Const, DefId(0:4 ~ test[9ab2]::test)), segments: [PathSegment { ident: test#6, hir_id: HirId(DefId(0:7 ~ test[9ab2]::main).10), res: Def(Const, DefId(0:4 ~ test[9ab2]::test)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate 'test'
+=========
+[DEBUG] Checking path TypeRelative(Ty { hir_id: HirId(DefId(0:6 ~ test[3e02]::test#1).6), kind: Path(Resolved(None, Path { span: tests/test.rs:3:13: 3:32 (#0), res: Def(Struct, DefId(24:1872 ~ trybuild[c2d8]::TestCases)), segments: [PathSegment { ident: trybuild#0, hir_id: HirId(DefId(0:6 ~ test[3e02]::test#1).4), res: Def(Mod, DefId(24:0 ~ trybuild[c2d8])), args: None, infer_args: true }, PathSegment { ident: TestCases#0, hir_id: HirId(DefId(0:6 ~ test[3e02]::test#1).5), res: Def(Struct, DefId(24:1872 ~ trybuild[c2d8]::TestCases)), args: None, infer_args: true }] })), span: tests/test.rs:3:13: 3:32 (#0) }, PathSegment { ident: new#0, hir_id: HirId(DefId(0:6 ~ test[3e02]::test#1).7), res: Err, args: None, infer_args: true })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:5:5: 5:6 (#0), res: Local(HirId(DefId(0:6 ~ test[3e02]::test#1).9)), segments: [PathSegment { ident: t#0, hir_id: HirId(DefId(0:6 ~ test[3e02]::test#1).13), res: Local(HirId(DefId(0:6 ~ test[3e02]::test#1).9)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:6:5: 6:6 (#0), res: Local(HirId(DefId(0:6 ~ test[3e02]::test#1).9)), segments: [PathSegment { ident: t#0, hir_id: HirId(DefId(0:6 ~ test[3e02]::test#1).19), res: Local(HirId(DefId(0:6 ~ test[3e02]::test#1).9)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: no-location (#5), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), segments: [PathSegment { ident: test#5, hir_id: HirId(DefId(0:7 ~ test[3e02]::main).4), res: Def(Mod, DefId(20:0 ~ test[522f])), args: None, infer_args: true }, PathSegment { ident: test_main_static#5, hir_id: HirId(DefId(0:7 ~ test[3e02]::main).5), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:2:1: 2:1 (#4), res: Def(Const, DefId(0:4 ~ test[3e02]::test)), segments: [PathSegment { ident: test#6, hir_id: HirId(DefId(0:7 ~ test[3e02]::main).10), res: Def(Const, DefId(0:4 ~ test[3e02]::test)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'a_tests'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild000'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild000[884f]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild000[884f]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/pass/let/let.0.rs:8:13: 8:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild000[884f]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild000[884f]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild000[884f]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild001'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild001[42ca]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin", "c", "b"}), Specific({"bin", "b", "c"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild001[42ca]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/pass/let/let.1.rs:8:13: 8:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild001[42ca]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild001[42ca]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild001[42ca]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate 'a_tests'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild001'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild001[42ca]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild001[42ca]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin", "b", "c"}), Specific({"b", "bin", "c"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/pass/let/let.1.rs:8:13: 8:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild001[42ca]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild001[42ca]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild001[42ca]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate 'test'
+=========
+[DEBUG] Checking path TypeRelative(Ty { hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).6), kind: Path(Resolved(None, Path { span: tests/test.rs:3:13: 3:32 (#0), res: Def(Struct, DefId(24:1872 ~ trybuild[1643]::TestCases)), segments: [PathSegment { ident: trybuild#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).4), res: Def(Mod, DefId(24:0 ~ trybuild[1643])), args: None, infer_args: true }, PathSegment { ident: TestCases#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).5), res: Def(Struct, DefId(24:1872 ~ trybuild[1643]::TestCases)), args: None, infer_args: true }] })), span: tests/test.rs:3:13: 3:32 (#0) }, PathSegment { ident: new#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).7), res: Err, args: None, infer_args: true })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:5:5: 5:6 (#0), res: Local(HirId(DefId(0:6 ~ test[9ab2]::test#1).9)), segments: [PathSegment { ident: t#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).13), res: Local(HirId(DefId(0:6 ~ test[9ab2]::test#1).9)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:6:5: 6:6 (#0), res: Local(HirId(DefId(0:6 ~ test[9ab2]::test#1).9)), segments: [PathSegment { ident: t#0, hir_id: HirId(DefId(0:6 ~ test[9ab2]::test#1).19), res: Local(HirId(DefId(0:6 ~ test[9ab2]::test#1).9)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: no-location (#5), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), segments: [PathSegment { ident: test#5, hir_id: HirId(DefId(0:7 ~ test[9ab2]::main).4), res: Def(Mod, DefId(20:0 ~ test[522f])), args: None, infer_args: true }, PathSegment { ident: test_main_static#5, hir_id: HirId(DefId(0:7 ~ test[9ab2]::main).5), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:2:1: 2:1 (#4), res: Def(Const, DefId(0:4 ~ test[9ab2]::test)), segments: [PathSegment { ident: test#6, hir_id: HirId(DefId(0:7 ~ test[9ab2]::main).10), res: Def(Const, DefId(0:4 ~ test[9ab2]::test)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate 'test'
+=========
+[DEBUG] Checking path TypeRelative(Ty { hir_id: HirId(DefId(0:6 ~ test[3e02]::test#1).6), kind: Path(Resolved(None, Path { span: tests/test.rs:3:13: 3:32 (#0), res: Def(Struct, DefId(24:1872 ~ trybuild[c2d8]::TestCases)), segments: [PathSegment { ident: trybuild#0, hir_id: HirId(DefId(0:6 ~ test[3e02]::test#1).4), res: Def(Mod, DefId(24:0 ~ trybuild[c2d8])), args: None, infer_args: true }, PathSegment { ident: TestCases#0, hir_id: HirId(DefId(0:6 ~ test[3e02]::test#1).5), res: Def(Struct, DefId(24:1872 ~ trybuild[c2d8]::TestCases)), args: None, infer_args: true }] })), span: tests/test.rs:3:13: 3:32 (#0) }, PathSegment { ident: new#0, hir_id: HirId(DefId(0:6 ~ test[3e02]::test#1).7), res: Err, args: None, infer_args: true })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:5:5: 5:6 (#0), res: Local(HirId(DefId(0:6 ~ test[3e02]::test#1).9)), segments: [PathSegment { ident: t#0, hir_id: HirId(DefId(0:6 ~ test[3e02]::test#1).13), res: Local(HirId(DefId(0:6 ~ test[3e02]::test#1).9)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:6:5: 6:6 (#0), res: Local(HirId(DefId(0:6 ~ test[3e02]::test#1).9)), segments: [PathSegment { ident: t#0, hir_id: HirId(DefId(0:6 ~ test[3e02]::test#1).19), res: Local(HirId(DefId(0:6 ~ test[3e02]::test#1).9)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: no-location (#5), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), segments: [PathSegment { ident: test#5, hir_id: HirId(DefId(0:7 ~ test[3e02]::main).4), res: Def(Mod, DefId(20:0 ~ test[522f])), args: None, infer_args: true }, PathSegment { ident: test_main_static#5, hir_id: HirId(DefId(0:7 ~ test[3e02]::main).5), res: Def(Fn, DefId(20:841 ~ test[522f]::test_main_static)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: tests/test.rs:2:1: 2:1 (#4), res: Def(Const, DefId(0:4 ~ test[3e02]::test)), segments: [PathSegment { ident: test#6, hir_id: HirId(DefId(0:7 ~ test[3e02]::main).10), res: Def(Const, DefId(0:4 ~ test[3e02]::test)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "test",
+            },
+        ),
+        Specific(
+            {
+                "test",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'a_tests'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild000'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:4 ~ trybuild000[884f]::main).15), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if/if.0.rs:10:16: 10:26 (#0), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), segments: [PathSegment { ident: c#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).5), res: Def(Mod, DefId(20:0 ~ c[c472])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).6), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "c",
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "c",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild001'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Mut), HirId(DefId(0:4 ~ trybuild001[42ca]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if/if.1.rs:12:8: 12:18 (#0), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), segments: [PathSegment { ident: b#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).8), res: Def(Mod, DefId(20:0 ~ b[bbfe])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).9), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), args: None, infer_args: true }] })
+[DEBUG] prepring to check assign term
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if/if.1.rs:13:9: 13:10 (#0), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).13), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).4)), args: None, infer_args: true }] })
+[DEBUG] expected is Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Opaque,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "b",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild002'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin", "b"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let/let.0.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild002[178e]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild003'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin", "c"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let/let.1.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild003[5eda]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild004'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild004[b74d]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild004[b74d]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/pass/let/let.0.rs:8:13: 8:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild004[b74d]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild004[b74d]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild004[b74d]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild005'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild005[4fa8]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild005[4fa8]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"b", "bin", "c"}), Specific({"b", "c", "bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/pass/let/let.1.rs:8:13: 8:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild005[4fa8]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild005[4fa8]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild005[4fa8]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate '___'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] Coenobita invoked for crate 'a_tests'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild000'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:4 ~ trybuild000[884f]::main).15), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if/if.0.rs:10:16: 10:26 (#0), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), segments: [PathSegment { ident: c#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).5), res: Def(Mod, DefId(20:0 ~ c[c472])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild000[884f]::main).6), res: Def(Fn, DefId(20:4 ~ c[c472]::boolean)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "c",
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "c",
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild001'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Mut), HirId(DefId(0:4 ~ trybuild001[42ca]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if/if.1.rs:12:8: 12:18 (#0), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), segments: [PathSegment { ident: b#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).8), res: Def(Mod, DefId(20:0 ~ b[bbfe])), args: None, infer_args: true }, PathSegment { ident: boolean#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).9), res: Def(Fn, DefId(20:4 ~ b[bbfe]::boolean)), args: None, infer_args: true }] })
+[DEBUG] prepring to check assign term
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/if/if.1.rs:13:9: 13:10 (#0), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:4 ~ trybuild001[42ca]::main).13), res: Local(HirId(DefId(0:4 ~ trybuild001[42ca]::main).4)), args: None, infer_args: true }] })
+[DEBUG] expected is Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Opaque,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+                "b",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild002'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin", "b"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild002[178e]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let/let.0.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild002[178e]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild002[178e]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] Coenobita invoked for crate 'trybuild003'
+=========
+[DEBUG] Crate type is bin
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).4), x#0, None) to have type Ty { property: FlowPair(Specific({"c", "bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}
+[DEBUG] settig local var Binding(BindingMode(No, Not), HirId(DefId(0:3 ~ trybuild003[5eda]::main).9), y#0, None) to have type Ty { property: FlowPair(Specific({"bin"}), Specific({"bin"})), kind: Opaque }
+[DEBUG] Checking path Resolved(None, Path { span: /Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/tests/a/tests/integrity/fail/let/let.1.rs:10:13: 10:14 (#0), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:3 ~ trybuild003[5eda]::main).7), res: Local(HirId(DefId(0:3 ~ trybuild003[5eda]::main).4)), args: None, infer_args: true }] })
+[DEBUG] introducing new ty Ty {
+    property: FlowPair(
+        Specific(
+            {
+                "bin",
+            },
+        ),
+        Specific(
+            {
+                "bin",
+            },
+        ),
+    ),
+    kind: Infer,
+}

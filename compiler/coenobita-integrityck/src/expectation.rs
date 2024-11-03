@@ -5,7 +5,7 @@ use crate::shared::{Result, Ty};
 
 /// Bidirectional type checking requires us to propagate the type
 /// we expect an expression to have as we move along.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum Expectation {
     /// We don't know what type this expression should have.
     NoExpectation,

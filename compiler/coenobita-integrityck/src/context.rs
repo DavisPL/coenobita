@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 
+use coenobita_log::debug;
 use coenobita_middle::flow::{FlowPair, FlowSet};
 use coenobita_middle::ty::{Ty as _Ty, TyKind};
 
@@ -7,13 +8,15 @@ type Ty = _Ty<FlowPair>;
 
 pub struct Context<'cnbt> {
     crate_name: &'cnbt str,
+    crate_type: &'cnbt str,
     levels: Vec<FlowSet>,
 }
 
 impl<'cnbt> Context<'cnbt> {
-    pub fn new(crate_name: &'cnbt str) -> Self {
+    pub fn new(crate_name: &'cnbt str, crate_type: &'cnbt str) -> Self {
         Context {
             crate_name,
+            crate_type,
             levels: vec![],
         }
     }
@@ -33,7 +36,9 @@ impl<'cnbt> Context<'cnbt> {
             .iter()
             .fold(self.origin(), |acc, elem| acc.union(elem));
 
-        Ty::new(FlowPair(explicit, implicit), TyKind::Infer)
+        let ty = Ty::new(FlowPair(explicit, implicit), TyKind::Infer);
+        debug(format!("introducing new ty {:#?}", ty));
+        ty
     }
 
     /// Adds implicit contributors to the given type. This is only necessary when "creating"
@@ -57,7 +62,13 @@ impl<'cnbt> Context<'cnbt> {
     }
 
     pub fn origin(&self) -> FlowSet {
-        FlowSet::Specific(HashSet::from([self.crate_name.to_owned()]))
+        let name = if self.crate_type == "bin" {
+            "bin".to_owned()
+        } else {
+            self.crate_name.to_owned()
+        };
+
+        FlowSet::Specific(HashSet::from([name]))
     }
 
     pub fn enter(&mut self, ty: &Ty) {

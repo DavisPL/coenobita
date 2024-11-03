@@ -3,6 +3,14 @@ name = "a"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+doctest = false
+
 [dependencies]
+b = { path = "../b" }
+c = { path = "../c" }
+
+[dev-dependencies]
+trybuild = { path = "../../../trybuild" }
 b = { path = "../b" }
 c = { path = "../c" }

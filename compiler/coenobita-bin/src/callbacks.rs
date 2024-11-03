@@ -8,12 +8,14 @@ use coenobita_provck::checker::Checker as PChecker;
 
 pub struct CoenobitaCallbacks {
     crate_name: String,
+    crate_type: String,
 }
 
 impl CoenobitaCallbacks {
-    pub fn new(crate_name: String) -> Self {
+    pub fn new(crate_name: String, crate_type: String) -> Self {
         CoenobitaCallbacks {
-            crate_name: crate_name,
+            crate_name,
+            crate_type,
         }
     }
 }
@@ -26,7 +28,7 @@ impl Callbacks for CoenobitaCallbacks {
     ) -> Compilation {
         queries.global_ctxt().unwrap().enter(|tcx| {
             let hir_map = tcx.hir();
-            let mut visitor = CoenobitaVisitor::new(&self.crate_name, tcx);
+            let mut visitor = CoenobitaVisitor::new(&self.crate_name, &self.crate_type, tcx);
 
             hir_map.visit_all_item_likes_in_crate(&mut visitor);
         });
@@ -43,8 +45,8 @@ struct CoenobitaVisitor<'cnbt, 'tcx> {
 }
 
 impl<'c, 'tcx> CoenobitaVisitor<'c, 'tcx> {
-    pub fn new(crate_name: &'c str, tcx: TyCtxt<'tcx>) -> Self {
-        let context = Context::new(crate_name);
+    pub fn new(crate_name: &'c str, crate_type: &'c str, tcx: TyCtxt<'tcx>) -> Self {
+        let context = Context::new(crate_name, crate_type);
 
         CoenobitaVisitor {
             crate_name,

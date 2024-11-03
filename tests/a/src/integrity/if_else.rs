@@ -27,3 +27,14 @@ fn test_nested_if_else() {
         }
     };
 }
+
+fn test_some() {
+    #[cnbt::tag({a}{a})]
+    let mut x = 5;
+
+    if c::boolean() {
+        x = 6;
+    } else {
+        x = 7;
+    }
+}

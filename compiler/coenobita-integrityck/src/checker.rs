@@ -568,6 +568,10 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
                 if let Ok(ty) = parser.parse_ity() {
                     let expected: Ty = ty.into();
+                    debug(format!(
+                        "settig local var {:?} to have type {:?}",
+                        local.pat.kind, expected
+                    ));
                     self.process_pattern(local.pat.kind, expected.clone(), local.pat.hir_id);
 
                     if let Some(expr) = local.init {
@@ -611,8 +615,8 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             ExprKind::AddrOf(_, _, expr) => self.check_expr(expr, expectation)?,
             ExprKind::Index(expr, _, _) => self.check_expr(expr, expectation)?,
 
-            ExprKind::Assign(dest, expr, _) => self.check_expr_assign(dest, expr, expectation)?,
-            ExprKind::AssignOp(_, dest, expr) => self.check_expr_assign(dest, expr, expectation)?,
+            ExprKind::Assign(dest, expr, _) => self.check_expr_assign(dest, expr)?,
+            ExprKind::AssignOp(_, dest, expr) => self.check_expr_assign(dest, expr)?,
 
             ExprKind::Block(block, _) => self.check_expr_block(block, expectation)?,
             ExprKind::Loop(block, _, _, _) => self.check_expr_block(block, expectation)?,
@@ -651,7 +655,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             }
         };
 
-        expectation.check(self.tcx, self.context.influence(ty), expr.span)
+        expectation.check(self.tcx, ty, expr.span)
     }
 
     /// Checks the type of a path expression.
@@ -935,13 +939,12 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     }
 
     /// Checks the type of an assignment expression.
-    pub fn check_expr_assign(
-        &mut self,
-        dest: &Expr,
-        expr: &Expr,
-        expectation: &Expectation,
-    ) -> Result<Ty> {
-        let expected = self.check_expr(dest, expectation)?;
+    pub fn check_expr_assign(&mut self, dest: &Expr, expr: &Expr) -> Result<Ty> {
+        debug(format!("prepring to check assign term"));
+        let expected = self.check_expr(dest, &Expectation::NoExpectation)?;
+
+        debug(format!("expected is {:#?}", expected));
+
         let expectation = &Expectation::ExpectHasType(expected.clone());
         self.check_expr(expr, expectation)
     }

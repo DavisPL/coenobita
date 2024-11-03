@@ -36,18 +36,35 @@ fn main() {
         })
         .unwrap_or("-".into());
 
+    let crate_type = crate_type(&args)
+        .and_then(|s| {
+            debug(format!("Crate type is {s}"));
+            Some(s)
+        })
+        .unwrap_or("-".into());
+
     // if crate_name != "cstd" {
     //     args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/debug/libcstd.rlib".to_string());
     // }
 
     // Create callbacks and run the compiler
-    let mut callbacks = CoenobitaCallbacks::new(crate_name);
+    let mut callbacks = CoenobitaCallbacks::new(crate_name, crate_type);
     let _result = RunCompiler::new(&args, &mut callbacks).run();
 }
 
 fn crate_name<'a>(args: &'a [String]) -> Option<String> {
     for pair in args.windows(2) {
         if pair[0] == "--crate-name" {
+            return Some(pair[1].clone());
+        }
+    }
+
+    None
+}
+
+fn crate_type<'a>(args: &'a [String]) -> Option<String> {
+    for pair in args.windows(2) {
+        if pair[0] == "--crate-type" {
             return Some(pair[1].clone());
         }
     }
