@@ -69,14 +69,8 @@ impl Ty<FlowPair> {
     }
 
     pub fn satisfies(&self, other: &Ty<FlowPair>) -> bool {
-        let explicit = self
-            .property
-            .explicit()
-            .is_subset(other.property.explicit());
-        let implicit = self
-            .property
-            .implicit()
-            .is_subset(other.property.implicit());
+        let explicit = self.property.explicit().is_subset(other.property.explicit());
+        let implicit = self.property.implicit().is_subset(other.property.implicit());
 
         explicit
             && implicit
@@ -291,9 +285,7 @@ impl From<ATyKind<AProvenancePair>> for TyKind<ProvenancePair> {
                 arg_tys.into_iter().map(|ty| ty.into()).collect(),
                 Box::new(Ty::from(*ret_ty)),
             ),
-            ATyKind::Tuple(item_tys) => {
-                Self::Tuple(item_tys.into_iter().map(|ty| ty.into()).collect())
-            }
+            ATyKind::Tuple(item_tys) => Self::Tuple(item_tys.into_iter().map(|ty| ty.into()).collect()),
             ATyKind::Array(item_ty) => Self::Array(Box::new(Ty::from(*item_ty))),
             ATyKind::Opaque => Self::Opaque,
             _ => todo!(),

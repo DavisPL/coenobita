@@ -82,11 +82,7 @@ impl Display for FlowSet {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Specific(origins) => {
-                let origins = origins
-                    .iter()
-                    .map(|ident| ident.to_string())
-                    .sorted()
-                    .join(",");
+                let origins = origins.iter().map(|ident| ident.to_string()).sorted().join(",");
                 write!(f, "{{{origins}}}")
             }
 

@@ -92,10 +92,7 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
         if self.parser.eat(&BinOp(BinOpToken::Star)) {
             Ok(Provenance::Universal(self.end(start)))
         } else {
-            Ok(Provenance::Specific(
-                self.parser.parse_ident()?,
-                self.end(start),
-            ))
+            Ok(Provenance::Specific(self.parser.parse_ident()?, self.end(start)))
         }
     }
 
@@ -267,10 +264,7 @@ pub fn create_psess(tcx: &TyCtxt) -> ParseSess {
     ParseSess::with_dcx(dcx, source_map)
 }
 
-pub fn create_parser<'cnbt>(
-    psess: &'cnbt ParseSess,
-    stream: TokenStream,
-) -> CoenobitaParser<'cnbt> {
+pub fn create_parser<'cnbt>(psess: &'cnbt ParseSess, stream: TokenStream) -> CoenobitaParser<'cnbt> {
     // Set up the rustc parser and the custom CnbtParser
     let rustc_parser = Parser::new(&psess, stream, None);
     let parser = CoenobitaParser::new(rustc_parser);
@@ -289,13 +283,8 @@ pub fn emitter(
     match opts.error_format {
         ErrorOutputType::HumanReadable(err_type, color_config) => {
             if let HumanReadableErrorType::AnnotateSnippet = err_type {
-                let emitter = AnnotateSnippetEmitter::new(
-                    Some(source_map),
-                    None,
-                    fallback_bundle,
-                    false,
-                    false,
-                );
+                let emitter =
+                    AnnotateSnippetEmitter::new(Some(source_map), None, fallback_bundle, false, false);
                 Box::new(emitter)
             } else {
                 let dst = stderr_destination(color_config);

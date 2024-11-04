@@ -11,8 +11,8 @@ use rustc_ast::AttrKind;
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::def_id::DefId;
 use rustc_hir::{
-    Arm, Block, BodyId, Expr, ExprField, ExprKind, FnSig, HirId, Item, ItemKind, LetStmt, QPath,
-    Stmt, StmtKind,
+    Arm, Block, BodyId, Expr, ExprField, ExprKind, FnSig, HirId, Item, ItemKind, LetStmt, QPath, Stmt,
+    StmtKind,
 };
 use rustc_middle::ty::{self, FieldDef, TyCtxt};
 use rustc_span::{ErrorGuaranteed, Symbol};
@@ -164,7 +164,9 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                             } else {
                                 self.def_map.insert(def_id, default);
 
-                                let msg = format!("Function must have {expected} arguments, but its Coenobita signature has {actual}");
+                                let msg = format!(
+                                    "Function must have {expected} arguments, but its Coenobita signature has {actual}"
+                                );
                                 self.tcx.dcx().span_err(ty.span, msg);
                             }
                         }
@@ -241,13 +243,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
     // TODO: Change the name of this function
     pub fn new_check_item_fn(&mut self, def_id: DefId) -> Result {
-        let expected = self
-            .tcx
-            .fn_sig(def_id)
-            .skip_binder()
-            .inputs()
-            .iter()
-            .count();
+        let expected = self.tcx.fn_sig(def_id).skip_binder().inputs().iter().count();
 
         let default = Ty::ty_fn(expected);
 
@@ -308,9 +304,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             ExprKind::Lit(_) => Ok(self.introduce()),
             ExprKind::Path(qpath) => self.check_expr_path(expr.hir_id, &qpath),
             ExprKind::Call(func, args) => self.check_expr_call(func, args),
-            ExprKind::If(guard, then_expr, else_expr) => {
-                self.check_expr_if(guard, then_expr, else_expr)
-            }
+            ExprKind::If(guard, then_expr, else_expr) => self.check_expr_if(guard, then_expr, else_expr),
             ExprKind::Match(guard, arms, _) => self.check_expr_match(guard, arms),
             ExprKind::Binary(_, lhs, rhs) => self.check_expr_binary(lhs, rhs),
             ExprKind::Unary(_, expr) => self.check_expr(expr),
@@ -388,12 +382,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         }
     }
 
-    pub fn check_expr_if(
-        &mut self,
-        guard: &Expr,
-        then_expr: &Expr,
-        else_expr: Option<&Expr>,
-    ) -> Result<Ty> {
+    pub fn check_expr_if(&mut self, guard: &Expr, then_expr: &Expr, else_expr: Option<&Expr>) -> Result<Ty> {
         self.check_expr(guard)?;
 
         let tty = self.check_expr(then_expr)?;
@@ -476,12 +465,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         }
     }
 
-    pub fn check_expr_struct(
-        &mut self,
-        hir_id: HirId,
-        qpath: &QPath,
-        fields: &[ExprField],
-    ) -> Result<Ty> {
+    pub fn check_expr_struct(&mut self, hir_id: HirId, qpath: &QPath, fields: &[ExprField]) -> Result<Ty> {
         let local_def_id = hir_id.owner.to_def_id().as_local().unwrap();
 
         match self.tcx.typeck(local_def_id).qpath_res(qpath, hir_id) {
@@ -509,8 +493,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                         }
 
                         _ => {
-                            let msg =
-                                format!("'{}' is not a struct", qpath_string(self.tcx, qpath));
+                            let msg = format!("'{}' is not a struct", qpath_string(self.tcx, qpath));
                             Err(self.tcx.dcx().span_err(qpath.span(), msg))
                         }
                     }

@@ -6,9 +6,7 @@ pub struct Map<F, T> {
 
 impl<F: Eq + Hash, T> Map<F, T> {
     pub fn new() -> Self {
-        Map {
-            map: HashMap::new(),
-        }
+        Map { map: HashMap::new() }
     }
 
     pub fn get(&self, key: &F) -> Option<&T> {

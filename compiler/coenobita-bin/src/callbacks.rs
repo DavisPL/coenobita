@@ -21,11 +21,7 @@ impl CoenobitaCallbacks {
 }
 
 impl Callbacks for CoenobitaCallbacks {
-    fn after_analysis<'tcx>(
-        &mut self,
-        _compiler: &Compiler,
-        queries: &'tcx Queries<'tcx>,
-    ) -> Compilation {
+    fn after_analysis<'tcx>(&mut self, _compiler: &Compiler, queries: &'tcx Queries<'tcx>) -> Compilation {
         queries.global_ctxt().unwrap().enter(|tcx| {
             let hir_map = tcx.hir();
             let mut visitor = CoenobitaVisitor::new(&self.crate_name, &self.crate_type, tcx);

@@ -6,14 +6,12 @@ use coenobita_middle::map::Map;
 use coenobita_middle::ty::TyKind;
 
 use coenobita_parse::{create_parser, create_psess};
-use itertools::Itertools;
 use rustc_ast::AttrKind;
 use rustc_hir::def::{CtorOf, DefKind, Res};
 use rustc_hir::def_id::DefId;
 use rustc_hir::{
-    Arm, Block, BodyId, Closure, Expr, ExprField, ExprKind, FnSig, HirId, Impl, ImplItem,
-    ImplItemKind, Item, ItemKind, LangItem, LetExpr, LetStmt, MatchSource, PatField, PatKind,
-    QPath, Stmt, StmtKind,
+    Arm, Block, BodyId, Closure, Expr, ExprField, ExprKind, FnSig, HirId, Impl, ImplItem, ImplItemKind, Item,
+    ItemKind, LangItem, LetExpr, LetStmt, MatchSource, PatField, PatKind, QPath, Stmt, StmtKind,
 };
 use rustc_middle::ty::{self, FieldDef, TyCtxt};
 use rustc_span::symbol::Ident;
@@ -121,16 +119,13 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 self.hir_map.insert(hir_id, ty.clone());
             }
 
-            PatKind::Struct(qpath, fields, _) => {
-                self.process_pattern_struct(hir_id, &qpath, fields)
-            }
+            PatKind::Struct(qpath, fields, _) => self.process_pattern_struct(hir_id, &qpath, fields),
 
             PatKind::Box(pat) => self.process_pattern(pat.kind, ty, pat.hir_id),
             PatKind::Deref(pat) => self.process_pattern(pat.kind, ty, pat.hir_id),
             PatKind::Err(_) | PatKind::Lit(_) => {}
 
             PatKind::TupleStruct(qpath, pats, _) => {
-                debug("pat is tupstruct");
                 let fields: Vec<PatField> = pats
                     .iter()
                     .enumerate()
@@ -146,23 +141,20 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 self.process_pattern_struct(hir_id, &qpath, &fields);
             }
 
-            PatKind::Tuple(pats, _) => {
-                debug("pat is tuple");
-                match ty.kind {
-                    TyKind::Tuple(elements) => {
-                        for (pat, ty) in pats.iter().zip(elements) {
-                            self.process_pattern(pat.kind, ty, pat.hir_id);
-                        }
-                    }
-
-                    _ => {
-                        // Either the type is opaque or it's simply incorrect
-                        for pat in pats.iter() {
-                            self.process_pattern(pat.kind, self.context.universal(), pat.hir_id);
-                        }
+            PatKind::Tuple(pats, _) => match ty.kind {
+                TyKind::Tuple(elements) => {
+                    for (pat, ty) in pats.iter().zip(elements) {
+                        self.process_pattern(pat.kind, ty, pat.hir_id);
                     }
                 }
-            }
+
+                _ => {
+                    // Either the type is opaque or it's simply incorrect
+                    for pat in pats.iter() {
+                        self.process_pattern(pat.kind, self.context.universal(), pat.hir_id);
+                    }
+                }
+            },
 
             PatKind::Ref(pat, _) => self.process_pattern(pat.kind, ty, pat.hir_id),
 
@@ -200,10 +192,6 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     pub fn check_item(&mut self, item: &Item) -> Result {
         let did = item.owner_id.to_def_id();
 
-        if self.tcx.get_attr(did, Symbol::intern("ignore")).is_some() {
-            return Ok(());
-        }
-
         match item.kind {
             ItemKind::Fn(signature, _, body_id) => self.check_item_fn(&signature, body_id),
             ItemKind::Impl(impl_) => self.check_item_impl(impl_),
@@ -213,7 +201,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                         .data
                         .fields()
                         .iter()
-                        .map(|f| ty::FieldDef {
+                        .map(|f| FieldDef {
                             did: f.def_id.to_def_id(),
                             name: f.ident.name,
                             vis: self.tcx.visibility(f.def_id),
@@ -280,12 +268,13 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
                             if actual == expected {
                                 // Note that we currently don't check whether types have the correct shape
-                                self.def_map
-                                    .insert(def_id, self.context.influence(ty.into()));
+                                self.def_map.insert(def_id, self.context.influence(ty.into()));
                             } else {
                                 self.def_map.insert(def_id, default);
 
-                                let msg = format!("Function must have {expected} arguments, but its Coenobita signature has {actual}");
+                                let msg = format!(
+                                    "Function must have {expected} arguments, but its Coenobita signature has {actual}"
+                                );
                                 self.tcx.dcx().span_err(ty.span, msg);
                             }
                         }
@@ -316,11 +305,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         }
 
         let expr = body.value;
-        let actual = self.check_expr(
-            &body.value,
-            &Expectation::ExpectHasType(*expected.clone()),
-            false,
-        )?;
+        let actual = self.check_expr(&body.value, &Expectation::ExpectHasType(*expected.clone()), false)?;
 
         if !actual.satisfies(&expected) {
             let msg = format!("Expected {expected}, found {actual}");
@@ -415,13 +400,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     }
 
     pub fn check_external_item_fn(&mut self, def_id: DefId) -> Result {
-        let expected = self
-            .tcx
-            .fn_sig(def_id)
-            .skip_binder()
-            .inputs()
-            .iter()
-            .count();
+        let expected = self.tcx.fn_sig(def_id).skip_binder().inputs().iter().count();
 
         let default = self.context.influence(Ty::ty_fn(expected));
 
@@ -467,11 +446,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     self.process_pattern(local.pat.kind, expected.clone(), local.pat.hir_id);
 
                     if let Some(expr) = local.init {
-                        self.check_expr(
-                            expr,
-                            &Expectation::ExpectHasType(expected.clone()),
-                            false,
-                        )?;
+                        self.check_expr(expr, &Expectation::ExpectHasType(expected.clone()), false)?;
                     }
                 };
 
@@ -486,8 +461,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 self.process_pattern(local.pat.kind, self.context.universal(), local.pat.hir_id);
             } else {
                 // TODO: Think about what should happen here
-                self.hir_map
-                    .insert(local.pat.hir_id, self.context.universal());
+                self.hir_map.insert(local.pat.hir_id, self.context.universal());
             }
         }
 
@@ -495,12 +469,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     }
 
     /// Serves as the type checking entrypoint for all expressions.
-    pub fn check_expr(
-        &mut self,
-        expr: &Expr,
-        expectation: &Expectation,
-        is_lvalue: bool,
-    ) -> Result<Ty> {
+    pub fn check_expr(&mut self, expr: &Expr, expectation: &Expectation, is_lvalue: bool) -> Result<Ty> {
         let ty = match expr.kind {
             ExprKind::Lit(_) => self.context.introduce(),
             ExprKind::Break(_, _) => self.context.introduce(),
@@ -542,9 +511,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             ExprKind::Match(guard, arms, source) => {
                 self.check_expr_match(guard, arms, source, expectation)?
             }
-            ExprKind::Struct(qpath, fields, _) => {
-                self.check_expr_struct(expr.hir_id, qpath, fields)?
-            }
+            ExprKind::Struct(qpath, fields, _) => self.check_expr_struct(expr.hir_id, qpath, fields)?,
 
             _ => {
                 debug(format!("Skipping expression of kind {:#?}", expr.kind));
@@ -560,12 +527,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     }
 
     /// Checks the type of a path expression.
-    pub fn check_expr_path(
-        &mut self,
-        hir_id: HirId,
-        qpath: &QPath,
-        expectation: &Expectation,
-    ) -> Result<Ty> {
+    pub fn check_expr_path(&mut self, hir_id: HirId, qpath: &QPath, expectation: &Expectation) -> Result<Ty> {
         let local_def_id = hir_id.owner.to_def_id().as_local().unwrap();
 
         let res = self.tcx.typeck(local_def_id).qpath_res(qpath, hir_id);
@@ -631,9 +593,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 DefKind::Static { .. } => self.context.introduce(),
 
                 // TODO: Implement actual logic
-                DefKind::AssocConst | DefKind::Const | DefKind::ConstParam => {
-                    self.context.introduce()
-                }
+                DefKind::AssocConst | DefKind::Const | DefKind::ConstParam => self.context.introduce(),
 
                 DefKind::Union => {
                     debug("[WARN] Silently skipping union usage");
@@ -646,27 +606,14 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 }
             },
 
-            Res::SelfCtor(def_id) => {
-                let self_ty = self.tcx.type_of(def_id).skip_binder().kind();
+            Res::SelfCtor(alias_to) | Res::SelfTyAlias { alias_to, .. } => {
+                match self.tcx.type_of(alias_to).skip_binder().kind() {
+                    ty::TyKind::Adt(adt_def, _) => {
+                        let did = adt_def.did();
+                        self.adt_ty(did, did, FIRST_VARIANT)
+                    }
 
-                if let ty::TyKind::Adt(adt_def, _) = self_ty {
-                    let did = adt_def.did();
-                    let sty = self.adt_ty(did, did, FIRST_VARIANT);
-
-                    sty
-                } else {
-                    todo!()
-                }
-            }
-
-            Res::SelfTyAlias { alias_to, .. } => {
-                let self_ty = self.tcx.type_of(alias_to).skip_binder().kind();
-
-                if let ty::TyKind::Adt(adt_def, _) = self_ty {
-                    let did = adt_def.did();
-                    self.adt_ty(did, did, FIRST_VARIANT)
-                } else {
-                    todo!()
+                    _ => todo!(),
                 }
             }
 
@@ -837,12 +784,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     }
 
     /// Checks the type of a binary expression.
-    pub fn check_expr_binary(
-        &mut self,
-        lhs: &Expr,
-        rhs: &Expr,
-        expectation: &Expectation,
-    ) -> Result<Ty> {
+    pub fn check_expr_binary(&mut self, lhs: &Expr, rhs: &Expr, expectation: &Expectation) -> Result<Ty> {
         let ty = self
             .check_expr(lhs, expectation, false)?
             .merge(self.check_expr(rhs, expectation, false)?);
@@ -887,12 +829,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     }
 
     /// Checks the type of a struct expression.
-    pub fn check_expr_struct(
-        &mut self,
-        hir_id: HirId,
-        qpath: &QPath,
-        fields: &[ExprField],
-    ) -> Result<Ty> {
+    pub fn check_expr_struct(&mut self, hir_id: HirId, qpath: &QPath, fields: &[ExprField]) -> Result<Ty> {
         let ty = match qpath {
             QPath::LangItem(item, _) => match item {
                 LangItem::Range => {
@@ -900,11 +837,8 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     let mut result = self.context.introduce();
 
                     for field in fields {
-                        result = result.merge(self.check_expr(
-                            field.expr,
-                            &Expectation::NoExpectation,
-                            false,
-                        )?);
+                        result =
+                            result.merge(self.check_expr(field.expr, &Expectation::NoExpectation, false)?);
                     }
 
                     result
@@ -976,11 +910,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     }
 
     /// Checks the type of a closure expression.
-    pub fn check_expr_closure(
-        &mut self,
-        closure: &Closure,
-        expectation: &Expectation,
-    ) -> Result<Ty> {
+    pub fn check_expr_closure(&mut self, closure: &Closure, expectation: &Expectation) -> Result<Ty> {
         match expectation {
             Expectation::ExpectHasType(Ty {
                 property,
@@ -1037,10 +967,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
     /// Checks the type of a projection.
     pub fn check_expr_field(&mut self, object: &Expr, field: Ident) -> Result<Ty> {
-        match self
-            .check_expr(object, &Expectation::NoExpectation, false)?
-            .kind
-        {
+        match self.check_expr(object, &Expectation::NoExpectation, false)?.kind {
             TyKind::Adt(field_map) => {
                 if !field_map.contains_key(&field.name) {
                     let msg = format!("unknown field '{}'", field.name);

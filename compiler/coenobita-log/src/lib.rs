@@ -19,8 +19,7 @@ use std::sync::{Arc, Mutex};
 use once_cell::sync::Lazy;
 
 static LOGGER: Lazy<Logger> = Lazy::new(|| {
-    Logger::new("/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/coenobita.log")
-        .unwrap()
+    Logger::new("/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/coenobita.log").unwrap()
 });
 
 pub struct Logger {

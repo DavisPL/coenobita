@@ -21,10 +21,7 @@ impl<'cnbt> Context<'cnbt> {
     }
 
     pub fn universal(&self) -> Ty {
-        Ty::new(
-            FlowPair(FlowSet::Universal, FlowSet::Universal),
-            TyKind::Infer,
-        )
+        Ty::new(FlowPair(FlowSet::Universal, FlowSet::Universal), TyKind::Infer)
     }
 
     pub fn introduce(&self) -> Ty {
