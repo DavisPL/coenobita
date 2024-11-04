@@ -1,9 +1,8 @@
 # Testing Coenobita
 
-## Introduction
-Testing Coenobita is challenging because it is a compiler plugin that involves complicated interactions between multiple crates. Following in the footsteps of the Rust compiler and related tools, we have set up UI tests for Coenobita using `trybuild`. Before reading any further, you should probably check out its [documentation](https://github.com/dtolnay/trybuild).
+Testing Coenobita is challenging because it's a compiler plugin that involves complicated interactions between multiple crates. Following in the footsteps of the Rust compiler and related tools, we have set up UI tests for Coenobita using `trybuild`. Before reading any further, you should probably check out its [documentation](https://github.com/dtolnay/trybuild).
 
-Instead of asserting the equality (or inequality) of values, we assert that a program either _passes_ or _fails_ with some specific message. All of our tests live in the `a/tests` directory. Right now, it only has an `integrity` subfolder, but there will likely be more in the future.
+Instead of asserting the equality or inequality of values, we assert that a program either _passes_ or _fails_ with some specific message. All of our tests live in the `a/tests` directory. Right now, it only has an `integrity` subfolder, but there will likely be more in the future.
 
 Every category (like integrity or provenance) has two additional folders inside of it named `pass` and `fail`. Like their names suggest, all the programs in `pass` should compile successfully and all the programs in `fail` should fail to compile. Not only should programs in the second group fail, but they must do so with a specific error message.
 
@@ -23,4 +22,4 @@ error: expected {a}{a}, found {bin}{bin}
    |                ^
 ```
 
-We make sure that it fails with this exact message by including it in `tests/integrity/fail/fn/fn.0.stderr`.
+We make sure that it fails with this exact message by including it in `fn.0.stderr`.
