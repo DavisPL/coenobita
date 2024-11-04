@@ -11,6 +11,6 @@ b = { path = "../b" }
 c = { path = "../c" }
 
 [dev-dependencies]
-trybuild = { path = "../../../trybuild" }
+trybuild = "1.0"
 b = { path = "../b" }
 c = { path = "../c" }
