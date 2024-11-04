@@ -1,0 +1,5 @@
+error: expected {bin}{bin}, found {bin}{*}
+  --> tests/integrity/fail/pattern/pattern.2.rs:15:13
+   |
+15 |     let y = a;
+   |             ^

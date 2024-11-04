@@ -1,0 +1,11 @@
+error: expected {b}{b}, found {a}{a}
+ --> tests/integrity/fail/fn/fn.0.rs:6:5
+  |
+6 |     x
+  |     ^
+
+error: expected {a}{a}, found {bin}{bin}
+  --> tests/integrity/fail/fn/fn.0.rs:10:16
+   |
+10 |     let x = id(5);
+   |                ^

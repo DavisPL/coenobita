@@ -1,28 +1,15 @@
-
-// enum Foo {
-//     #[cnbt::tag({a}{a} struct ({a}{a}))]
-//     Bar(i32),
-    
-//     #[cnbt::tag({a}{a} struct ({aa}{aa}, {b}{b}))]
-//     Baz(i32, i32)
+// struct Baz {
+//     #[cnbt::tag({a,b}{a})]
+//     a: i64
 // }
 
 // fn main() {
-//     #[cnbt::tag({a}{a,b})]
-//     let f = Foo::Bar(5);
+//     #[cnbt::tag({a}{a})]
+//     let x = Baz { a: 6 };
 
-//     match f {
-//         Foo::Bar(x) => {
-//             #[cnbt::tag({a}{a,b})]
-//             let x_ = 6;
-//         }
+//     #[cnbt::tag({a}{a,c})]
+//     let Baz { a } = x;
 
-//         Foo::Baz(y, z) => {
-//             #[cnbt::tag({a}{a})]
-//             let y_ = y;
-
-//             #[cnbt::tag({b}{b})]
-//             let z_ = z;
-//         }
-//     }
+//     #[cnbt::tag({a}{a})]
+//     let y = a;
 // }

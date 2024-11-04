@@ -1,0 +1,5 @@
+error: expected {a,bin}{a,bin}, found {bin}{bin,c}
+  --> tests/integrity/fail/fn/fn.3.rs:11:20
+   |
+11 |         let _ = id(5);
+   |                    ^

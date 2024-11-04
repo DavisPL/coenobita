@@ -1,0 +1,5 @@
+error: expected {b}{b}, found {bin}{bin}
+ --> tests/integrity/fail/pattern/pattern.1.rs:8:9
+  |
+8 |     y = false;
+  |         ^^^^^

@@ -1,6 +1,5 @@
 use std::collections::HashSet;
 
-use coenobita_log::debug;
 use coenobita_middle::flow::{FlowPair, FlowSet};
 use coenobita_middle::ty::{Ty as _Ty, TyKind};
 
@@ -37,7 +36,6 @@ impl<'cnbt> Context<'cnbt> {
             .fold(self.origin(), |acc, elem| acc.union(elem));
 
         let ty = Ty::new(FlowPair(explicit, implicit), TyKind::Infer);
-        debug(format!("introducing new ty {:#?}", ty));
         ty
     }
 
