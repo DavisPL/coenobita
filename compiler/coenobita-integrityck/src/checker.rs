@@ -260,7 +260,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 let psess = create_psess(&self.tcx);
                 let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
 
-                if let Ok(ty) = parser.parse_ity() {
+                if let Ok(ty) = parser.parse_ty() {
                     match ty.kind {
                         ATyKind::Fn(ref arg_tys, _) => {
                             // Make sure the number of arguments matches
@@ -338,7 +338,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
                 let mut map = HashMap::new();
 
-                if let Ok(ty) = parser.parse_ity() {
+                if let Ok(ty) = parser.parse_ty() {
                     match ty.kind {
                         ATyKind::Struct(ref elements) => {
                             for (name, ty) in elements {
@@ -375,7 +375,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                             let psess = create_psess(&self.tcx);
                             let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
 
-                            if let Ok(ty) = parser.parse_ity() {
+                            if let Ok(ty) = parser.parse_ty() {
                                 fields.insert(field.name, ty.into());
                             };
                         }
@@ -414,7 +414,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 let psess = create_psess(&self.tcx);
                 let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
 
-                if let Ok(ty) = parser.parse_ity() {
+                if let Ok(ty) = parser.parse_ty() {
                     self.def_map.insert(def_id, ty.into());
                 };
             }
@@ -441,7 +441,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 let psess = create_psess(&self.tcx);
                 let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
 
-                if let Ok(ty) = parser.parse_ity() {
+                if let Ok(ty) = parser.parse_ty() {
                     let expected: Ty = ty.into();
                     self.process_pattern(local.pat.kind, expected.clone(), local.pat.hir_id);
 

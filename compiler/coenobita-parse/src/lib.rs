@@ -12,8 +12,9 @@ extern crate rustc_span;
 use std::io;
 use std::sync::Arc;
 
-use rustc_ast::token::TokenKind::{self, BinOp, CloseDelim, Comma, OpenDelim};
-use rustc_ast::token::{BinOpToken, Delimiter};
+use parse::{CoenobitaParser, Parse};
+use rustc_ast::token::Delimiter;
+use rustc_ast::token::TokenKind::{self, CloseDelim, Comma, OpenDelim};
 use rustc_ast::tokenstream::TokenStream;
 
 use rustc_data_structures::sync;
@@ -36,106 +37,32 @@ use rustc_span::symbol::kw;
 use rustc_span::{BytePos, Span};
 
 use coenobita_ast::ast::{Ty, TyKind};
-use coenobita_ast::flow::{FlowPair, FlowSet};
-use coenobita_ast::provenance::{Provenance, ProvenancePair};
 
-pub struct CoenobitaParser<'cnbt> {
-    parser: Parser<'cnbt>,
-}
+mod parse;
 
 impl<'cnbt> CoenobitaParser<'cnbt> {
     pub fn new(parser: Parser<'cnbt>) -> Self {
         CoenobitaParser { parser }
     }
 
-    pub fn parse_ity(&mut self) -> PResult<'cnbt, Ty<FlowPair>> {
+    pub fn parse_ty<T: Parse>(&mut self) -> PResult<'cnbt, Ty<T>> {
         let start = self.start();
 
         Ok(Ty {
-            property: self.parse_flow_pair()?,
-            kind: self.parse_ity_kind()?,
+            property: T::parse(self)?,
+            kind: self.parse_ty_kind()?,
             span: self.end(start),
         })
     }
 
-    pub fn parse_pty(&mut self) -> PResult<'cnbt, Ty<ProvenancePair>> {
-        let start = self.start();
-
-        Ok(Ty {
-            property: self.parse_provenance_pair()?,
-            kind: self.parse_pty_kind()?,
-            span: self.end(start),
-        })
-    }
-
-    pub fn parse_provenance_pair(&mut self) -> PResult<'cnbt, ProvenancePair> {
-        let start = self.start();
-
-        self.parser.expect(&OpenDelim(Delimiter::Parenthesis))?;
-
-        let first = self.parse_provenance()?;
-        self.parser.expect(&TokenKind::Comma)?;
-        let last = self.parse_provenance()?;
-
-        self.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
-
-        Ok(ProvenancePair {
-            first,
-            last,
-            span: self.end(start),
-        })
-    }
-
-    pub fn parse_provenance(&mut self) -> PResult<'cnbt, Provenance> {
-        let start = self.start();
-
-        if self.parser.eat(&BinOp(BinOpToken::Star)) {
-            Ok(Provenance::Universal(self.end(start)))
-        } else {
-            Ok(Provenance::Specific(self.parser.parse_ident()?, self.end(start)))
-        }
-    }
-
-    pub fn parse_flow_pair(&mut self) -> PResult<'cnbt, FlowPair> {
-        let start = self.start();
-
-        Ok(FlowPair {
-            explicit: self.parse_flow_set()?,
-            implicit: self.parse_flow_set()?,
-            span: self.end(start),
-        })
-    }
-
-    pub fn parse_flow_set(&mut self) -> PResult<'cnbt, FlowSet> {
-        let start = self.start();
-        self.parser.expect(&OpenDelim(Delimiter::Brace))?;
-
-        if self.parser.eat(&BinOp(BinOpToken::Star)) {
-            self.parser.expect(&CloseDelim(Delimiter::Brace))?;
-            Ok(FlowSet::Universal(self.end(start)))
-        } else {
-            let mut origins = vec![];
-            while self.parser.token != CloseDelim(Delimiter::Brace) {
-                origins.push(self.parser.parse_ident()?);
-
-                if self.parser.token != CloseDelim(Delimiter::Brace) {
-                    self.parser.expect(&Comma)?;
-                }
-            }
-
-            self.parser.expect(&CloseDelim(Delimiter::Brace))?;
-            Ok(FlowSet::Specific(origins, self.end(start)))
-        }
-    }
-
-    pub fn parse_ity_kind(&mut self) -> PResult<'cnbt, TyKind<FlowPair>> {
+    pub fn parse_ty_kind<T: Parse>(&mut self) -> PResult<'cnbt, TyKind<T>> {
         if self.parser.eat_keyword(kw::Fn) {
             // We are parsing a function type
             self.parser.expect(&OpenDelim(Delimiter::Parenthesis))?;
 
             let mut args = vec![];
             while self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                args.push(self.parse_ity()?);
+                args.push(self.parse_ty()?);
 
                 if self.parser.token != CloseDelim(Delimiter::Parenthesis) {
                     self.parser.expect(&Comma)?;
@@ -145,7 +72,7 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
             self.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
             self.parser.expect(&TokenKind::RArrow)?;
 
-            Ok(TyKind::Fn(args, Box::new(self.parse_ity()?)))
+            Ok(TyKind::Fn(args, Box::new(self.parse_ty()?)))
         } else if self.parser.eat_keyword(kw::Struct) {
             // We are parsing a struct type
             if self.parser.token.kind == OpenDelim(Delimiter::Brace) {
@@ -157,7 +84,7 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
                     let ident = self.parser.parse_ident()?;
                     self.parser.expect(&TokenKind::Colon)?;
 
-                    fields.push((ident, self.parse_ity()?));
+                    fields.push((ident, self.parse_ty()?));
 
                     if self.parser.token != CloseDelim(Delimiter::Brace) {
                         self.parser.expect(&TokenKind::Comma)?;
@@ -172,7 +99,7 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
 
                 let mut elements = vec![];
                 while self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                    elements.push(self.parse_ity()?);
+                    elements.push(self.parse_ty()?);
 
                     if self.parser.token != CloseDelim(Delimiter::Parenthesis) {
                         self.parser.expect(&TokenKind::Comma)?;
@@ -186,7 +113,7 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
             // We are parsing a tuple type
             let mut elements = vec![];
             while self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                elements.push(self.parse_ity()?);
+                elements.push(self.parse_ty()?);
 
                 if self.parser.token != CloseDelim(Delimiter::Parenthesis) {
                     self.parser.expect(&Comma)?;
@@ -197,49 +124,9 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
             Ok(TyKind::Tuple(elements))
         } else if self.parser.eat(&OpenDelim(Delimiter::Bracket)) {
             // We are parsing an array type
-            let element = self.parse_ity()?;
+            let element = self.parse_ty()?;
             self.parser.expect(&CloseDelim(Delimiter::Bracket))?;
             Ok(TyKind::Array(Box::new(element)))
-        } else {
-            Ok(TyKind::Opaque)
-        }
-    }
-
-    pub fn parse_pty_kind(&mut self) -> PResult<'cnbt, TyKind<ProvenancePair>> {
-        if self.parser.eat_keyword(kw::Fn) {
-            // We are parsing a function type
-            self.parser
-                .expect(&TokenKind::OpenDelim(Delimiter::Parenthesis))?;
-
-            let mut args = vec![];
-            while self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                args.push(self.parse_pty()?);
-
-                if self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                    self.parser.expect(&Comma)?;
-                }
-            }
-
-            self.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
-            self.parser.expect(&TokenKind::RArrow)?;
-
-            Ok(TyKind::Fn(args, Box::new(self.parse_pty()?)))
-        } else if self.parser.eat(&OpenDelim(Delimiter::Parenthesis)) {
-            // We are parsing a tuple type
-            let mut items = vec![];
-            while self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                items.push(self.parse_pty()?);
-
-                if self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                    self.parser.expect(&Comma)?;
-                }
-            }
-
-            self.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
-            Ok(TyKind::Tuple(items))
-        } else if self.parser.eat(&OpenDelim(Delimiter::Bracket)) {
-            // We are parsing an array type
-            todo!()
         } else {
             Ok(TyKind::Opaque)
         }
