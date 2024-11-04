@@ -12,8 +12,8 @@ use rustc_hir::def::{CtorOf, DefKind, Res};
 use rustc_hir::def_id::DefId;
 use rustc_hir::{
     Arm, Block, BodyId, Closure, Expr, ExprField, ExprKind, FnSig, HirId, Impl, ImplItem,
-    ImplItemKind, Item, ItemKind, LangItem, LetExpr, LetStmt, MatchSource, PatKind, QPath, Stmt,
-    StmtKind,
+    ImplItemKind, Item, ItemKind, LangItem, LetExpr, LetStmt, MatchSource, PatField, PatKind,
+    QPath, Stmt, StmtKind,
 };
 use rustc_middle::ty::{self, FieldDef, TyCtxt};
 use rustc_span::symbol::Ident;
@@ -87,105 +87,42 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         }
     }
 
+    pub fn process_pattern_struct(&mut self, hir_id: HirId, qpath: &QPath, fields: &[PatField]) {
+        match self.check_expr_path(hir_id, qpath, &Expectation::NoExpectation) {
+            Ok(ty) => match ty.kind() {
+                TyKind::Adt(map) => {
+                    for field in fields {
+                        let ty = self.context.influence(map[&field.ident.name].clone());
+                        self.process_pattern(field.pat.kind, ty, field.pat.hir_id);
+                    }
+                }
+
+                TyKind::Opaque | TyKind::Infer => {
+                    for field in fields {
+                        let ty = self.context.universal();
+                        self.process_pattern(field.pat.kind, ty, field.pat.hir_id);
+                    }
+                }
+
+                _ => todo!(),
+            },
+
+            Err(_) => {
+                debug("[WARN] Pattern struct processing failing silently");
+            }
+        }
+    }
+
     pub fn process_pattern(&mut self, pat_kind: PatKind, ty: Ty, hir_id: HirId) {
         self.context.enter(&ty);
 
-        debug(format!("Processing pattern {:#?}", pat_kind));
-
-        let ldid = hir_id.owner.to_def_id().as_local().unwrap();
-
         match pat_kind {
             PatKind::Binding(_, hir_id, _, _) => {
-                debug("> pat is binding");
                 self.hir_map.insert(hir_id, ty.clone());
             }
 
             PatKind::Struct(qpath, fields, _) => {
-                debug("pat is struct");
-                let res = self.tcx.typeck(ldid).qpath_res(&qpath, hir_id);
-                match res {
-                    Res::Def(def_kind, def_id) => match def_kind {
-                        DefKind::Struct => {
-                            let TyKind::Adt(tys) =
-                                self.adt_ty(def_id, def_id, FIRST_VARIANT).kind()
-                            else {
-                                todo!()
-                            };
-
-                            for field in fields {
-                                self.hir_map.insert(
-                                    field.pat.hir_id,
-                                    self.context
-                                        .influence(tys.get(&field.ident.name).cloned().unwrap()),
-                                );
-                            }
-                        }
-                        DefKind::Variant => {
-                            // The variant DefId
-                            let id = def_id;
-
-                            // The parent DefId
-                            let def_id = self.tcx.parent(def_id);
-
-                            // The parent ADT definition
-                            let adt = self.tcx.adt_def(def_id);
-
-                            // The index of this variant in particular
-                            let idx = adt
-                                .variants()
-                                .iter()
-                                .enumerate()
-                                .find(|(_, vdef)| vdef.def_id == id)
-                                .unwrap()
-                                .0;
-
-                            let TyKind::Adt(tys) = self.adt_ty(def_id, id, idx.into()).kind else {
-                                todo!()
-                            };
-
-                            for field in fields {
-                                self.hir_map.insert(
-                                    field.pat.hir_id,
-                                    self.context
-                                        .influence(tys.get(&field.ident.name).cloned().unwrap()),
-                                );
-                            }
-                        }
-                        DefKind::Ctor(_, _) => todo!(),
-                        _ => todo!(),
-                    },
-
-                    Res::Err => {}
-
-                    Res::SelfTyAlias { alias_to, .. } => {
-                        let self_ty = self.tcx.type_of(alias_to).skip_binder().kind();
-
-                        if let ty::TyKind::Adt(adt_def, _) = self_ty {
-                            let did = adt_def.did();
-                            let sty = self.adt_ty(did, did, FIRST_VARIANT);
-
-                            match sty.kind() {
-                                TyKind::Adt(field_tys) => {
-                                    for field in fields {
-                                        let ty = field_tys[&field.ident.name].clone();
-                                        self.process_pattern(field.pat.kind, ty, field.pat.hir_id);
-                                    }
-                                }
-
-                                _ => {
-                                    todo!()
-                                }
-                            }
-                        } else {
-                            todo!()
-                        }
-                    }
-
-                    _ => {
-                        debug(format!("Unsupported res {:#?}", res));
-                        todo!()
-                    }
-                }
+                self.process_pattern_struct(hir_id, &qpath, fields)
             }
 
             PatKind::Box(pat) => self.process_pattern(pat.kind, ty, pat.hir_id),
@@ -194,69 +131,19 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
             PatKind::TupleStruct(qpath, pats, _) => {
                 debug("pat is tupstruct");
-                let res = self.tcx.typeck(ldid).qpath_res(&qpath, hir_id);
-                match res {
-                    Res::Def(def_kind, def_id) => match def_kind {
-                        // TODO: Basically rewrite all of this logic. It's incorrect!
-                        DefKind::Ctor(_, _) => {
-                            // Get the DefId of the variant
-                            let def_id_variant = self.tcx.parent(def_id);
+                let fields: Vec<PatField> = pats
+                    .iter()
+                    .enumerate()
+                    .map(|(i, pat)| PatField {
+                        hir_id: pat.hir_id,
+                        ident: Ident::from_str(&i.to_string()),
+                        pat,
+                        is_shorthand: false,
+                        span: pat.span,
+                    })
+                    .collect();
 
-                            // Get the DefId of the parent
-                            let def_id = self.tcx.parent(def_id_variant);
-                            let adt = self.tcx.adt_def(def_id);
-
-                            let idx = adt
-                                .variants()
-                                .iter()
-                                .enumerate()
-                                .find(|(_, vdef)| vdef.def_id == def_id_variant)
-                                .unwrap()
-                                .0;
-
-                            let ty = self.adt_ty(def_id, def_id_variant, idx.into());
-
-                            match ty.kind {
-                                TyKind::Adt(map) => {
-                                    let fields =
-                                        map.iter().sorted_by_key(|(key, _)| key.to_string());
-
-                                    for (pat, (_, fty)) in pats.iter().zip(fields) {
-                                        let fty = self.context.influence(fty.clone());
-                                        self.process_pattern(pat.kind, fty.clone(), pat.hir_id);
-                                    }
-                                }
-
-                                _ => todo!(),
-                            }
-                        }
-
-                        DefKind::Struct => {
-                            let TyKind::Adt(tys) =
-                                self.adt_ty(def_id, def_id, FIRST_VARIANT).kind()
-                            else {
-                                todo!()
-                            };
-
-                            for (i, pat) in pats.iter().enumerate() {
-                                let key = Symbol::intern(&i.to_string());
-                                let ty = self.context.influence(tys[&key].clone());
-                                self.process_pattern(pat_kind, ty, pat.hir_id);
-                            }
-                        }
-
-                        _ => todo!(),
-                    },
-
-                    Res::Err => {
-                        debug("[WARN] Name resolution during pattern processing silently failed");
-                    }
-
-                    _ => {
-                        debug(format!("cant process tupstruct pattern: def is {:#?}", res));
-                        todo!()
-                    }
-                }
+                self.process_pattern_struct(hir_id, &qpath, &fields);
             }
 
             PatKind::Tuple(pats, _) => {
@@ -688,6 +575,30 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 // TODO: Check that `AssocFn` is handled properly
                 DefKind::Fn | DefKind::AssocFn => self.fn_ty(def_id),
 
+                DefKind::Struct => self.adt_ty(def_id, def_id, FIRST_VARIANT),
+
+                DefKind::Variant => {
+                    // The variant DefId
+                    let id = def_id;
+
+                    // The parent DefId
+                    let def_id = self.tcx.parent(def_id);
+
+                    // The parent ADT definition
+                    let adt = self.tcx.adt_def(def_id);
+
+                    // The index of this variant in particular
+                    let idx = adt
+                        .variants()
+                        .iter()
+                        .enumerate()
+                        .find(|(_, vdef)| vdef.def_id == id)
+                        .unwrap()
+                        .0;
+
+                    self.adt_ty(def_id, id, idx.into())
+                }
+
                 // TODO: Test this thoroughly
                 DefKind::Ctor(ctor_of, _) => match ctor_of {
                     CtorOf::Struct => {
@@ -724,6 +635,11 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     self.context.introduce()
                 }
 
+                DefKind::Union => {
+                    debug("[WARN] Silently skipping union usage");
+                    self.context.introduce()
+                }
+
                 _ => {
                     debug(format!("unsupported def kind {:#?}", res));
                     todo!()
@@ -738,6 +654,17 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     let sty = self.adt_ty(did, did, FIRST_VARIANT);
 
                     sty
+                } else {
+                    todo!()
+                }
+            }
+
+            Res::SelfTyAlias { alias_to, .. } => {
+                let self_ty = self.tcx.type_of(alias_to).skip_binder().kind();
+
+                if let ty::TyKind::Adt(adt_def, _) = self_ty {
+                    let did = adt_def.did();
+                    self.adt_ty(did, did, FIRST_VARIANT)
                 } else {
                     todo!()
                 }
@@ -966,8 +893,8 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         qpath: &QPath,
         fields: &[ExprField],
     ) -> Result<Ty> {
-        if let QPath::LangItem(item, _) = qpath {
-            match item {
+        let ty = match qpath {
+            QPath::LangItem(item, _) => match item {
                 LangItem::Range => {
                     // NOTE: We handle ranges in a special manner for the time being
                     let mut result = self.context.introduce();
@@ -980,124 +907,36 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                         )?);
                     }
 
-                    return Ok(result);
-                }
-
-                _ => {}
-            }
-        }
-
-        let local_def_id = hir_id.owner.to_def_id().as_local().unwrap();
-
-        let res = self.tcx.typeck(local_def_id).qpath_res(qpath, hir_id);
-        match res {
-            Res::Def(def_kind, def_id) => match def_kind {
-                DefKind::Struct => {
-                    let sty = self.adt_ty(def_id, def_id, FIRST_VARIANT);
-
-                    match sty.kind() {
-                        TyKind::Adt(field_tys) => {
-                            for field in fields {
-                                let ty = field_tys[&field.ident.name].clone();
-                                let expectation = &Expectation::ExpectHasType(ty);
-                                self.check_expr(field.expr, expectation, false)?;
-                            }
-
-                            // We need to replace the flow pair of `ty` with the introduction pair
-                            let mut ty = self.context.introduce();
-                            ty.kind = TyKind::Adt(field_tys);
-
-                            Ok(ty)
-                        }
-
-                        _ => {
-                            let msg =
-                                format!("'{}' is not a struct", qpath_string(self.tcx, qpath));
-                            Err(self.tcx.dcx().span_err(qpath.span(), msg))
-                        }
-                    }
-                }
-
-                DefKind::Variant => {
-                    // The variant DefId
-                    let id = def_id;
-
-                    // The parent DefId
-                    let def_id = self.tcx.parent(def_id);
-
-                    // The parent ADT definition
-                    let adt = self.tcx.adt_def(def_id);
-
-                    // The index of this variant in particular
-                    let idx = adt
-                        .variants()
-                        .iter()
-                        .enumerate()
-                        .find(|(_, vdef)| vdef.def_id == id)
-                        .unwrap()
-                        .0;
-
-                    let ty = self.adt_ty(def_id, id, idx.into());
-                    let TyKind::Adt(tys) = &ty.kind else { todo!() };
-
-                    for field in fields {
-                        let ty = tys[&field.ident.name].clone();
-                        let expectation = Expectation::ExpectHasType(ty);
-                        self.check_expr(field.expr, &expectation, false)?;
-                    }
-
-                    Ok(ty)
-                }
-
-                DefKind::Union => {
-                    debug("[WARN] Silently skipping union usage");
-                    Ok(self.context.introduce())
+                    result
                 }
 
                 _ => {
-                    debug(format!("Unsupported def kind {:#?}", def_kind));
-                    todo!()
+                    debug("lang item being silently ignored, ");
+                    self.context.introduce()
                 }
             },
+            _ => self.check_expr_path(hir_id, qpath, &Expectation::NoExpectation)?,
+        };
 
-            Res::SelfTyAlias { alias_to, .. } => {
-                let self_ty = self.tcx.type_of(alias_to).skip_binder().kind();
-
-                if let ty::TyKind::Adt(adt_def, _) = self_ty {
-                    let did = adt_def.did();
-                    let sty = self.adt_ty(did, did, FIRST_VARIANT);
-
-                    match sty.kind() {
-                        TyKind::Adt(field_tys) => {
-                            for field in fields {
-                                let ty = field_tys[&field.ident.name].clone();
-                                let expectation = &Expectation::ExpectHasType(ty);
-                                self.check_expr(field.expr, expectation, false)?;
-                            }
-
-                            // We need to replace the flow pair of `ty` with the introduction pair
-                            let mut ty = self.context.introduce();
-                            ty.kind = TyKind::Adt(field_tys);
-
-                            Ok(ty)
-                        }
-
-                        _ => {
-                            let msg =
-                                format!("'{}' is not a struct", qpath_string(self.tcx, qpath));
-                            Err(self.tcx.dcx().span_err(qpath.span(), msg))
-                        }
-                    }
-                } else {
-                    todo!()
+        match ty.kind() {
+            TyKind::Adt(tys) => {
+                for field in fields {
+                    let ty = tys[&field.ident.name].clone();
+                    let expectation = Expectation::ExpectHasType(ty);
+                    self.check_expr(field.expr, &expectation, false)?;
                 }
             }
 
-            _ => {
-                debug(format!("unsupported res of kind {:#?}", res));
-                todo!()
+            TyKind::Opaque | TyKind::Infer => {
+                for field in fields {
+                    self.check_expr(field.expr, &Expectation::NoExpectation, false)?;
+                }
             }
+
+            _ => todo!(),
         }
+
+        Ok(ty)
     }
 
     /// Checks the type of an array expression.
@@ -1246,28 +1085,6 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 self.check_item(self.tcx.hir().item(item_id))?;
                 Ok(self.context.introduce())
             }
-        }
-    }
-}
-
-fn qpath_string<'tcx>(tcx: TyCtxt<'tcx>, qpath: &QPath<'_>) -> String {
-    match qpath {
-        QPath::Resolved(_, path) => {
-            // If the path is resolved, we can get the DefId and print it
-            if let Res::Def(_, def_id) = path.res {
-                let path_str = tcx.def_path_str(def_id);
-                format!("Resolved QPath: {}", path_str)
-            } else {
-                todo!()
-            }
-        }
-        QPath::TypeRelative(ty, segment) => {
-            // If it's a type-relative path, we print it in a type-relative way
-            format!("TypeRelative QPath: {:?}::{}", ty, segment.ident)
-        }
-        QPath::LangItem(lang_item, _) => {
-            // Language items can be printed directly by their known name
-            format!("LangItem QPath: {:?}", lang_item)
         }
     }
 }
