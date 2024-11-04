@@ -1,15 +1,6 @@
-// struct Baz {
-//     #[cnbt::tag({a,b}{a})]
-//     a: i64
-// }
-
 // fn main() {
-//     #[cnbt::tag({a}{a})]
-//     let x = Baz { a: 6 };
+//     let x = 5;
 
-//     #[cnbt::tag({a}{a,c})]
-//     let Baz { a } = x;
-
-//     #[cnbt::tag({a}{a})]
-//     let y = a;
+//     #[cnbt::provenance((bin, bin))]
+//     let y = x;
 // }

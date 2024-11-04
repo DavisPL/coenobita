@@ -2,10 +2,10 @@
 #![allow(unused_assignments)]
 
 enum Foo {
-    #[cnbt::tag({bin}{bin} struct ({bin}{bin}))]
+    #[cnbt::integrity({bin}{bin} struct ({bin}{bin}))]
     Bar(i32),
     
-    #[cnbt::tag({bin}{bin} struct ({a}{a}, {b}{b}))]
+    #[cnbt::integrity({bin}{bin} struct ({a}{a}, {b}{b}))]
     Baz(i32, i32)
 }
 
@@ -14,15 +14,15 @@ fn main() {
 
     match f {
         Foo::Bar(x) => {
-            #[cnbt::tag({b}{b,c})]
+            #[cnbt::integrity({b}{b,c})]
             let x_ = x;
         }
 
         Foo::Baz(y, z) => {
-            #[cnbt::tag({a}{a})]
+            #[cnbt::integrity({a}{a})]
             let y_ = y;
 
-            #[cnbt::tag({b}{b})]
+            #[cnbt::integrity({b}{b})]
             let z_ = z;
         }
     }

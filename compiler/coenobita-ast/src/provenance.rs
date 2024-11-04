@@ -2,6 +2,7 @@ use std::fmt::Display;
 
 use rustc_span::{symbol::Ident, Span};
 
+#[derive(Clone, Debug)]
 pub struct ProvenancePair {
     pub first: Provenance,
 
@@ -16,6 +17,7 @@ impl Display for ProvenancePair {
     }
 }
 
+#[derive(Clone, Debug)]
 pub enum Provenance {
     Specific(Ident, Span),
     Universal(Span),

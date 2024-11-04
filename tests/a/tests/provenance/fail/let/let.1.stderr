@@ -1,0 +1,5 @@
+error: expected (bin,b), found (bin,bin)
+ --> tests/provenance/fail/let/let.1.rs:6:13
+  |
+6 |     let w = 5;
+  |             ^

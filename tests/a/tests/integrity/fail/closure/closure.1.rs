@@ -2,6 +2,6 @@
 #![allow(unused_assignments)]
 
 fn main() {
-    #[cnbt::tag({*}{*} fn({a}{a}) -> {b}{b})]
+    #[cnbt::integrity({*}{*} fn({a}{a}) -> {b}{b})]
     let f = |x: i32| x;
 }

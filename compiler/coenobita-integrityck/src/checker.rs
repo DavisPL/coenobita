@@ -34,7 +34,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     pub fn new(tcx: TyCtxt<'tcx>, context: Context<'cnbt>) -> Self {
         Checker {
             context,
-            attr: vec![Symbol::intern("cnbt"), Symbol::intern("tag")],
+            attr: vec![Symbol::intern("cnbt"), Symbol::intern("integrity")],
             tcx,
             def_map: Map::new(),
             hir_map: Map::new(),

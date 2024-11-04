@@ -2,10 +2,10 @@
 #![allow(unused_assignments)]
 
 fn main() {
-    #[cnbt::tag({bin}{bin,b,c})]
+    #[cnbt::integrity({bin}{bin,b,c})]
     let mut x = 5;
 
-    #[cnbt::tag({bin,b}{bin,b})]
+    #[cnbt::integrity({bin,b}{bin,b})]
     let items = [1, 2, 3];
 
     for i in items {

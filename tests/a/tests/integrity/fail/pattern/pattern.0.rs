@@ -2,6 +2,6 @@
 #![allow(unused_assignments)]
 
 fn main() {
-    #[cnbt::tag({*}{*} ({bin}{bin}, {b}{b}))]
+    #[cnbt::integrity({*}{*} ({bin}{bin}, {b}{b}))]
     let (x, y) = (5, 6);
 }

@@ -4,12 +4,12 @@
 struct BarBar<'a> {
     number: i32,
     
-    #[cnbt::tag({bin}{bin})]
+    #[cnbt::integrity({bin}{bin})]
     string: &'a str
 }
 
 fn main() {
-    #[cnbt::tag({bin}{bin})]
+    #[cnbt::integrity({bin}{bin})]
     let string = "something";
 
     let b = BarBar {

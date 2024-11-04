@@ -2,7 +2,7 @@
 #![allow(unused_assignments)]
 
 struct Baz {
-    #[cnbt::tag({bin}{bin})]
+    #[cnbt::integrity({bin}{bin})]
     a: i64
 }
 
@@ -11,6 +11,6 @@ fn main() {
 
     let Baz { a } = x;
 
-    #[cnbt::tag({bin}{bin})]
+    #[cnbt::integrity({bin}{bin})]
     let y = a;
 }

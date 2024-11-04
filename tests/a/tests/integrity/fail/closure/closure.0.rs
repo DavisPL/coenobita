@@ -4,6 +4,6 @@
 fn main() {
     let f = |x: i32| x;
 
-    #[cnbt::tag({bin}{bin})]
+    #[cnbt::integrity({bin}{bin})]
     let y = f(5);
 }

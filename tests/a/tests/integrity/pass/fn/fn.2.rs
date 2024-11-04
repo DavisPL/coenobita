@@ -1,12 +1,12 @@
 #![allow(unused_variables)]
 #![allow(unused_assignments)]
 
-#[cnbt::tag({*}{*} fn({a,bin}{a,bin}) -> {a,bin}{a,bin})]
+#[cnbt::integrity({*}{*} fn({a,bin}{a,bin}) -> {a,bin}{a,bin})]
 fn id(x: i32) -> i32 {
     x
 }
 
 fn main() {
-    #[cnbt::tag({a,bin}{a,b,c,bin})]
+    #[cnbt::integrity({a,bin}{a,b,c,bin})]
     let x = id(5);
 }

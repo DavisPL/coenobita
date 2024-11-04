@@ -2,9 +2,9 @@
 #![allow(unused_assignments)]
 
 fn main() {
-    #[cnbt::tag({*}{*} fn({bin}{bin}) -> {bin}{bin})]
+    #[cnbt::integrity({*}{*} fn({bin}{bin}) -> {bin}{bin})]
     let f = |x: i32| x;
 
-    #[cnbt::tag({bin}{bin})]
+    #[cnbt::integrity({bin}{bin})]
     let y = f(5);
 }

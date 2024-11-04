@@ -4,12 +4,12 @@
 struct BarBar<'a> {
     number: i32,
     
-    #[cnbt::tag({bin}{bin,c})]
+    #[cnbt::integrity({bin}{bin,c})]
     string: &'a str
 }
 
 fn main() {
-    #[cnbt::tag({bin}{bin,c})]
+    #[cnbt::integrity({bin}{bin,c})]
     let string = if c::boolean() {
         "something"
     } else {
@@ -21,6 +21,6 @@ fn main() {
         string
     };
 
-    #[cnbt::tag({*}{*})]
+    #[cnbt::integrity({*}{*})]
     let y = b.string;
 }
