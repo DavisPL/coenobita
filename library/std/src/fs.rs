@@ -1,117 +1,418 @@
-use crate::io;
-use crate::path::{Path, PathBuf};
-
+use std::ffi::OsString;
 use std::fmt::Debug;
 use std::fs;
-use std::os::unix::fs::{DirEntryExt, MetadataExt};
+use std::io::{Read as Read_, Seek as Seek_, Write as Write_};
+use std::os::unix::fs::DirEntryExt;
 
-pub struct File(fs::File);
+use crate::io::{self, IoSlice, IoSliceMut, Read, Seek, SeekFrom, Write};
+use crate::path::{Path, PathBuf};
+use crate::sync::Arc;
+use crate::time::SystemTime;
 
-impl File {
-    pub fn create<P: AsRef<Path>>(path: P) -> io::Result<File> {
-        Ok(File(fs::File::create(&path.as_ref().inner)?))
-    }
+use crate::transmute;
+
+pub struct File {
+    inner: fs::File,
 }
 
-pub struct ReadDir(fs::ReadDir);
+pub struct Metadata {
+    pub(crate) inner: fs::Metadata,
+}
 
-impl Iterator for ReadDir {
-    type Item = io::Result<DirEntry>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.0.next().map(|v| v.map(|o| DirEntry(o)))
-    }
+pub struct ReadDir {
+    inner: fs::ReadDir,
 }
 
 impl Debug for ReadDir {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.fmt(f)
+        self.inner.fmt(f)
     }
 }
 
-pub struct DirEntry(fs::DirEntry);
-
-impl DirEntry {
-    pub fn file_type(&self) -> io::Result<FileType> {
-        Ok(FileType(self.0.file_type()?))
-    }
-
-    pub fn path(&self) -> PathBuf {
-        PathBuf {
-            inner: self.0.path(),
-        }
-    }
-
-    pub fn ino(&self) -> u64 {
-        self.0.ino()
-    }
+pub struct DirEntry {
+    inner: fs::DirEntry,
 }
 
-#[derive(Clone, Copy)]
-pub struct FileType(fs::FileType);
-
-impl FileType {
-    pub fn is_dir(&self) -> bool {
-        self.0.is_symlink()
-    }
-
-    pub fn is_file(&self) -> bool {
-        self.0.is_symlink()
-    }
-
-    pub fn is_symlink(&self) -> bool {
-        self.0.is_symlink()
-    }
+pub struct OpenOptions {
+    inner: fs::OpenOptions,
 }
 
-pub struct Metadata(pub(crate) fs::Metadata);
-
-impl Metadata {
-    pub fn is_dir(&self) -> bool {
-        self.0.is_dir()
-    }
-
-    pub fn is_file(&self) -> bool {
-        self.0.is_file()
-    }
-
-    pub fn is_symlink(&self) -> bool {
-        self.0.is_symlink()
-    }
-
-    pub fn file_type(&self) -> FileType {
-        FileType(self.0.file_type())
-    }
-
-    pub fn ino(&self) -> u64 {
-        self.0.ino()
-    }
-
-    pub fn dev(&self) -> u64 {
-        self.0.dev()
-    }
+pub struct FileTimes {
+    inner: fs::FileTimes,
 }
 
-pub fn metadata<P: AsRef<Path>>(path: P) -> io::Result<Metadata> {
-    Ok(Metadata(fs::metadata(&path.as_ref().inner)?))
+pub struct Permissions {
+    inner: fs::Permissions,
 }
 
-pub fn symlink_metadata<P: AsRef<Path>>(path: P) -> io::Result<Metadata> {
-    Ok(Metadata(fs::symlink_metadata(&path.as_ref().inner)?))
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
+pub struct FileType {
+    inner: fs::FileType,
+}
+
+pub fn read<P: AsRef<Path>>(path: P) -> io::Result<Vec<u8>> {
+    transmute!(fs::read(&path.as_ref().inner))
 }
 
 pub fn read_to_string<P: AsRef<Path>>(path: P) -> io::Result<String> {
-    Ok(fs::read_to_string(&path.as_ref().inner)?)
+    transmute!(fs::read_to_string(&path.as_ref().inner))
 }
 
-pub fn read_dir<P: AsRef<Path>>(path: P) -> io::Result<ReadDir> {
-    Ok(ReadDir(fs::read_dir(&path.as_ref().inner)?))
+pub fn write<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, contents: C) -> io::Result<()> {
+    transmute!(fs::write(&path.as_ref().inner, contents))
 }
 
-pub fn remove_dir_all<P: AsRef<Path>>(path: P) -> io::Result<()> {
-    fs::remove_dir_all(&path.as_ref().inner)
+impl File {
+    pub fn open<P: AsRef<Path>>(path: P) -> io::Result<File> {
+        unsafe { std::mem::transmute(fs::File::open(&path.as_ref().inner)) }
+    }
+
+    pub fn create<P: AsRef<Path>>(path: P) -> io::Result<File> {
+        unsafe { std::mem::transmute(fs::File::create(&path.as_ref().inner)) }
+    }
+
+    pub fn create_new<P: AsRef<Path>>(path: P) -> io::Result<File> {
+        unsafe { std::mem::transmute(fs::File::create_new(&path.as_ref().inner)) }
+    }
+
+    pub fn options() -> OpenOptions {
+        OpenOptions {
+            inner: fs::OpenOptions::new(),
+        }
+    }
+
+    pub fn sync_all(&self) -> io::Result<()> {
+        transmute!(self.inner.sync_all())
+    }
+
+    pub fn sync_data(&self) -> io::Result<()> {
+        transmute!(self.inner.sync_data())
+    }
+
+    pub fn set_len(&self, size: u64) -> io::Result<()> {
+        transmute!(self.inner.set_len(size))
+    }
+
+    pub fn metadata(&self) -> io::Result<Metadata> {
+        transmute!(self.inner.metadata())
+    }
+
+    pub fn try_clone(&self) -> io::Result<File> {
+        transmute!(self.inner.try_clone())
+    }
+
+    pub fn set_permissions(&self, perm: Permissions) -> io::Result<()> {
+        transmute!(self.inner.set_permissions(transmute!(perm)))
+    }
+
+    pub fn set_times(&self, times: FileTimes) -> io::Result<()> {
+        transmute!(self.inner.set_times(transmute!(times)))
+    }
+
+    #[inline]
+    pub fn set_modified(&self, time: SystemTime) -> io::Result<()> {
+        transmute!(self.inner.set_modified(time))
+    }
+}
+
+impl Read for &File {
+    #[inline]
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        todo!()
+    }
+
+    #[inline]
+    fn read_vectored(&mut self, bufs: &mut [IoSliceMut<'_>]) -> io::Result<usize> {
+        todo!()
+    }
+
+    // Reserves space in the buffer based on the file size when available.
+    fn read_to_end(&mut self, buf: &mut Vec<u8>) -> io::Result<usize> {
+        todo!()
+    }
+
+    // Reserves space in the buffer based on the file size when available.
+    fn read_to_string(&mut self, buf: &mut String) -> io::Result<usize> {
+        todo!()
+    }
+}
+
+impl Write for &File {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        todo!()
+    }
+
+    fn write_vectored(&mut self, bufs: &[IoSlice<'_>]) -> io::Result<usize> {
+        todo!()
+    }
+
+    #[inline]
+    fn flush(&mut self) -> io::Result<()> {
+        todo!()
+    }
+}
+
+impl Seek for &File {
+    fn seek(&mut self, pos: SeekFrom) -> io::Result<u64> {
+        todo!()
+    }
+}
+
+impl Read for File {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        transmute!(self.inner.read(buf))
+    }
+
+    fn read_vectored(&mut self, bufs: &mut [IoSliceMut<'_>]) -> io::Result<usize> {
+        transmute!(self.inner.read_vectored(bufs))
+    }
+
+    fn read_to_end(&mut self, buf: &mut Vec<u8>) -> io::Result<usize> {
+        transmute!(self.inner.read_to_end(buf))
+    }
+
+    fn read_to_string(&mut self, buf: &mut String) -> io::Result<usize> {
+        transmute!(self.inner.read_to_string(buf))
+    }
+}
+
+impl Write for File {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        transmute!(self.inner.write(buf))
+    }
+
+    fn write_vectored(&mut self, bufs: &[IoSlice<'_>]) -> io::Result<usize> {
+        transmute!(self.inner.write_vectored(bufs))
+    }
+
+    #[inline]
+    fn flush(&mut self) -> io::Result<()> {
+        transmute!(self.inner.flush())
+    }
+}
+
+impl Seek for File {
+    fn seek(&mut self, pos: SeekFrom) -> io::Result<u64> {
+        transmute!(self.inner.seek(pos))
+    }
+}
+
+impl Read for Arc<File> {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        todo!()
+    }
+
+    fn read_vectored(&mut self, bufs: &mut [IoSliceMut<'_>]) -> io::Result<usize> {
+        todo!()
+    }
+
+    fn read_to_end(&mut self, buf: &mut Vec<u8>) -> io::Result<usize> {
+        todo!()
+    }
+
+    fn read_to_string(&mut self, buf: &mut String) -> io::Result<usize> {
+        todo!()
+    }
+}
+
+impl Write for Arc<File> {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        todo!()
+    }
+
+    fn write_vectored(&mut self, bufs: &[IoSlice<'_>]) -> io::Result<usize> {
+        todo!()
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        todo!()
+    }
+}
+
+impl Seek for Arc<File> {
+    fn seek(&mut self, pos: SeekFrom) -> io::Result<u64> {
+        todo!()
+    }
+}
+
+impl OpenOptions {
+    pub fn new() -> Self {
+        OpenOptions {
+            inner: fs::OpenOptions::new(),
+        }
+    }
+
+    pub fn read(&mut self, read: bool) -> &mut Self {
+        unsafe { std::mem::transmute(self.inner.read(read)) }
+    }
+
+    pub fn write(&mut self, write: bool) -> &mut Self {
+        unsafe { std::mem::transmute(self.inner.write(write)) }
+    }
+
+    pub fn append(&mut self, append: bool) -> &mut Self {
+        unsafe { std::mem::transmute(self.inner.append(append)) }
+    }
+
+    pub fn truncate(&mut self, truncate: bool) -> &mut Self {
+        unsafe { std::mem::transmute(self.inner.truncate(truncate)) }
+    }
+
+    pub fn create(&mut self, create: bool) -> &mut Self {
+        unsafe { std::mem::transmute(self.inner.create(create)) }
+    }
+
+    pub fn create_new(&mut self, create_new: bool) -> &mut Self {
+        unsafe { std::mem::transmute(self.inner.create_new(create_new)) }
+    }
+
+    pub fn open<P: AsRef<Path>>(&self, path: P) -> io::Result<File> {
+        unsafe { std::mem::transmute(self.inner.open(&path.as_ref().inner)) }
+    }
+}
+
+impl Metadata {
+    pub fn file_type(&self) -> FileType {
+        transmute!(self.inner.file_type())
+    }
+
+    pub fn is_dir(&self) -> bool {
+        self.inner.is_dir()
+    }
+
+    pub fn is_file(&self) -> bool {
+        self.inner.is_file()
+    }
+
+    pub fn is_symlink(&self) -> bool {
+        self.inner.is_symlink()
+    }
+
+    pub fn len(&self) -> u64 {
+        self.inner.len()
+    }
+
+    pub fn permissions(&self) -> Permissions {
+        transmute!(self.inner.permissions())
+    }
+
+    pub fn modified(&self) -> io::Result<SystemTime> {
+        transmute!(self.inner.modified())
+    }
+
+    pub fn accessed(&self) -> io::Result<SystemTime> {
+        transmute!(self.inner.accessed())
+    }
+
+    pub fn created(&self) -> io::Result<SystemTime> {
+        transmute!(self.inner.created())
+    }
+}
+
+impl FileType {
+    pub fn is_dir(&self) -> bool {
+        self.inner.is_dir()
+    }
+
+    pub fn is_file(&self) -> bool {
+        self.inner.is_file()
+    }
+
+    pub fn is_symlink(&self) -> bool {
+        self.inner.is_symlink()
+    }
+}
+
+impl Iterator for ReadDir {
+    type Item = io::Result<DirEntry>;
+
+    fn next(&mut self) -> Option<io::Result<DirEntry>> {
+        transmute!(self.inner.next())
+    }
+}
+
+impl DirEntryExt for DirEntry {
+    fn ino(&self) -> u64 {
+        self.inner.ino()
+    }
+}
+
+impl DirEntry {
+    pub fn path(&self) -> PathBuf {
+        transmute!(self.inner.path())
+    }
+
+    pub fn metadata(&self) -> io::Result<Metadata> {
+        transmute!(self.inner.metadata())
+    }
+
+    pub fn file_type(&self) -> io::Result<FileType> {
+        transmute!(self.inner.file_type())
+    }
+
+    pub fn file_name(&self) -> OsString {
+        transmute!(self.inner.file_name())
+    }
+}
+
+impl Debug for DirEntry {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.inner.fmt(f)
+    }
+}
+
+pub fn remove_file<P: AsRef<Path>>(path: P) -> io::Result<()> {
+    transmute!(fs::remove_file(&path.as_ref().inner))
+}
+
+pub fn metadata<P: AsRef<Path>>(path: P) -> io::Result<Metadata> {
+    transmute!(fs::metadata(&path.as_ref().inner))
+}
+
+pub fn symlink_metadata<P: AsRef<Path>>(path: P) -> io::Result<Metadata> {
+    transmute!(fs::symlink_metadata(&path.as_ref().inner))
+}
+
+pub fn rename<P: AsRef<Path>, Q: AsRef<Path>>(from: P, to: Q) -> io::Result<()> {
+    transmute!(fs::rename(&from.as_ref().inner, &to.as_ref().inner))
+}
+
+pub fn copy<P: AsRef<Path>, Q: AsRef<Path>>(from: P, to: Q) -> io::Result<u64> {
+    transmute!(fs::copy(&from.as_ref().inner, &to.as_ref().inner))
+}
+
+pub fn hard_link<P: AsRef<Path>, Q: AsRef<Path>>(original: P, link: Q) -> io::Result<()> {
+    transmute!(fs::hard_link(&original.as_ref().inner, &link.as_ref().inner))
+}
+
+pub fn read_link<P: AsRef<Path>>(path: P) -> io::Result<PathBuf> {
+    transmute!(fs::read_link(&path.as_ref().inner))
+}
+
+pub fn canonicalize<P: AsRef<Path>>(path: P) -> io::Result<PathBuf> {
+    transmute!(fs::canonicalize(&path.as_ref().inner))
+}
+
+pub fn create_dir<P: AsRef<Path>>(path: P) -> io::Result<()> {
+    transmute!(fs::create_dir(&path.as_ref().inner))
 }
 
 pub fn create_dir_all<P: AsRef<Path>>(path: P) -> io::Result<()> {
-    fs::create_dir_all(&path.as_ref().inner)
+    transmute!(fs::create_dir_all(&path.as_ref().inner))
+}
+
+pub fn remove_dir<P: AsRef<Path>>(path: P) -> io::Result<()> {
+    transmute!(fs::remove_dir(&path.as_ref().inner))
+}
+
+pub fn remove_dir_all<P: AsRef<Path>>(path: P) -> io::Result<()> {
+    transmute!(fs::remove_dir_all(&path.as_ref().inner))
+}
+
+pub fn read_dir<P: AsRef<Path>>(path: P) -> io::Result<ReadDir> {
+    transmute!(fs::read_dir(&path.as_ref().inner))
+}
+
+pub fn set_permissions<P: AsRef<Path>>(path: P, perm: Permissions) -> io::Result<()> {
+    transmute!(fs::set_permissions(&path.as_ref().inner, transmute!(perm)))
 }
