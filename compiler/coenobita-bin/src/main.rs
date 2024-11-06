@@ -67,6 +67,10 @@ fn crate_type<'a>(args: &'a [String]) -> Option<String> {
         if pair[0] == "--crate-type" {
             return Some(pair[1].clone());
         }
+
+        if pair[0] == "--test" || pair[1] == "--test" {
+            return Some("bin".to_owned());
+        }
     }
 
     None

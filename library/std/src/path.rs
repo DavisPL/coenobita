@@ -58,7 +58,7 @@ impl<T: ?Sized + AsRef<OsStr>> From<&T> for PathBuf {
 impl From<OsString> for PathBuf {
     #[inline]
     fn from(s: OsString) -> PathBuf {
-        PathBuf { inner: s.into() }
+        transmute!(<std::ffi::OsString as std::convert::Into<path::PathBuf>>::into(s))
     }
 }
 
@@ -88,16 +88,12 @@ impl FromStr for PathBuf {
 impl PathBuf {
     #[inline]
     pub fn new() -> PathBuf {
-        PathBuf {
-            inner: path::PathBuf::new(),
-        }
+        transmute!(path::PathBuf::new())
     }
 
     #[inline]
     pub fn with_capacity(capacity: usize) -> PathBuf {
-        PathBuf {
-            inner: path::PathBuf::with_capacity(capacity),
-        }
+        transmute!(path::PathBuf::with_capacity(capacity))
     }
 
     #[inline]
@@ -184,9 +180,7 @@ impl PathBuf {
 impl Clone for PathBuf {
     #[inline]
     fn clone(&self) -> Self {
-        PathBuf {
-            inner: self.inner.clone(),
-        }
+        transmute!(self.inner.clone())
     }
 
     #[inline]
@@ -216,7 +210,6 @@ impl Borrow<Path> for PathBuf {
         self.deref()
     }
 }
-
 
 macro_rules! impl_cmp {
     (<$($life:lifetime),*> $lhs:ty, $rhs: ty) => {
@@ -252,7 +245,6 @@ macro_rules! impl_cmp {
 
 impl_cmp!(<> PathBuf, Path);
 impl_cmp!(<'a> PathBuf, &'a Path);
-
 
 #[repr(transparent)]
 pub struct Path {
@@ -351,8 +343,9 @@ impl Path {
     }
 
     #[inline]
+    #[cnbt::provenance((*,*) fn((*,bin), (*,bin)) -> (*,cstd))]
     pub fn join<P: AsRef<Path>>(&self, path: P) -> PathBuf {
-        unsafe { std::mem::transmute(self.inner.join(&path.as_ref().inner)) }
+        transmute!(self.inner.join(&path.as_ref().inner))
     }
 
     #[inline]
