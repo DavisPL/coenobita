@@ -1,5 +1,5 @@
 use std::ffi::OsString;
-use std::fmt::Debug;
+use std::fmt::{self, Debug};
 use std::fs;
 use std::io::{Read as Read_, Seek as Seek_, Write as Write_};
 use std::os::unix::fs::DirEntryExt;
@@ -12,7 +12,7 @@ use crate::time::SystemTime;
 use crate::transmute;
 
 pub struct File {
-    inner: fs::File,
+    pub(crate) inner: fs::File,
 }
 
 pub struct Metadata {
@@ -112,6 +112,12 @@ impl File {
     #[inline]
     pub fn set_modified(&self, time: SystemTime) -> io::Result<()> {
         transmute!(self.inner.set_modified(time))
+    }
+}
+
+impl fmt::Debug for File {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.inner.fmt(f)
     }
 }
 

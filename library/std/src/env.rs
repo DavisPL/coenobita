@@ -1,5 +1,5 @@
-use crate::path::PathBuf;
+use crate::{path::PathBuf, transmute};
 
 pub fn temp_dir() -> PathBuf {
-    todo!()
+    transmute!(std::env::temp_dir())
 }
