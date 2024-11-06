@@ -63,7 +63,7 @@ impl<'c, 'tcx> Visitor<'tcx> for CoenobitaVisitor<'c, 'tcx> {
 
     fn visit_item(&mut self, item: &'tcx Item<'tcx>) -> Self::Result {
         // Check integrity
-        // let _ = self.ichecker.check_item(item);
+        let _ = self.ichecker.check_item(item);
 
         // Check provenance
         let _ = self.pchecker.check_item(item);

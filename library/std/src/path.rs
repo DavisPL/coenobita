@@ -343,7 +343,6 @@ impl Path {
     }
 
     #[inline]
-    #[cnbt::provenance((*,*) fn((*,bin), (*,bin)) -> (*,cstd))]
     pub fn join<P: AsRef<Path>>(&self, path: P) -> PathBuf {
         transmute!(self.inner.join(&path.as_ref().inner))
     }

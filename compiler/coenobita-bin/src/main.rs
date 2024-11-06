@@ -13,15 +13,21 @@ extern crate rustc_parse;
 extern crate rustc_session;
 extern crate rustc_span;
 
-use coenobita_log::debug;
-
-use std::env;
+use log::{debug, error, info, warn};
+use std::{env, fs::File, path::Path};
 
 use callbacks::CoenobitaCallbacks;
 
 use rustc_driver::RunCompiler;
+use simplelog::{Config, WriteLogger};
 
 fn main() {
+    // Set up logging
+    let log = File::create("coenobita.log").expect("Could not create Coenobita logging file");
+
+    WriteLogger::init(simplelog::LevelFilter::Debug, Config::default(), log)
+        .expect("Could not initialize Coenobita logger");
+
     // Collect all the arguments passed to us by Cargo
     let mut args: Vec<String> = env::args().skip(1).collect();
 
@@ -31,14 +37,14 @@ fn main() {
 
     let crate_name = crate_name(&args)
         .and_then(|s| {
-            debug(format!("Coenobita invoked for crate '{s}'\n========="));
+            debug!("Coenobita invoked for crate '{s}'\n=========");
             Some(s)
         })
         .unwrap_or("-".into());
 
     let crate_type = crate_type(&args)
         .and_then(|s| {
-            debug(format!("Crate type is {s}"));
+            debug!("Crate type is {s}");
             Some(s)
         })
         .unwrap_or("-".into());

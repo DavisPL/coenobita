@@ -1,7 +1,7 @@
+use log::debug;
 use std::collections::HashMap;
 
 use coenobita_ast::ast::TyKind as ATyKind;
-use coenobita_log::debug;
 use coenobita_middle::map::Map;
 use coenobita_middle::ty::TyKind;
 
@@ -79,7 +79,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         match self.hir_map.get(&hir_id) {
             Some(ty) => ty.clone(),
             None => {
-                debug("[WARN] Silently failed to get type of local var");
+                debug!("[WARN] Silently failed to get type of local var");
                 self.context.introduce()
             }
         }
@@ -106,7 +106,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             },
 
             Err(_) => {
-                debug("[WARN] Pattern struct processing failing silently");
+                debug!("[WARN] Pattern struct processing failing silently");
             }
         }
     }
@@ -510,7 +510,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             ExprKind::Struct(qpath, fields, _) => self.check_expr_struct(expr.hir_id, qpath, fields)?,
 
             _ => {
-                debug(format!("Skipping expression of kind {:#?}", expr.kind));
+                debug!("Skipping expression of kind {:#?}", expr.kind);
                 todo!()
             }
         };
@@ -592,12 +592,12 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 DefKind::AssocConst | DefKind::Const | DefKind::ConstParam => self.context.introduce(),
 
                 DefKind::Union => {
-                    debug("[WARN] Silently skipping union usage");
+                    debug!("[WARN] Silently skipping union usage");
                     self.context.introduce()
                 }
 
                 _ => {
-                    debug(format!("unsupported def kind {:#?}", res));
+                    debug!("unsupported def kind {:#?}", res);
                     todo!()
                 }
             },
@@ -614,7 +614,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             }
 
             _ => {
-                debug(format!("unsupported res {:#?}", res));
+                debug!("unsupported res {:#?}", res);
                 todo!()
             }
         };
@@ -636,7 +636,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     // );
 
                     // return Err(self.tcx.dcx().span_err(span, msg));
-                    debug("[WARN] arg ct doesnt match up");
+                    debug!("[WARN] arg ct doesnt match up");
                 }
 
                 for (ty, expr) in arg_tys.into_iter().zip(args) {
@@ -695,7 +695,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                             // );
 
                             // return Err(self.tcx.dcx().span_err(span, msg));
-                            debug("[WARN] arg ct doesnt match up");
+                            debug!("[WARN] arg ct doesnt match up");
                         }
 
                         let args = std::iter::once(receiver).chain(args.iter());
@@ -829,7 +829,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 }
 
                 _ => {
-                    debug("lang item being silently ignored, ");
+                    debug!("lang item being silently ignored, ");
                     self.context.introduce()
                 }
             },

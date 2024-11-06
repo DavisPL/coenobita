@@ -9,10 +9,11 @@ edition = "2021"
 [workspace.dependencies]
 coenobita-ast = { path = "./compiler/coenobita-ast" }
 coenobita-bin = { path = "./compiler/coenobita-bin" }
-coenobita-log = { path = "./compiler/coenobita-log" }
 coenobita-middle = { path = "./compiler/coenobita-middle" }
 coenobita-parse = { path = "./compiler/coenobita-parse" }
 coenobita-integrityck = { path = "./compiler/coenobita-integrityck" }
 coenobita-provck = { path = "./compiler/coenobita-provck" }
 
 itertools = "0.13.0"
+simplelog = "0.12"
+log = "0.4"

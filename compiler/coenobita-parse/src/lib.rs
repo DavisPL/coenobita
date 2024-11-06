@@ -12,6 +12,7 @@ extern crate rustc_span;
 use std::io;
 use std::sync::Arc;
 
+use coenobita_ast::flow::FlowPair;
 use parse::{CoenobitaParser, Parse};
 use rustc_ast::token::Delimiter;
 use rustc_ast::token::TokenKind::{self, CloseDelim, Comma, OpenDelim};
