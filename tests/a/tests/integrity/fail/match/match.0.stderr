@@ -1,4 +1,4 @@
-error: expected {b}{b,c}, found {bin}{*}
+error: expected {b}{b,c}, found {root}{*}
   --> tests/integrity/fail/match/match.0.rs:18:22
    |
 18 |             let x_ = x;

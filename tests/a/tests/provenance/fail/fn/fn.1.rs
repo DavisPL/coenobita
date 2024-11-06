@@ -1,12 +1,12 @@
 #![allow(unused_variables)]
 #![allow(unused_assignments)]
 
-#[cnbt::provenance((*,*) fn((b,bin)) -> (b,bin))]
+#[cnbt::provenance((*,*) fn((b,root)) -> (b,root))]
 fn id(x: i32) -> i32 {
     x + 1
 }
 
 fn main() {
-    #[cnbt::provenance((b,bin))]
+    #[cnbt::provenance((b,root))]
     let x = id(b::value());
 }

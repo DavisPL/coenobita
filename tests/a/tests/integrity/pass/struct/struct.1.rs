@@ -4,12 +4,12 @@
 struct BarBar<'a> {
     number: i32,
     
-    #[cnbt::integrity({bin}{bin,c})]
+    #[cnbt::integrity({root}{root,c})]
     string: &'a str
 }
 
 fn main() {
-    #[cnbt::integrity({bin}{bin,c})]
+    #[cnbt::integrity({root}{root,c})]
     let string = if c::boolean() {
         "something"
     } else {

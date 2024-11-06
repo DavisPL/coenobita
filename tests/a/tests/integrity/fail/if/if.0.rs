@@ -4,7 +4,7 @@
 fn main() {
     // Since the value assigned to `x` is implicitly affected by
     // crate `c`, this example should fail to type check
-    #[cnbt::integrity({bin}{bin})]
+    #[cnbt::integrity({root}{root})]
     let x = if c::boolean() {
         5
     } else {

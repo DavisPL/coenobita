@@ -1,4 +1,4 @@
-error: expected {bin}{bin} struct {number:{*}{*},string:{bin}{bin}}, found {bin}{bin} struct {number:{*}{*},string:{bin}{bin,c}}
+error: expected {root}{root} struct {number:{*}{*},string:{root}{root}}, found {root}{root} struct {number:{*}{*},string:{root}{c,root}}
   --> tests/integrity/fail/struct/struct.2.rs:20:13
    |
 20 |       let b = BarBar {

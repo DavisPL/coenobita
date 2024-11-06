@@ -1,4 +1,4 @@
-error: expected {bin}{bin}, found {bin}{b,bin}
+error: expected {root}{root}, found {root}{b,root}
  --> tests/integrity/fail/if/if.1.rs:9:13
   |
 9 |         x = 6;

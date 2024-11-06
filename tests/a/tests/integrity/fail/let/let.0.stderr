@@ -1,4 +1,4 @@
-error: expected {bin}{bin}, found {bin}{b,bin}
+error: expected {root}{root}, found {root}{b,root}
   --> tests/integrity/fail/let/let.0.rs:10:13
    |
 10 |     let y = x;

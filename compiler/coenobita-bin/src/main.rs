@@ -75,16 +75,13 @@ fn crate_name<'a>(args: &'a [String]) -> Option<String> {
     None
 }
 
-fn crate_type<'a>(args: &'a [String]) -> Option<String> {
-    for pair in args.windows(2) {
-        if pair[0] == "--crate-type" {
-            return Some(pair[1].clone());
-        }
-
-        // if pair[0] == "--test" || pair[1] == "--test" {
-        //     return Some("bin".to_owned());
-        // }
-    }
-
-    None
+fn crate_type(args: &[String]) -> Option<String> {
+    args.windows(2)
+        .find_map(|pair| match [pair[0].as_str(), &pair[1]] {
+            ["--test", _] | [_, "--test"] => Some("root".to_owned()),
+            ["--crate-name", "cstd"] => Some("root".to_owned()),
+            ["--crate-type", "bin"] => Some("root".to_owned()),
+            ["--crate-type", _] => Some("lib".to_owned()),
+            _ => None,
+        })
 }

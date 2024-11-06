@@ -71,6 +71,7 @@ impl From<PathBuf> for OsString {
 
 impl From<String> for PathBuf {
     #[inline]
+    #[cnbt::provenance((*,*) fn((*,root)) -> (*,root))]
     fn from(s: String) -> PathBuf {
         PathBuf::from(OsString::from(s))
     }
@@ -102,6 +103,7 @@ impl PathBuf {
     }
 
     #[inline]
+    #[cnbt::provenance((*,*) fn((*,root), (*,root)) -> (*,root))]
     pub fn push<P: AsRef<Path>>(&mut self, path: P) {
         self.inner.push(&path.as_ref().inner);
     }

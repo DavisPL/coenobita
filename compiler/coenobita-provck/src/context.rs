@@ -38,8 +38,8 @@ impl<'cnbt> Context<'cnbt> {
     }
 
     pub fn origin(&self) -> Provenance {
-        let name = if self.crate_type == "bin" {
-            "bin".to_owned()
+        let name = if self.crate_type == "root" {
+            "root".to_owned()
         } else {
             self.crate_name.to_owned()
         };

@@ -1,10 +1,10 @@
-error: expected (bin,bin), found (b,bin)
+error: expected (root,root), found (b,root)
  --> tests/provenance/fail/fn/fn.0.rs:6:5
   |
 6 |     x
   |     ^
 
-error: expected (b,b), found (b,bin)
+error: expected (b,b), found (b,root)
   --> tests/provenance/fail/fn/fn.0.rs:11:16
    |
 11 |     let x = id(b::value());

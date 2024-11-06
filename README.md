@@ -34,8 +34,10 @@ Coenobita requires Nightly Rust. This project was last built successfully using 
 First, you will need to install Coenobita on your machine.
 
 #### Manually Install Coenobita
-1. Clone this repository
-2. Enter the root directory and run `./install.sh`
+1. Install Rust and Cargo (`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`)
+2. Install Nightly (`rustup default nightly`)
+3. Run `rustup component add rust-dev` so Coenobita can access compiler internals
+4. Enter the root directory and run `./install.sh`
 
 #### Install Coenobita Using Cargo
 Note that this currently **does not work** because Coenobita hasn't been published yet.
@@ -71,7 +73,3 @@ test tests/integrity/fail/closure/closure.1.rs [should fail to compile] ... ok
 test tests/integrity/pass/struct/struct.2.rs [should pass] ... ok
 test tests/integrity/pass/struct/struct.3.rs [should pass] ... ok
 ```
-
-## Logging
-
-Since Coenobita serves as a `rustc` wrapper, it cannot print anything. Instead, logs are stored in `coenobita.log`. This solution is quick and dirty, but it gets the job done. Make sure to clear it every now and then because VSCode can't handle very large files! We will replace our manual logging setup with something more robust in the future.

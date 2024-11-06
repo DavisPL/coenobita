@@ -2,13 +2,13 @@
 #![allow(unused_assignments)]
 
 fn main() {
-    #[cnbt::integrity({*}{*} fn({bin}{bin}, {bin}{bin}) -> {bin}{bin})]
+    #[cnbt::integrity({*}{*} fn({root}{root}, {root}{root}) -> {root}{root})]
     let f = if b::boolean() && c::boolean() {
         |x: i32, y: i32| x 
     } else {
         |x: i32, y: i32| y
     };
 
-    #[cnbt::integrity({bin}{bin})]
+    #[cnbt::integrity({root}{root})]
     let y = f(5, 6);
 }

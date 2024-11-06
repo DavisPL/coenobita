@@ -4,24 +4,24 @@
 struct BarBar<'a> {
     number: i32,
     
-    #[cnbt::integrity({bin}{bin,c})]
+    #[cnbt::integrity({root}{root,c})]
     string: &'a str
 }
 
 fn main() {
-    #[cnbt::integrity({bin}{bin,c})]
+    #[cnbt::integrity({root}{root,c})]
     let string = if c::boolean() {
         "something"
     } else {
         "else"
     };
 
-    #[cnbt::integrity({bin}{bin} struct { number: {*}{*}, string: {bin}{bin} })]
+    #[cnbt::integrity({root}{root} struct { number: {*}{*}, string: {root}{root} })]
     let b = BarBar {
         number: b::value(),
         string
     };
 
-    #[cnbt::integrity({bin}{bin})]
+    #[cnbt::integrity({root}{root})]
     let y = b.string;
 }

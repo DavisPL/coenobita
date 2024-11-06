@@ -1,4 +1,4 @@
-error: expected {bin}{bin}, found {bin}{b,bin,c}
+error: expected {root}{root}, found {root}{b,c,root}
  --> tests/integrity/fail/closure/closure.3.rs:7:26
   |
 7 |         |x: i32, y: i32| x

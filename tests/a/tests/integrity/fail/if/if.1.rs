@@ -2,7 +2,7 @@
 #![allow(unused_assignments)]
 
 fn main() {
-    #[cnbt::integrity({bin}{bin})]
+    #[cnbt::integrity({root}{root})]
     let mut x = 5;
 
     if b::boolean() {

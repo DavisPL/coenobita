@@ -2,13 +2,13 @@
 #![allow(unused_assignments)]
 
 fn main() {
-    #[cnbt::provenance((bin,bin))]
+    #[cnbt::provenance((root,root))]
     let w = 5;
 
-    #[cnbt::provenance((*,bin))]
+    #[cnbt::provenance((*,root))]
     let x = w;
 
-    #[cnbt::provenance((bin,*))]
+    #[cnbt::provenance((root,*))]
     let y = w;
 
     #[cnbt::provenance((*,*))]

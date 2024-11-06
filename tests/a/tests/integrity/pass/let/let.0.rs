@@ -1,9 +1,9 @@
 #![allow(unused_variables)]
 
 fn main() {
-    #[cnbt::integrity({bin}{bin})]
+    #[cnbt::integrity({root}{root})]
     let x = 5;
 
-    #[cnbt::integrity({bin}{b,bin})]
+    #[cnbt::integrity({root}{b,root})]
     let y = x;
 }

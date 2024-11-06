@@ -2,7 +2,7 @@
 #![allow(unused_assignments)]
 
 fn main() {
-    #[cnbt::integrity({*}{*} ({bin}{bin}, {b,bin}{b,bin}))]
+    #[cnbt::integrity({*}{*} ({root}{root}, {b,root}{b,root}))]
     let (x, mut y) = (5, b::boolean());
 
     y = false;

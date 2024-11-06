@@ -1,7 +1,7 @@
 [DEBUG] Coenobita invoked for crate 'b'
 =========
 [DEBUG] Crate type is lib
-[DEBUG] Trying to get func ty of defid DefId(0:3 ~ b[3f10]::value)
+[DEBUG] Trying to get func ty of defid DefId(0:3 ~ b[bbfe]::value)
 [DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Specific({"b"}), Specific({"b"})), kind: Opaque }) }
-[DEBUG] Trying to get func ty of defid DefId(0:4 ~ b[3f10]::boolean)
+[DEBUG] Trying to get func ty of defid DefId(0:4 ~ b[bbfe]::boolean)
 [DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Specific({"b"}), Specific({"b"})), kind: Opaque }) }

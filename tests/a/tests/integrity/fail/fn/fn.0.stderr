@@ -4,7 +4,7 @@ error: expected {b}{b}, found {a}{a}
 6 |     x
   |     ^
 
-error: expected {a}{a}, found {bin}{bin}
+error: expected {a}{a}, found {root}{root}
   --> tests/integrity/fail/fn/fn.0.rs:10:16
    |
 10 |     let x = id(5);

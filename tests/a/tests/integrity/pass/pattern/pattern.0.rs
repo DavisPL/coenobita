@@ -2,6 +2,6 @@
 #![allow(unused_assignments)]
 
 fn main() {
-    #[cnbt::integrity({*}{*} ({bin}{bin}, {b}{b}))]
+    #[cnbt::integrity({*}{*} ({root}{root}, {b}{b}))]
     let (x, y) = (5, b::value());
 }

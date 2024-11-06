@@ -1,11 +1,11 @@
 #![allow(unused_variables)]
 
 fn main() {
-    #[cnbt::integrity({bin}{b,bin})]
+    #[cnbt::integrity({root}{b,root})]
     let x = 5;
 
     // We shouldn't be able to assign a value with implicit flow
-    // set {bin} to a variable with implicit flow set {b,bin}
-    #[cnbt::integrity({bin}{bin})]
+    // set {root} to a variable with implicit flow set {b,root}
+    #[cnbt::integrity({root}{root})]
     let y = x;
 }

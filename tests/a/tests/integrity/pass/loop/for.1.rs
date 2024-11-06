@@ -2,7 +2,7 @@
 #![allow(unused_assignments)]
 
 fn main() {
-    #[cnbt::integrity({bin}{*})]
+    #[cnbt::integrity({root}{*})]
     let mut x = 5;
 
     let items = [1, 2, 3];

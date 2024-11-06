@@ -1,4 +1,4 @@
-error: expected {*}{*} ({bin}{bin},{b}{b}), found {bin}{bin} ({bin}{bin},{bin}{bin})
+error: expected {*}{*} ({root}{root},{b}{b}), found {root}{root} ({root}{root},{root}{root})
  --> tests/integrity/fail/pattern/pattern.0.rs:6:18
   |
 6 |     let (x, y) = (5, 6);

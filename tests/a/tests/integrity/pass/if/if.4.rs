@@ -2,7 +2,7 @@
 #![allow(unused_assignments)]
 
 fn main() {
-    #[cnbt::integrity({bin}{bin,b,c})]
+    #[cnbt::integrity({root}{root,b,c})]
     let mut x = 5;
     
     // Since the value assigned to `x` is implicitly affected by

@@ -1,4 +1,4 @@
-error: expected {a,bin}{a,bin}, found {bin}{bin,c}
+error: expected {a,root}{a,root}, found {root}{c,root}
   --> tests/integrity/fail/fn/fn.3.rs:11:20
    |
 11 |         let _ = id(5);

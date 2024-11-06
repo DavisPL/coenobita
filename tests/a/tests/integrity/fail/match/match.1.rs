@@ -2,20 +2,20 @@
 #![allow(unused_assignments)]
 
 enum Foo {
-    #[cnbt::integrity({bin}{bin} struct ({bin}{bin,c}))]
+    #[cnbt::integrity({root}{root} struct ({root}{root,c}))]
     Bar(i32),
     
-    #[cnbt::integrity({bin}{bin} struct ({a}{a}, {b}{b}))]
+    #[cnbt::integrity({root}{root} struct ({a}{a}, {b}{b}))]
     Baz(i32, i32)
 }
 
 fn main() {
-    #[cnbt::integrity({bin}{bin})]
+    #[cnbt::integrity({root}{root})]
     let f = Foo::Bar(5);
 
     match f {
         Foo::Bar(x) => {
-            #[cnbt::integrity({bin}{bin,c})]
+            #[cnbt::integrity({root}{root,c})]
             let x_ = x;
         }
 

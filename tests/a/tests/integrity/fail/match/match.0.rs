@@ -2,10 +2,10 @@
 #![allow(unused_assignments)]
 
 enum Foo {
-    #[cnbt::integrity({bin}{bin} struct ({bin}{bin}))]
+    #[cnbt::integrity({root}{root} struct ({root}{root}))]
     Bar(i32),
     
-    #[cnbt::integrity({bin}{bin} struct ({a}{a}, {b}{b}))]
+    #[cnbt::integrity({root}{root} struct ({a}{a}, {b}{b}))]
     Baz(i32, i32)
 }
 

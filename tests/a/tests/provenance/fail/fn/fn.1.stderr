@@ -1,4 +1,4 @@
-error: expected (b,bin), found (bin,bin)
+error: expected (b,root), found (root,root)
  --> tests/provenance/fail/fn/fn.1.rs:6:5
   |
 6 |     x + 1

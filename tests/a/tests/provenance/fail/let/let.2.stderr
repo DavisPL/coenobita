@@ -1,4 +1,4 @@
-error: expected (bin,*), found (*,bin)
+error: expected (root,*), found (*,root)
   --> tests/provenance/fail/let/let.2.rs:12:13
    |
 12 |     let y = x;

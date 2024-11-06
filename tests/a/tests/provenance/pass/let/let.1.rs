@@ -2,6 +2,6 @@
 #![allow(unused_assignments)]
 
 fn main() {
-    #[cnbt::provenance((bin,bin))]
+    #[cnbt::provenance((root,root))]
     let w = 5;
 }

@@ -1,4 +1,4 @@
-error: expected {bin}{bin}, found {bin}{bin,c}
+error: expected {root}{root}, found {root}{c,root}
   --> tests/integrity/fail/struct/struct.0.rs:21:9
    |
 21 |         string

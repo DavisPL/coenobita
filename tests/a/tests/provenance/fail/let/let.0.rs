@@ -4,6 +4,6 @@
 fn main() {
     let x = 5;
 
-    #[cnbt::provenance((bin, bin))]
+    #[cnbt::provenance((root, root))]
     let y = x;
 }

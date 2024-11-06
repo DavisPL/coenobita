@@ -2,7 +2,7 @@
 #![allow(unused_assignments)]
 
 fn main() {
-    #[cnbt::integrity({bin}{bin,c})]
+    #[cnbt::integrity({root}{root,c})]
     let x = if c::boolean() {
         5
     } else {

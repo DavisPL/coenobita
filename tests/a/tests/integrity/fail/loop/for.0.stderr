@@ -1,4 +1,4 @@
-error: expected {bin}{bin}, found {bin}{bin,c}
+error: expected {root}{root}, found {root}{c,root}
  --> tests/integrity/fail/loop/for.0.rs:8:14
   |
 8 |         x += 6;
