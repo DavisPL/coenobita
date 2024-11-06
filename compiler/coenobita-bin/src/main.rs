@@ -19,13 +19,20 @@ use std::{env, fs::File, path::Path};
 use callbacks::CoenobitaCallbacks;
 
 use rustc_driver::RunCompiler;
-use simplelog::{Config, WriteLogger};
+use simplelog::{Config, ConfigBuilder, WriteLogger};
 
 fn main() {
     // Set up logging
     let log = File::create("coenobita.log").expect("Could not create Coenobita logging file");
 
-    WriteLogger::init(simplelog::LevelFilter::Debug, Config::default(), log)
+    let config = ConfigBuilder::new()
+        .set_time_level(log::LevelFilter::Off) // Don't show time
+        .set_target_level(log::LevelFilter::Off) // Don't show target (like "(1)")
+        .set_thread_level(log::LevelFilter::Off) // Don't show thread ID
+        .set_location_level(log::LevelFilter::Off) // Don't show file/line location
+        .build();
+
+    WriteLogger::init(simplelog::LevelFilter::Debug, config, log)
         .expect("Could not initialize Coenobita logger");
 
     // Collect all the arguments passed to us by Cargo
@@ -74,9 +81,9 @@ fn crate_type<'a>(args: &'a [String]) -> Option<String> {
             return Some(pair[1].clone());
         }
 
-        if pair[0] == "--test" || pair[1] == "--test" {
-            return Some("bin".to_owned());
-        }
+        // if pair[0] == "--test" || pair[1] == "--test" {
+        //     return Some("bin".to_owned());
+        // }
     }
 
     None

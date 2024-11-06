@@ -1,3 +1,7 @@
-08:19:15 [DEBUG] (1) coenobita: Coenobita invoked for crate 'c'
+[DEBUG] Coenobita invoked for crate 'c'
 =========
-08:19:15 [DEBUG] (1) coenobita: Crate type is lib
+[DEBUG] Crate type is lib
+[DEBUG] Trying to get func ty of defid DefId(0:3 ~ c[3801]::value)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Specific({"c"}), Specific({"c"})), kind: Opaque }) }
+[DEBUG] Trying to get func ty of defid DefId(0:4 ~ c[3801]::boolean)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Specific({"c"}), Specific({"c"})), kind: Opaque }) }

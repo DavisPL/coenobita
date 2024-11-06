@@ -1,4 +1,5 @@
-use log::debug;
+use log::{debug, warn};
+use rustc_span::sym::warn;
 use std::collections::HashMap;
 
 use coenobita_ast::ast::TyKind as ATyKind;
@@ -248,7 +249,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
         match self.tcx.get_attrs_by_path(def_id, &self.attr).next() {
             Some(attr) => {
-                // The `coenobita::tag` is guaranteed to be a normal attribute
+                // The `coenobita::integrity` is guaranteed to be a normal attribute
                 let AttrKind::Normal(normal) = &attr.kind else {
                     unreachable!()
                 };
@@ -324,7 +325,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     pub fn check_item_struct(&mut self, def_id: DefId, field_defs: &[FieldDef]) -> Result {
         let fields = match self.tcx.get_attrs_by_path(def_id, &self.attr).next() {
             Some(attr) => {
-                // The `coenobita::tag` is guaranteed to be a normal attribute
+                // The `coenobita::integrity` is guaranteed to be a normal attribute
                 let AttrKind::Normal(normal) = &attr.kind else {
                     unreachable!()
                 };
@@ -363,7 +364,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 for field in field_defs {
                     match self.tcx.get_attrs_by_path(field.did, &self.attr).next() {
                         Some(attr) => {
-                            // The `coenobita::tag` is guaranteed to be a normal attribute
+                            // The `coenobita::integrity` is guaranteed to be a normal attribute
                             let AttrKind::Normal(normal) = &attr.kind else {
                                 unreachable!()
                             };
@@ -402,7 +403,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
         match self.tcx.get_attrs_by_path(def_id, &self.attr).next() {
             Some(attr) => {
-                // The `coenobita::tag` is guaranteed to be a normal attribute
+                // The `coenobita::integrity` is guaranteed to be a normal attribute
                 let AttrKind::Normal(normal) = &attr.kind else {
                     unreachable!()
                 };
@@ -658,9 +659,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             }
 
             _ => {
-                let msg = "Coenobita cannot tell if this is a function";
-                self.tcx.dcx().span_warn(func.span, msg);
-
+                warn!("Cannot tell if expression is a function - {:?}", func);
                 Ok(fty)
             }
         }

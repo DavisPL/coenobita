@@ -1,4 +1,4 @@
-use log::debug;
+use log::{debug, warn};
 use std::collections::HashMap;
 
 use coenobita_ast::ast::TyKind as ATyKind;
@@ -42,10 +42,16 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     }
 
     pub fn fn_ty(&mut self, def_id: DefId) -> Ty {
+        debug!("Trying to get func ty of defid {:?}", def_id);
+
         let ty = match self.def_map.get(&def_id) {
-            Some(ty) => ty.clone(),
+            Some(ty) => {
+                debug!(">> FOUND IT! It's {:?}", ty.clone());
+                ty.clone()
+            }
             None => {
                 // We haven't processed the definition of this function yet
+                debug!(">> NOT FOUND! Getting extern def");
                 let _ = self.check_external_item_fn(def_id);
                 self.def_map.get(&def_id).unwrap().clone()
             }
@@ -252,7 +258,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
         match self.tcx.get_attrs_by_path(def_id, &self.attr).next() {
             Some(attr) => {
-                // The `coenobita::tag` is guaranteed to be a normal attribute
+                // The `coenobita::integrity` is guaranteed to be a normal attribute
                 let AttrKind::Normal(normal) = &attr.kind else {
                     unreachable!()
                 };
@@ -328,7 +334,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
     pub fn check_item_struct(&mut self, def_id: DefId, field_defs: &[FieldDef]) -> Result {
         let fields = match self.tcx.get_attrs_by_path(def_id, &self.attr).next() {
             Some(attr) => {
-                // The `coenobita::tag` is guaranteed to be a normal attribute
+                // The `coenobita::integrity` is guaranteed to be a normal attribute
                 let AttrKind::Normal(normal) = &attr.kind else {
                     unreachable!()
                 };
@@ -367,7 +373,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 for field in field_defs {
                     match self.tcx.get_attrs_by_path(field.did, &self.attr).next() {
                         Some(attr) => {
-                            // The `coenobita::tag` is guaranteed to be a normal attribute
+                            // The `coenobita::integrity` is guaranteed to be a normal attribute
                             let AttrKind::Normal(normal) = &attr.kind else {
                                 unreachable!()
                             };
@@ -406,7 +412,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
         match self.tcx.get_attrs_by_path(def_id, &self.attr).next() {
             Some(attr) => {
-                // The `coenobita::tag` is guaranteed to be a normal attribute
+                // The `coenobita::integrity` is guaranteed to be a normal attribute
                 let AttrKind::Normal(normal) = &attr.kind else {
                     unreachable!()
                 };
@@ -415,6 +421,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
 
                 if let Ok(ty) = parser.parse_ty() {
+                    debug!("Parsed ty");
                     self.def_map.insert(def_id, ty.into());
                 };
             }
@@ -514,7 +521,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             ExprKind::Struct(qpath, fields, _) => self.check_expr_struct(expr.hir_id, qpath, fields)?,
 
             _ => {
-                debug!("Skipping expression of kind {:#?}", expr.kind);
+                debug!("Skipping expression of kind {:?}", expr.kind);
                 todo!()
             }
         };
@@ -628,7 +635,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
     /// Checks the type of a call expression.
     pub fn check_expr_call(&mut self, func: &Expr, args: &[Expr], span: Span) -> Result<Ty> {
-        let fty = self.check_expr(func, &Expectation::NoExpectation, true)?;
+        let fty = self.check_expr(func, &Expectation::NoExpectation, false)?;
 
         match fty.kind() {
             TyKind::Fn(arg_tys, ret_ty) => {
@@ -648,6 +655,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                     self.check_expr(expr, &expectation, false)?;
                 }
 
+                debug!("Done checking call expression with ret ty: {:?}", *ret_ty);
                 Ok(*ret_ty)
             }
 
@@ -662,9 +670,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
             }
 
             _ => {
-                let msg = "Coenobita cannot tell if this is a function";
-                self.tcx.dcx().span_warn(func.span, msg);
-
+                warn!("Cannot tell if expression is a function - {:?}", func);
                 Ok(fty)
             }
         }
@@ -728,6 +734,9 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
         expectation: &Expectation,
     ) -> Result<Ty> {
         let ity = self.check_expr(guard, &Expectation::NoExpectation, false)?;
+
+        debug!("Checking `if` influenced by {:?}", ity);
+
         self.context.enter(&ity);
 
         let mut rty = self.check_expr(then_expr, expectation, false)?;
@@ -785,9 +794,17 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
     /// Checks the type of a binary expression.
     pub fn check_expr_binary(&mut self, lhs: &Expr, rhs: &Expr, expectation: &Expectation) -> Result<Ty> {
-        let ty = self
-            .check_expr(lhs, expectation, false)?
-            .merge(self.check_expr(rhs, expectation, false)?);
+        debug!("Checking binary expression with...");
+        debug!("> LHS: {:?}", lhs);
+        debug!("> RHS: {:?}", rhs);
+
+        let lty = self.check_expr(lhs, expectation, false)?;
+        let rty = self.check_expr(rhs, expectation, false)?;
+
+        debug!("  > LHS Type is: {:?}", lty);
+        debug!("  > RHS Type is: {:?}", rty);
+
+        let ty = lty.merge(rty);
 
         Ok(ty)
     }
