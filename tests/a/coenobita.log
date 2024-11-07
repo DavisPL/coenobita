@@ -1,3 +1,30 @@
 [DEBUG] Coenobita invoked for crate 'a'
 =========
-[DEBUG] Crate type is lib
+[DEBUG] Crate type is root[[DEBUG] Trying to get func ty of defid DefId(0:7 ~ a[df96]::{impl#0}::something)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Checking binary expression with...
+[DEBUG] > LHS: Expr { hir_id: HirId(DefId(0:7 ~ a[df96]::{impl#0}::something).4), kind: Path(Resolved(None, Path { span: src/lib.rs:11:9: 11:10 (#0), res: Local(HirId(DefId(0:7 ~ a[df96]::{impl#0}::something).2)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:7 ~ a[df96]::{impl#0}::something).5), res: Local(HirId(DefId(0:7 ~ a[df96]::{impl#0}::something).2)), args: None, infer_args: true }] })), span: src/lib.rs:11:9: 11:10 (#0) }
+[DEBUG] > RHS: Expr { hir_id: HirId(DefId(0:7 ~ a[df96]::{impl#0}::something).6), kind: Call(Expr { hir_id: HirId(DefId(0:7 ~ a[df96]::{impl#0}::something).7), kind: Path(Resolved(None, Path { span: src/lib.rs:11:13: 11:21 (#0), res: Def(Fn, DefId(24:3 ~ c[3801]::value)), segments: [PathSegment { ident: c#0, hir_id: HirId(DefId(0:7 ~ a[df96]::{impl#0}::something).8), res: Def(Mod, DefId(24:0 ~ c[3801])), args: None, infer_args: true }, PathSegment { ident: value#0, hir_id: HirId(DefId(0:7 ~ a[df96]::{impl#0}::something).9), res: Def(Fn, DefId(24:3 ~ c[3801]::value)), args: None, infer_args: true }] })), span: src/lib.rs:11:13: 11:21 (#0) }, []), span: src/lib.rs:11:13: 11:23 (#0) }
+[DEBUG] Trying to get func ty of defid DefId(24:3 ~ c[3801]::value)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Parsed ty
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Specific({"c"}), Specific({"c"})), kind: Opaque }
+[DEBUG]   > LHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG]   > RHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }[[DEBUG] Trying to get func ty of defid DefId(0:11 ~ a[df96]::{impl#1}::another)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Specific({"b"}), Specific({"b"})), kind: Opaque }], Ty { property: FlowPair(Specific({"c", "b"}), Specific({"b", "c"})), kind: Opaque }) }
+[DEBUG] Checking binary expression with...
+[DEBUG] > LHS: Expr { hir_id: HirId(DefId(0:11 ~ a[df96]::{impl#1}::another).4), kind: Path(Resolved(None, Path { span: src/lib.rs:18:9: 18:10 (#0), res: Local(HirId(DefId(0:11 ~ a[df96]::{impl#1}::another).2)), segments: [PathSegment { ident: x#0, hir_id: HirId(DefId(0:11 ~ a[df96]::{impl#1}::another).5), res: Local(HirId(DefId(0:11 ~ a[df96]::{impl#1}::another).2)), args: None, infer_args: true }] })), span: src/lib.rs:18:9: 18:10 (#0) }
+[DEBUG] > RHS: Expr { hir_id: HirId(DefId(0:11 ~ a[df96]::{impl#1}::another).6), kind: Call(Expr { hir_id: HirId(DefId(0:11 ~ a[df96]::{impl#1}::another).7), kind: Path(Resolved(None, Path { span: src/lib.rs:18:13: 18:21 (#0), res: Def(Fn, DefId(24:3 ~ c[3801]::value)), segments: [PathSegment { ident: c#0, hir_id: HirId(DefId(0:11 ~ a[df96]::{impl#1}::another).8), res: Def(Mod, DefId(24:0 ~ c[3801])), args: None, infer_args: true }, PathSegment { ident: value#0, hir_id: HirId(DefId(0:11 ~ a[df96]::{impl#1}::another).9), res: Def(Fn, DefId(24:3 ~ c[3801]::value)), args: None, infer_args: true }] })), span: src/lib.rs:18:13: 18:21 (#0) }, []), span: src/lib.rs:18:13: 18:23 (#0) }[[DEBUG TTrying to get func ty of defidDDefId22:3  ~cc[3801]::valu)
+[[DEBUG >>> FOUND IT! It'sTT  {ppropert::FFlowPai(UUniversa,,UUniversa),,kkin::FF([],,TT  {ppropert::FFlowPai(SSpecifi({"c"}),,SSpecifi({"c"})),,kkin::OOpaqu  )  
+[[DEBUG DDone checking call expression with ret ty:TT  {ppropert::FFlowPai(SSpecifi({"c"}),,SSpecifi({"c"})),,kkin::OOpaqu  
+[[DEBUG    > LHS Type is:TT  {ppropert::FFlowPai(SSpecifi({"b",,"c"}),,SSpecifi({"c",,"b"})),,kkin::OOpaque }
+[DEBUG]   > RHS Type is: Ty { property: FlowPair(Specific({"c", "b"}), Specific({"b", "c"})), kind: Opaque }[[DEBUG] Trying to get func ty of defid DefId(0:9 ~ a[df96]::_test_trait)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }[[DEBUG TTrying to get func ty of defidDDefId0:11  ~aa[df96]::Bazinga::somethin)
+[[DEBUG >>> NOT FOUND! Getting extern de
+[[DEBUG PParsed t
+
+[DEBUG] Trying to get func ty of defid DefId(0:12 ~ a[df96]::main)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(20:841 ~ test[522f]::test_main_static)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
