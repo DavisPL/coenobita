@@ -4,6 +4,7 @@ use std::fs;
 use std::io::{Read as Read_, Seek as Seek_, Write as Write_};
 use std::os::unix::fs::DirEntryExt;
 
+use crate::cap::AsRef;
 use crate::io::{self, IoSlice, IoSliceMut, Read, Seek, SeekFrom, Write};
 use crate::path::{Path, PathBuf};
 use crate::sync::Arc;
@@ -51,28 +52,28 @@ pub struct FileType {
 }
 
 pub fn read<P: AsRef<Path>>(path: P) -> io::Result<Vec<u8>> {
-    transmute!(fs::read(&path.as_ref().inner))
+    transmute!(fs::read(&AsRef::as_ref(&path).inner))
 }
 
 pub fn read_to_string<P: AsRef<Path>>(path: P) -> io::Result<String> {
-    transmute!(fs::read_to_string(&path.as_ref().inner))
+    transmute!(fs::read_to_string(&AsRef::as_ref(&path).inner))
 }
 
-pub fn write<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, contents: C) -> io::Result<()> {
-    transmute!(fs::write(&path.as_ref().inner, contents))
+pub fn write<P: AsRef<Path>, C: std::convert::AsRef<[u8]>>(path: P, contents: C) -> io::Result<()> {
+    transmute!(fs::write(&AsRef::as_ref(&path).inner, contents))
 }
 
 impl File {
     pub fn open<P: AsRef<Path>>(path: P) -> io::Result<File> {
-        unsafe { std::mem::transmute(fs::File::open(&path.as_ref().inner)) }
+        unsafe { std::mem::transmute(fs::File::open(&AsRef::as_ref(&path).inner)) }
     }
 
     pub fn create<P: AsRef<Path>>(path: P) -> io::Result<File> {
-        unsafe { std::mem::transmute(fs::File::create(&path.as_ref().inner)) }
+        unsafe { std::mem::transmute(fs::File::create(&AsRef::as_ref(&path).inner)) }
     }
 
     pub fn create_new<P: AsRef<Path>>(path: P) -> io::Result<File> {
-        unsafe { std::mem::transmute(fs::File::create_new(&path.as_ref().inner)) }
+        unsafe { std::mem::transmute(fs::File::create_new(&AsRef::as_ref(&path).inner)) }
     }
 
     pub fn options() -> OpenOptions {
@@ -273,7 +274,7 @@ impl OpenOptions {
     }
 
     pub fn open<P: AsRef<Path>>(&self, path: P) -> io::Result<File> {
-        unsafe { std::mem::transmute(self.inner.open(&path.as_ref().inner)) }
+        unsafe { std::mem::transmute(self.inner.open(&AsRef::as_ref(&path).inner)) }
     }
 }
 
@@ -368,57 +369,63 @@ impl Debug for DirEntry {
 }
 
 pub fn remove_file<P: AsRef<Path>>(path: P) -> io::Result<()> {
-    transmute!(fs::remove_file(&path.as_ref().inner))
+    transmute!(fs::remove_file(&AsRef::as_ref(&path).inner))
 }
 
 pub fn metadata<P: AsRef<Path>>(path: P) -> io::Result<Metadata> {
-    transmute!(fs::metadata(&path.as_ref().inner))
+    transmute!(fs::metadata(&AsRef::as_ref(&path).inner))
 }
 
 pub fn symlink_metadata<P: AsRef<Path>>(path: P) -> io::Result<Metadata> {
-    transmute!(fs::symlink_metadata(&path.as_ref().inner))
+    transmute!(fs::symlink_metadata(&AsRef::as_ref(&path).inner))
 }
 
 pub fn rename<P: AsRef<Path>, Q: AsRef<Path>>(from: P, to: Q) -> io::Result<()> {
-    transmute!(fs::rename(&from.as_ref().inner, &to.as_ref().inner))
+    transmute!(fs::rename(
+        &AsRef::as_ref(&from).inner,
+        &&AsRef::as_ref(&to).inner
+    ))
 }
 
 pub fn copy<P: AsRef<Path>, Q: AsRef<Path>>(from: P, to: Q) -> io::Result<u64> {
-    transmute!(fs::copy(&from.as_ref().inner, &to.as_ref().inner))
+    transmute!(fs::copy(&&AsRef::as_ref(&from).inner, &&AsRef::as_ref(&to).inner))
 }
 
 pub fn hard_link<P: AsRef<Path>, Q: AsRef<Path>>(original: P, link: Q) -> io::Result<()> {
-    transmute!(fs::hard_link(&original.as_ref().inner, &link.as_ref().inner))
+    transmute!(fs::hard_link(
+        &AsRef::as_ref(&original).inner,
+        &AsRef::as_ref(&link).inner
+    ))
 }
 
 pub fn read_link<P: AsRef<Path>>(path: P) -> io::Result<PathBuf> {
-    transmute!(fs::read_link(&path.as_ref().inner))
+    transmute!(fs::read_link(&AsRef::as_ref(&path).inner))
 }
 
 pub fn canonicalize<P: AsRef<Path>>(path: P) -> io::Result<PathBuf> {
-    transmute!(fs::canonicalize(&path.as_ref().inner))
+    transmute!(fs::canonicalize(&AsRef::as_ref(&path).inner))
 }
 
 pub fn create_dir<P: AsRef<Path>>(path: P) -> io::Result<()> {
-    transmute!(fs::create_dir(&path.as_ref().inner))
+    transmute!(fs::create_dir(&AsRef::as_ref(&path).inner))
 }
 
 pub fn create_dir_all<P: AsRef<Path>>(path: P) -> io::Result<()> {
-    transmute!(fs::create_dir_all(&path.as_ref().inner))
+    transmute!(fs::create_dir_all(&AsRef::as_ref(&path).inner))
 }
 
 pub fn remove_dir<P: AsRef<Path>>(path: P) -> io::Result<()> {
-    transmute!(fs::remove_dir(&path.as_ref().inner))
+    transmute!(fs::remove_dir(&AsRef::as_ref(&path).inner))
 }
 
 pub fn remove_dir_all<P: AsRef<Path>>(path: P) -> io::Result<()> {
-    transmute!(fs::remove_dir_all(&path.as_ref().inner))
+    transmute!(fs::remove_dir_all(&AsRef::as_ref(&path).inner))
 }
 
 pub fn read_dir<P: AsRef<Path>>(path: P) -> io::Result<ReadDir> {
-    transmute!(fs::read_dir(&path.as_ref().inner))
+    transmute!(fs::read_dir(&AsRef::as_ref(&path).inner))
 }
 
 pub fn set_permissions<P: AsRef<Path>>(path: P, perm: Permissions) -> io::Result<()> {
-    transmute!(fs::set_permissions(&path.as_ref().inner, transmute!(perm)))
+    transmute!(fs::set_permissions(&AsRef::as_ref(&path).inner, transmute!(perm)))
 }

@@ -1,11 +1,12 @@
 pub use std::os::unix::fs::{DirEntryExt, MetadataExt};
 
+use crate::cap::AsRef;
 use crate::{fs, io, path::Path, transmute};
 
 pub fn symlink<P: AsRef<Path>, Q: AsRef<Path>>(original: P, link: Q) -> io::Result<()> {
     transmute!(std::os::unix::fs::symlink(
-        &original.as_ref().inner,
-        &link.as_ref().inner
+        &AsRef::as_ref(&original).inner,
+        &AsRef::as_ref(&link).inner
     ))
 }
 

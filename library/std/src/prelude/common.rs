@@ -14,7 +14,7 @@ pub use crate::mem::drop;
 pub use crate::mem::{align_of, align_of_val, size_of, size_of_val};
 
 // Re-exported types and traits
-pub use crate::convert::{AsMut, AsRef, Into};
+pub use crate::convert::{AsMut, Into};
 pub use crate::iter::{DoubleEndedIterator, ExactSizeIterator};
 pub use crate::iter::{Extend, IntoIterator, Iterator};
 pub use crate::option::Option::{self, None, Some};

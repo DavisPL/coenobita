@@ -10,7 +10,7 @@ use crate::ffi::{OsStr, OsString};
 use crate::io;
 use crate::{fs, transmute};
 
-use crate::cap::From;
+use crate::cap::{AsRef, From};
 
 pub struct Components<'a> {
     inner: path::Components<'a>,
@@ -51,10 +51,12 @@ impl Ord for PathBuf {
     }
 }
 
-impl<T: ?Sized + AsRef<OsStr>> From<&T> for PathBuf {
+impl<T: ?Sized + std::convert::AsRef<OsStr>> From<&T> for PathBuf {
     #[inline(always)]
     fn from(s: &T) -> PathBuf {
-        PathBuf { inner: s.into() }
+        PathBuf {
+            inner: s.as_ref().into(),
+        }
     }
 }
 
@@ -109,7 +111,7 @@ impl PathBuf {
     #[inline(always)]
     #[cnbt::provenance((*,*) fn((*,root), (*,root)) -> (*,root))]
     pub fn push<P: AsRef<Path>>(&mut self, path: P) {
-        self.inner.push(&path.as_ref().inner);
+        self.inner.push(&<P as AsRef<Path>>::as_ref(&path).inner);
     }
 
     #[inline(always)]
@@ -121,13 +123,13 @@ impl PathBuf {
     #[inline(always)]
     #[cnbt::provenance((*,*) fn((*,root), (*,root)) -> (*,root))]
     pub fn set_file_name<S: AsRef<OsStr>>(&mut self, file_name: S) {
-        self.inner.set_file_name(file_name.as_ref());
+        self.inner.set_file_name(&<S as AsRef<OsStr>>::as_ref(&file_name));
     }
 
     #[inline(always)]
     #[cnbt::provenance((*,*) fn((*,root), (*,root)) -> (*,root))]
     pub fn set_extension<S: AsRef<OsStr>>(&mut self, extension: S) -> bool {
-        self.inner.set_extension(extension.as_ref())
+        self.inner.set_extension(&<S as AsRef<OsStr>>::as_ref(&extension))
     }
 
     #[inline(always)]
@@ -219,7 +221,8 @@ impl Deref for PathBuf {
     // No need for tag - doesn't create new path
     #[inline(always)]
     fn deref(&self) -> &Path {
-        Path::new(&self.inner)
+        // TODO: See if this actually does what it should later
+        unsafe { &*(std::convert::AsRef::as_ref(&self.inner) as *const OsStr as *const Path) }
     }
 }
 
@@ -277,7 +280,7 @@ impl Path {
     #[inline(always)]
     #[cnbt::provenance((*,*) fn((*,root)) -> (*,root))]
     pub fn new<S: AsRef<OsStr> + ?Sized>(s: &S) -> &Path {
-        unsafe { &*(s.as_ref() as *const OsStr as *const Path) }
+        unsafe { &*(std::convert::AsRef::as_ref(&s) as *const OsStr as *const Path) }
     }
 
     #[inline(always)]
@@ -341,17 +344,17 @@ impl Path {
     where
         P: AsRef<Path>,
     {
-        unsafe { std::mem::transmute(self.inner.strip_prefix(&base.as_ref().inner)) }
+        unsafe { std::mem::transmute(self.inner.strip_prefix(&std::convert::AsRef::as_ref(&base).inner)) }
     }
 
     #[inline(always)]
     pub fn starts_with<P: AsRef<Path>>(&self, base: P) -> bool {
-        self.inner.starts_with(&base.as_ref().inner)
+        self.inner.starts_with(&std::convert::AsRef::as_ref(&base).inner)
     }
 
     #[inline(always)]
     pub fn ends_with<P: AsRef<Path>>(&self, child: P) -> bool {
-        self.inner.ends_with(&child.as_ref().inner)
+        self.inner.ends_with(&std::convert::AsRef::as_ref(&child).inner)
     }
 
     #[inline(always)]
@@ -367,19 +370,19 @@ impl Path {
     #[inline(always)]
     #[cnbt::provenance((*,*) fn((*,root), (*,root)) -> (*,root))]
     pub fn join<P: AsRef<Path>>(&self, path: P) -> PathBuf {
-        transmute!(self.inner.join(&path.as_ref().inner))
+        transmute!(self.inner.join(&<P as AsRef<Path>>::as_ref(&path).inner))
     }
 
     #[inline(always)]
     #[cnbt::provenance((*,*) fn((*,root), (*,root)) -> (*,root))]
     pub fn with_file_name<S: AsRef<OsStr>>(&self, file_name: S) -> PathBuf {
-        unsafe { std::mem::transmute(self.inner.with_file_name(file_name.as_ref())) }
+        unsafe { std::mem::transmute(self.inner.with_file_name(std::convert::AsRef::as_ref(&file_name))) }
     }
 
     #[inline(always)]
     #[cnbt::provenance((*,*) fn((*,root), (*,root)) -> (*,root))]
     pub fn with_extension<S: AsRef<OsStr>>(&self, extension: S) -> PathBuf {
-        unsafe { std::mem::transmute(self.inner.with_extension(extension.as_ref())) }
+        unsafe { std::mem::transmute(self.inner.with_extension(std::convert::AsRef::as_ref(&extension))) }
     }
 
     #[inline(always)]
@@ -469,38 +472,44 @@ impl fmt::Display for Display<'_> {
     }
 }
 
-impl AsRef<Path> for Path {
-    #[inline(always)]
+impl std::convert::AsRef<Path> for Path {
     fn as_ref(&self) -> &Path {
         self
     }
 }
 
-impl AsRef<Path> for PathBuf {
-    #[inline(always)]
+impl std::convert::AsRef<Path> for PathBuf {
     fn as_ref(&self) -> &Path {
         self
     }
 }
 
-impl AsRef<OsStr> for Path {
+impl std::convert::AsRef<OsStr> for Path {
     #[inline(always)]
     fn as_ref(&self) -> &OsStr {
-        &self.inner.as_ref()
+        <path::Path as std::convert::AsRef<OsStr>>::as_ref(&self.inner)
     }
 }
 
-impl AsRef<OsStr> for PathBuf {
+impl std::convert::AsRef<OsStr> for PathBuf {
     #[inline(always)]
     fn as_ref(&self) -> &OsStr {
-        &self.inner.as_ref()
+        <path::Path as std::convert::AsRef<OsStr>>::as_ref(&self.inner)
     }
 }
 
-impl AsRef<Path> for str {
+impl std::convert::AsRef<Path> for OsStr {
+    #[inline]
+    fn as_ref(&self) -> &Path {
+        transmute!(self)
+    }
+}
+
+impl std::convert::AsRef<Path> for str {
     #[inline(always)]
     fn as_ref(&self) -> &Path {
-        Path::new(self)
+        // TODO: Check if this works.
+        transmute!(self)
     }
 }
 
@@ -510,10 +519,10 @@ impl fmt::Debug for Path {
     }
 }
 
-impl AsRef<Path> for String {
+impl std::convert::AsRef<Path> for String {
     #[inline(always)]
     fn as_ref(&self) -> &Path {
-        Path::new(self)
+        transmute!(self.as_str())
     }
 }
 
