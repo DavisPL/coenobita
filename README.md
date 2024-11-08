@@ -36,8 +36,10 @@ First, you will need to install Coenobita on your machine.
 #### Manually Install Coenobita
 1. Install Rust and Cargo (`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`)
 2. Install Nightly (`rustup default nightly`)
-3. Run `rustup component add rust-dev` so Coenobita can access compiler internals
+3. Run `rustup component add rustc-dev` so Coenobita can access compiler internals
 4. Enter the root directory and run `./install.sh`
+
+**Note:** After trying the code, you can optionally switch from nightly back to stable with `rustup default stable`.
 
 #### Install Coenobita Using Cargo
 Note that this currently **does not work** because Coenobita hasn't been published yet.
