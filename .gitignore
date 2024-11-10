@@ -1,2 +1,6 @@
 *target
 *.DS_Store
+
+# Logs
+logs
+*.log
