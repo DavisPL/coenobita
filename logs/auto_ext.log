@@ -1,5 +1,0 @@
-[DEBUG] Trying to get func ty of defid DefId(0:3 ~ auto_ext[f28d]::main)
-[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
-[DEBUG] Trying to get func ty of defid DefId(20:841 ~ test[522f]::test_main_static)
-[DEBUG] >> NOT FOUND! Getting extern def
-[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
