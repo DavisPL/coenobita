@@ -59,6 +59,17 @@ rustc-wrapper = "coenobita"
 
 You should be good to go! Please check out the `tests` directory for some examples.
 
+### Setting Up VSCode
+
+Coenobita _mostly_ works with VS Code and Rust Analyzer. At the moment, you may not be able to inspect standard library constructs because we inject our own capability safe version of the standard library. A quick fix is to add `std` as a dependency to your project's `Cargo.toml` as follows.
+
+However, you must remove the dependency before trying to check, build, or test!
+
+```toml
+[dependencies]
+std = { path = "<path to coenobita>/library/std" }
+```
+
 ## Testing Coenobita
 
 Coenobita is very fragile and needs to handle many edge cases. To make sure we don't accidentally break anything while working on Coenobita, we set up [UI](https://rustc-dev-guide.rust-lang.org/tests/ui.html) tests using `trybuild`. To run these tests...
