@@ -2,8 +2,14 @@
 [DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
 [DEBUG] Trying to get func ty of defid DefId(3:3892 ~ core[7d5a]::ops::try_trait::Try::branch)
 [DEBUG] >> NOT FOUND! Getting extern def
-[DEBUG] Trying to get func ty of defid DefId(21:58 ~ same_file[7e44]::is_same_file)
+[DEBUG] Trying to get func ty of defid DefId(21:60 ~ same_file[7e44]::is_same_file)
 [DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:266 ~ std[3c1d]::path::{impl#9}::new)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:266 ~ std[3c1d]::path::{impl#9}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
 [DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
 [DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
 [DEBUG] Trying to get func ty of defid DefId(3:3895 ~ core[7d5a]::ops::try_trait::FromResidual::from_residual)

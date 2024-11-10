@@ -1,0 +1,731 @@
+[DEBUG] Trying to get func ty of defid DefId(0:19 ~ std[a9bf]::env::temp_dir)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:2027 ~ std[e3cd]::env::temp_dir)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:35 ~ std[a9bf]::fs::read_dir)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2612 ~ std[e3cd]::fs::read_dir)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:37 ~ std[a9bf]::fs::create_dir_all)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2606 ~ std[e3cd]::fs::create_dir_all)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:39 ~ std[a9bf]::fs::create_dir)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2604 ~ std[e3cd]::fs::create_dir)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:41 ~ std[a9bf]::fs::remove_dir_all)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2610 ~ std[e3cd]::fs::remove_dir_all)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:43 ~ std[a9bf]::fs::metadata)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2584 ~ std[e3cd]::fs::metadata)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:45 ~ std[a9bf]::fs::symlink_metadata)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2586 ~ std[e3cd]::fs::symlink_metadata)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:47 ~ std[a9bf]::fs::read_link)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2600 ~ std[e3cd]::fs::read_link)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:49 ~ std[a9bf]::fs::hard_link)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2594 ~ std[e3cd]::fs::hard_link)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:55 ~ std[a9bf]::fs::{impl#0}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:11137 ~ core[7d5a]::fmt::Debug::fmt)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:58 ~ std[a9bf]::fs::{impl#1}::next)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:8890 ~ core[7d5a]::iter::traits::iterator::Iterator::next)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:62 ~ std[a9bf]::fs::{impl#2}::path)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2574 ~ std[e3cd]::fs::{impl#31}::path)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:63 ~ std[a9bf]::fs::{impl#2}::metadata)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2575 ~ std[e3cd]::fs::{impl#31}::metadata)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:64 ~ std[a9bf]::fs::{impl#2}::file_type)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2576 ~ std[e3cd]::fs::{impl#31}::file_type)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:65 ~ std[a9bf]::fs::{impl#2}::file_name)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2577 ~ std[e3cd]::fs::{impl#31}::file_name)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:67 ~ std[a9bf]::fs::{impl#3}::ino)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:4350 ~ std[e3cd]::os::unix::fs::DirEntryExt::ino)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:69 ~ std[a9bf]::fs::{impl#4}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:11137 ~ core[7d5a]::fmt::Debug::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:73 ~ std[a9bf]::fs::{impl#5}::open)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2448 ~ std[e3cd]::fs::{impl#0}::open)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:75 ~ std[a9bf]::fs::{impl#5}::create)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2450 ~ std[e3cd]::fs::{impl#0}::create)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:77 ~ std[a9bf]::fs::{impl#5}::create_new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2452 ~ std[e3cd]::fs::{impl#0}::create_new)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:79 ~ std[a9bf]::fs::{impl#5}::options)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2454 ~ std[e3cd]::fs::{impl#0}::options)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:80 ~ std[a9bf]::fs::{impl#5}::sync_all)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2455 ~ std[e3cd]::fs::{impl#0}::sync_all)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:81 ~ std[a9bf]::fs::{impl#5}::sync_data)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2456 ~ std[e3cd]::fs::{impl#0}::sync_data)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:82 ~ std[a9bf]::fs::{impl#5}::set_len)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2457 ~ std[e3cd]::fs::{impl#0}::set_len)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:83 ~ std[a9bf]::fs::{impl#5}::metadata)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2458 ~ std[e3cd]::fs::{impl#0}::metadata)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:84 ~ std[a9bf]::fs::{impl#5}::try_clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2459 ~ std[e3cd]::fs::{impl#0}::try_clone)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:85 ~ std[a9bf]::fs::{impl#5}::set_permissions)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2460 ~ std[e3cd]::fs::{impl#0}::set_permissions)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:86 ~ std[a9bf]::fs::{impl#5}::set_times)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2461 ~ std[e3cd]::fs::{impl#0}::set_times)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:87 ~ std[a9bf]::fs::{impl#5}::set_modified)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2462 ~ std[e3cd]::fs::{impl#0}::set_modified)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:89 ~ std[a9bf]::fs::{impl#6}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:11137 ~ core[7d5a]::fmt::Debug::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:93 ~ std[a9bf]::fs::{impl#7}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2516 ~ std[e3cd]::fs::{impl#14}::new)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:94 ~ std[a9bf]::fs::{impl#7}::read)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2517 ~ std[e3cd]::fs::{impl#14}::read)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:95 ~ std[a9bf]::fs::{impl#7}::write)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2518 ~ std[e3cd]::fs::{impl#14}::write)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:96 ~ std[a9bf]::fs::{impl#7}::append)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2519 ~ std[e3cd]::fs::{impl#14}::append)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:97 ~ std[a9bf]::fs::{impl#7}::truncate)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2520 ~ std[e3cd]::fs::{impl#14}::truncate)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:98 ~ std[a9bf]::fs::{impl#7}::create)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2521 ~ std[e3cd]::fs::{impl#14}::create)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:99 ~ std[a9bf]::fs::{impl#7}::create_new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2522 ~ std[e3cd]::fs::{impl#14}::create_new)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:100 ~ std[a9bf]::fs::{impl#7}::open)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2523 ~ std[e3cd]::fs::{impl#14}::open)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:112 ~ std[a9bf]::os::fd::raw::{impl#0}::from)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3163 ~ core[7d5a]::convert::Into::into)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:114 ~ std[a9bf]::os::fd::raw::{impl#1}::from)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:116 ~ std[a9bf]::os::fd::raw::{impl#2}::as_raw_fd)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:4918 ~ std[e3cd]::os::fd::raw::AsRawFd::as_raw_fd)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:118 ~ std[a9bf]::os::fd::raw::{impl#3}::from_raw_fd)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3166 ~ core[7d5a]::convert::From::from)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:4920 ~ std[e3cd]::os::fd::raw::FromRawFd::from_raw_fd)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:120 ~ std[a9bf]::os::fd::raw::{impl#4}::into_raw_fd)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:4918 ~ std[e3cd]::os::fd::raw::AsRawFd::as_raw_fd)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:128 ~ std[a9bf]::os::unix::fs::symlink)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:4358 ~ std[e3cd]::os::unix::fs::symlink)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:153 ~ std[a9bf]::path::{impl#0}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5307 ~ std[e3cd]::path::{impl#29}::new)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:154 ~ std[a9bf]::path::{impl#0}::with_capacity)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5308 ~ std[e3cd]::path::{impl#29}::with_capacity)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:155 ~ std[a9bf]::path::{impl#0}::as_path)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:251 ~ std[a9bf]::path::{impl#0}::push)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5312 ~ std[e3cd]::path::{impl#29}::push)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:253 ~ std[a9bf]::path::{impl#0}::pop)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5316 ~ std[e3cd]::path::{impl#29}::pop)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:254 ~ std[a9bf]::path::{impl#0}::set_file_name)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5318 ~ std[e3cd]::path::{impl#29}::set_file_name)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:256 ~ std[a9bf]::path::{impl#0}::set_extension)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5321 ~ std[e3cd]::path::{impl#29}::set_extension)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:258 ~ std[a9bf]::path::{impl#0}::as_mut_os_string)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5327 ~ std[e3cd]::path::{impl#29}::as_mut_os_string)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:156 ~ std[a9bf]::path::{impl#0}::into_os_string)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5328 ~ std[e3cd]::path::{impl#29}::into_os_string)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:157 ~ std[a9bf]::path::{impl#0}::into_boxed_path)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5329 ~ std[e3cd]::path::{impl#29}::into_boxed_path)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:158 ~ std[a9bf]::path::{impl#0}::capacity)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5330 ~ std[e3cd]::path::{impl#29}::capacity)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:259 ~ std[a9bf]::path::{impl#0}::clear)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5331 ~ std[e3cd]::path::{impl#29}::clear)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:260 ~ std[a9bf]::path::{impl#0}::reserve)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5332 ~ std[e3cd]::path::{impl#29}::reserve)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:261 ~ std[a9bf]::path::{impl#0}::try_reserve)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5333 ~ std[e3cd]::path::{impl#29}::try_reserve)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:262 ~ std[a9bf]::path::{impl#0}::reserve_exact)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5334 ~ std[e3cd]::path::{impl#29}::reserve_exact)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:263 ~ std[a9bf]::path::{impl#0}::try_reserve_exact)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5335 ~ std[e3cd]::path::{impl#29}::try_reserve_exact)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:264 ~ std[a9bf]::path::{impl#0}::shrink_to_fit)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5336 ~ std[e3cd]::path::{impl#29}::shrink_to_fit)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:265 ~ std[a9bf]::path::{impl#0}::shrink_to)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5337 ~ std[e3cd]::path::{impl#29}::shrink_to)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:161 ~ std[a9bf]::path::{impl#2}::eq)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:2966 ~ core[7d5a]::cmp::PartialEq::eq)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:163 ~ std[a9bf]::path::{impl#3}::partial_cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3008 ~ core[7d5a]::cmp::PartialOrd::partial_cmp)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:165 ~ std[a9bf]::path::{impl#4}::cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3001 ~ core[7d5a]::cmp::Ord::cmp)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:168 ~ std[a9bf]::path::{impl#5}::deref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:170 ~ std[a9bf]::path::{impl#6}::borrow)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3656 ~ core[7d5a]::ops::deref::Deref::deref)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:172 ~ std[a9bf]::path::{impl#7}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:2919 ~ core[7d5a]::clone::Clone::clone)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:173 ~ std[a9bf]::path::{impl#7}::clone_from)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:2920 ~ core[7d5a]::clone::Clone::clone_from)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:175 ~ std[a9bf]::path::{impl#8}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:11137 ~ core[7d5a]::fmt::Debug::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:266 ~ std[a9bf]::path::{impl#9}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:182 ~ std[a9bf]::path::{impl#9}::as_os_str)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5428 ~ std[e3cd]::path::{impl#63}::as_os_str)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:268 ~ std[a9bf]::path::{impl#9}::as_mut_os_str)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5429 ~ std[e3cd]::path::{impl#63}::as_mut_os_str)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:183 ~ std[a9bf]::path::{impl#9}::to_str)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5430 ~ std[e3cd]::path::{impl#63}::to_str)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:184 ~ std[a9bf]::path::{impl#9}::to_string_lossy)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5431 ~ std[e3cd]::path::{impl#63}::to_string_lossy)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:185 ~ std[a9bf]::path::{impl#9}::to_path_buf)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5432 ~ std[e3cd]::path::{impl#63}::to_path_buf)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:186 ~ std[a9bf]::path::{impl#9}::is_absolute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5433 ~ std[e3cd]::path::{impl#63}::is_absolute)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:187 ~ std[a9bf]::path::{impl#9}::is_relative)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:186 ~ std[a9bf]::path::{impl#9}::is_absolute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:188 ~ std[a9bf]::path::{impl#9}::has_root)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5436 ~ std[e3cd]::path::{impl#63}::has_root)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:189 ~ std[a9bf]::path::{impl#9}::parent)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5437 ~ std[e3cd]::path::{impl#63}::parent)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:190 ~ std[a9bf]::path::{impl#9}::ancestors)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5439 ~ std[e3cd]::path::{impl#63}::ancestors)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:191 ~ std[a9bf]::path::{impl#9}::file_name)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5440 ~ std[e3cd]::path::{impl#63}::file_name)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:192 ~ std[a9bf]::path::{impl#9}::strip_prefix)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5442 ~ std[e3cd]::path::{impl#63}::strip_prefix)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:194 ~ std[a9bf]::path::{impl#9}::starts_with)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5446 ~ std[e3cd]::path::{impl#63}::starts_with)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:196 ~ std[a9bf]::path::{impl#9}::ends_with)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5449 ~ std[e3cd]::path::{impl#63}::ends_with)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:198 ~ std[a9bf]::path::{impl#9}::file_stem)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5452 ~ std[e3cd]::path::{impl#63}::file_stem)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:199 ~ std[a9bf]::path::{impl#9}::extension)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5456 ~ std[e3cd]::path::{impl#63}::extension)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:269 ~ std[a9bf]::path::{impl#9}::join)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5458 ~ std[e3cd]::path::{impl#63}::join)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:271 ~ std[a9bf]::path::{impl#9}::with_file_name)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5461 ~ std[e3cd]::path::{impl#63}::with_file_name)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:273 ~ std[a9bf]::path::{impl#9}::with_extension)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5464 ~ std[e3cd]::path::{impl#63}::with_extension)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:200 ~ std[a9bf]::path::{impl#9}::components)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5469 ~ std[e3cd]::path::{impl#63}::components)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:201 ~ std[a9bf]::path::{impl#9}::iter)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5470 ~ std[e3cd]::path::{impl#63}::iter)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:202 ~ std[a9bf]::path::{impl#9}::display)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5471 ~ std[e3cd]::path::{impl#63}::display)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:203 ~ std[a9bf]::path::{impl#9}::metadata)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5472 ~ std[e3cd]::path::{impl#63}::metadata)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:204 ~ std[a9bf]::path::{impl#9}::symlink_metadata)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5473 ~ std[e3cd]::path::{impl#63}::symlink_metadata)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:205 ~ std[a9bf]::path::{impl#9}::canonicalize)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5474 ~ std[e3cd]::path::{impl#63}::canonicalize)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:206 ~ std[a9bf]::path::{impl#9}::read_link)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5475 ~ std[e3cd]::path::{impl#63}::read_link)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:207 ~ std[a9bf]::path::{impl#9}::read_dir)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5476 ~ std[e3cd]::path::{impl#63}::read_dir)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:208 ~ std[a9bf]::path::{impl#9}::exists)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5477 ~ std[e3cd]::path::{impl#63}::exists)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:209 ~ std[a9bf]::path::{impl#9}::try_exists)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5478 ~ std[e3cd]::path::{impl#63}::try_exists)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:210 ~ std[a9bf]::path::{impl#9}::is_file)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5479 ~ std[e3cd]::path::{impl#63}::is_file)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:211 ~ std[a9bf]::path::{impl#9}::is_dir)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5481 ~ std[e3cd]::path::{impl#63}::is_dir)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:212 ~ std[a9bf]::path::{impl#9}::is_symlink)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:5483 ~ std[e3cd]::path::{impl#63}::is_symlink)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:213 ~ std[a9bf]::path::{impl#9}::into_path_buf)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:185 ~ std[a9bf]::path::{impl#9}::to_path_buf)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:215 ~ std[a9bf]::path::{impl#10}::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:217 ~ std[a9bf]::path::{impl#11}::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:219 ~ std[a9bf]::path::{impl#12}::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:221 ~ std[a9bf]::path::{impl#13}::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:223 ~ std[a9bf]::path::{impl#14}::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:225 ~ std[a9bf]::path::{impl#15}::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:227 ~ std[a9bf]::path::{impl#16}::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(5:5988 ~ alloc[5873]::string::{impl#0}::as_str)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:231 ~ std[a9bf]::path::{impl#19}::eq)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:2966 ~ core[7d5a]::cmp::PartialEq::eq)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:234 ~ std[a9bf]::path::{impl#21}::partial_cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3008 ~ core[7d5a]::cmp::PartialOrd::partial_cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:236 ~ std[a9bf]::path::{impl#22}::cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3001 ~ core[7d5a]::cmp::Ord::cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:238 ~ std[a9bf]::path::{impl#23}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:11137 ~ core[7d5a]::fmt::Debug::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:276 ~ std[a9bf]::path::{impl#28}::eq)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:2966 ~ core[7d5a]::cmp::PartialEq::eq)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:278 ~ std[a9bf]::path::{impl#29}::eq)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:2966 ~ core[7d5a]::cmp::PartialEq::eq)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:280 ~ std[a9bf]::path::{impl#30}::partial_cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3008 ~ core[7d5a]::cmp::PartialOrd::partial_cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:282 ~ std[a9bf]::path::{impl#31}::partial_cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3008 ~ core[7d5a]::cmp::PartialOrd::partial_cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:285 ~ std[a9bf]::path::{impl#32}::eq)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:2966 ~ core[7d5a]::cmp::PartialEq::eq)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:288 ~ std[a9bf]::path::{impl#33}::eq)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:2966 ~ core[7d5a]::cmp::PartialEq::eq)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:291 ~ std[a9bf]::path::{impl#34}::partial_cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3008 ~ core[7d5a]::cmp::PartialOrd::partial_cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:294 ~ std[a9bf]::path::{impl#35}::partial_cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3008 ~ core[7d5a]::cmp::PartialOrd::partial_cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:242 ~ std[a9bf]::path::{impl#24}::from)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3163 ~ core[7d5a]::convert::Into::into)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:244 ~ std[a9bf]::path::{impl#25}::from)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3163 ~ core[7d5a]::convert::Into::into)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:246 ~ std[a9bf]::path::{impl#26}::from)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3163 ~ core[7d5a]::convert::Into::into)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:295 ~ std[a9bf]::path::{impl#27}::from)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(2:3163 ~ core[7d5a]::convert::Into::into)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }

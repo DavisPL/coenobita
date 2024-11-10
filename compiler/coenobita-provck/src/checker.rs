@@ -605,7 +605,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                         ty::TyKind::Adt(adt_def, _) => {
                             debug!("SelfTy refers to an ADT!");
                             self.adt_ty(adt_def.did(), adt_def.did(), FIRST_VARIANT)
-                        },
+                        }
                         _ => {
                             debug!("unsupported tyalias kind {:?}", kind);
                             todo!()

@@ -44,8 +44,10 @@ fn main() {
         .unwrap_or("-".into());
 
     // Set up logging
-    let log = File::create(format!("/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/logs/{crate_name}.log"))
-        .expect("Could not create Coenobita logging file");
+    let log = File::create(format!(
+        "/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/logs/{crate_name}.log"
+    ))
+    .expect("Could not create Coenobita logging file");
 
     let config = ConfigBuilder::new()
         .set_time_level(log::LevelFilter::Off) // Don't show time
@@ -53,7 +55,7 @@ fn main() {
         .set_thread_level(log::LevelFilter::Off) // Don't show thread ID
         .set_location_level(log::LevelFilter::Off) // Don't show file/line location
         .build();
-    
+
     WriteLogger::init(simplelog::LevelFilter::Debug, config, log)
         .expect("Could not initialize Coenobita logger");
 

@@ -20,7 +20,7 @@
 [DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
 [DEBUG] Trying to get func ty of defid DefId(3:3892 ~ core[7d5a]::ops::try_trait::Try::branch)
 [DEBUG] >> NOT FOUND! Getting extern def
-[DEBUG] Trying to get func ty of defid DefId(21:53 ~ same_file[7e44]::{impl#0}::stderr)
+[DEBUG] Trying to get func ty of defid DefId(21:55 ~ same_file[7e44]::{impl#0}::stderr)
 [DEBUG] >> NOT FOUND! Getting extern def
 [DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
 [DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
@@ -29,16 +29,19 @@
 [DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
 [DEBUG] Trying to get func ty of defid DefId(3:3892 ~ core[7d5a]::ops::try_trait::Try::branch)
 [DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
-[DEBUG] Trying to get func ty of defid DefId(21:48 ~ same_file[7e44]::{impl#0}::from_path)
+[DEBUG] Trying to get func ty of defid DefId(21:50 ~ same_file[7e44]::{impl#0}::from_path)
 [DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:266 ~ std[3c1d]::path::{impl#9}::new)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
 [DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
 [DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
 [DEBUG] Trying to get func ty of defid DefId(3:3895 ~ core[7d5a]::ops::try_trait::FromResidual::from_residual)
 [DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
 [DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
 [DEBUG] Checking binary expression with...
-[DEBUG] > LHS: Expr { hir_id: HirId(DefId(0:7 ~ is_stderr[e602]::run).74), kind: Path(Resolved(None, Path { span: examples/is_stderr.rs:24:12: 24:25 (#0), res: Local(HirId(DefId(0:7 ~ is_stderr[e602]::run).34)), segments: [PathSegment { ident: stderr_handle#0, hir_id: HirId(DefId(0:7 ~ is_stderr[e602]::run).75), res: Local(HirId(DefId(0:7 ~ is_stderr[e602]::run).34)), args: None, infer_args: true }] })), span: examples/is_stderr.rs:24:12: 24:25 (#0) }
-[DEBUG] > RHS: Expr { hir_id: HirId(DefId(0:7 ~ is_stderr[e602]::run).76), kind: Path(Resolved(None, Path { span: examples/is_stderr.rs:24:29: 24:35 (#0), res: Local(HirId(DefId(0:7 ~ is_stderr[e602]::run).71)), segments: [PathSegment { ident: handle#0, hir_id: HirId(DefId(0:7 ~ is_stderr[e602]::run).77), res: Local(HirId(DefId(0:7 ~ is_stderr[e602]::run).71)), args: None, infer_args: true }] })), span: examples/is_stderr.rs:24:29: 24:35 (#0) }
+[DEBUG] > LHS: Expr { hir_id: HirId(DefId(0:7 ~ is_stderr[e602]::run).81), kind: Path(Resolved(None, Path { span: examples/is_stderr.rs:24:12: 24:25 (#0), res: Local(HirId(DefId(0:7 ~ is_stderr[e602]::run).34)), segments: [PathSegment { ident: stderr_handle#0, hir_id: HirId(DefId(0:7 ~ is_stderr[e602]::run).82), res: Local(HirId(DefId(0:7 ~ is_stderr[e602]::run).34)), args: None, infer_args: true }] })), span: examples/is_stderr.rs:24:12: 24:25 (#0) }
+[DEBUG] > RHS: Expr { hir_id: HirId(DefId(0:7 ~ is_stderr[e602]::run).83), kind: Path(Resolved(None, Path { span: examples/is_stderr.rs:24:29: 24:35 (#0), res: Local(HirId(DefId(0:7 ~ is_stderr[e602]::run).78)), segments: [PathSegment { ident: handle#0, hir_id: HirId(DefId(0:7 ~ is_stderr[e602]::run).84), res: Local(HirId(DefId(0:7 ~ is_stderr[e602]::run).78)), args: None, infer_args: true }] })), span: examples/is_stderr.rs:24:29: 24:35 (#0) }
 [DEBUG]   > LHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
 [DEBUG]   > RHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
 [DEBUG] Checking `if` influenced by Ty { property: FlowPair(Universal, Universal), kind: Infer }
