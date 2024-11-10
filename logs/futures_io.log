@@ -1,0 +1,245 @@
+[DEBUG] Trying to get func ty of defid DefId(0:78 ~ futures_io[a960]::if_std::{impl#0}::poll_read)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:22 ~ futures_io[a960]::if_std::AsyncRead::poll_read)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:10098 ~ core[7d5a]::pin::{impl#5}::new)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:79 ~ futures_io[a960]::if_std::{impl#0}::poll_read_vectored)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:23 ~ futures_io[a960]::if_std::AsyncRead::poll_read_vectored)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:10098 ~ core[7d5a]::pin::{impl#5}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:80 ~ futures_io[a960]::if_std::{impl#1}::poll_read)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:22 ~ futures_io[a960]::if_std::AsyncRead::poll_read)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10098 ~ core[7d5a]::pin::{impl#5}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:81 ~ futures_io[a960]::if_std::{impl#1}::poll_read_vectored)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:23 ~ futures_io[a960]::if_std::AsyncRead::poll_read_vectored)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10098 ~ core[7d5a]::pin::{impl#5}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:41 ~ futures_io[a960]::if_std::{impl#2}::poll_read)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:22 ~ futures_io[a960]::if_std::AsyncRead::poll_read)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10106 ~ core[7d5a]::pin::{impl#7}::as_mut)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:10123 ~ core[7d5a]::pin::{impl#10}::get_mut)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:42 ~ futures_io[a960]::if_std::{impl#2}::poll_read_vectored)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:23 ~ futures_io[a960]::if_std::AsyncRead::poll_read_vectored)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10106 ~ core[7d5a]::pin::{impl#7}::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10123 ~ core[7d5a]::pin::{impl#10}::get_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:82 ~ futures_io[a960]::if_std::{impl#3}::poll_read)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3729 ~ std[e3cd]::io::Read::read)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:83 ~ futures_io[a960]::if_std::{impl#3}::poll_read_vectored)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3730 ~ std[e3cd]::io::Read::read_vectored)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:84 ~ futures_io[a960]::if_std::{impl#4}::poll_write)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:25 ~ futures_io[a960]::if_std::AsyncWrite::poll_write)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:10098 ~ core[7d5a]::pin::{impl#5}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:85 ~ futures_io[a960]::if_std::{impl#4}::poll_write_vectored)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:26 ~ futures_io[a960]::if_std::AsyncWrite::poll_write_vectored)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:10098 ~ core[7d5a]::pin::{impl#5}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:86 ~ futures_io[a960]::if_std::{impl#4}::poll_flush)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:27 ~ futures_io[a960]::if_std::AsyncWrite::poll_flush)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:10098 ~ core[7d5a]::pin::{impl#5}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:87 ~ futures_io[a960]::if_std::{impl#4}::poll_close)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:28 ~ futures_io[a960]::if_std::AsyncWrite::poll_close)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:10098 ~ core[7d5a]::pin::{impl#5}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:88 ~ futures_io[a960]::if_std::{impl#5}::poll_write)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:25 ~ futures_io[a960]::if_std::AsyncWrite::poll_write)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10098 ~ core[7d5a]::pin::{impl#5}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:89 ~ futures_io[a960]::if_std::{impl#5}::poll_write_vectored)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:26 ~ futures_io[a960]::if_std::AsyncWrite::poll_write_vectored)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10098 ~ core[7d5a]::pin::{impl#5}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:90 ~ futures_io[a960]::if_std::{impl#5}::poll_flush)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:27 ~ futures_io[a960]::if_std::AsyncWrite::poll_flush)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10098 ~ core[7d5a]::pin::{impl#5}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:91 ~ futures_io[a960]::if_std::{impl#5}::poll_close)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:28 ~ futures_io[a960]::if_std::AsyncWrite::poll_close)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10098 ~ core[7d5a]::pin::{impl#5}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:52 ~ futures_io[a960]::if_std::{impl#6}::poll_write)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:25 ~ futures_io[a960]::if_std::AsyncWrite::poll_write)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10106 ~ core[7d5a]::pin::{impl#7}::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10123 ~ core[7d5a]::pin::{impl#10}::get_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:53 ~ futures_io[a960]::if_std::{impl#6}::poll_write_vectored)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:26 ~ futures_io[a960]::if_std::AsyncWrite::poll_write_vectored)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10106 ~ core[7d5a]::pin::{impl#7}::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10123 ~ core[7d5a]::pin::{impl#10}::get_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:54 ~ futures_io[a960]::if_std::{impl#6}::poll_flush)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:27 ~ futures_io[a960]::if_std::AsyncWrite::poll_flush)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10106 ~ core[7d5a]::pin::{impl#7}::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10123 ~ core[7d5a]::pin::{impl#10}::get_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:55 ~ futures_io[a960]::if_std::{impl#6}::poll_close)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:28 ~ futures_io[a960]::if_std::AsyncWrite::poll_close)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10106 ~ core[7d5a]::pin::{impl#7}::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10123 ~ core[7d5a]::pin::{impl#10}::get_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:92 ~ futures_io[a960]::if_std::{impl#7}::poll_write)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3786 ~ std[e3cd]::io::Write::write)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:93 ~ futures_io[a960]::if_std::{impl#7}::poll_write_vectored)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3787 ~ std[e3cd]::io::Write::write_vectored)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:94 ~ futures_io[a960]::if_std::{impl#7}::poll_flush)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3790 ~ std[e3cd]::io::Write::flush)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:95 ~ futures_io[a960]::if_std::{impl#7}::poll_close)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:27 ~ futures_io[a960]::if_std::AsyncWrite::poll_flush)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:96 ~ futures_io[a960]::if_std::{impl#8}::poll_seek)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:30 ~ futures_io[a960]::if_std::AsyncSeek::poll_seek)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:10098 ~ core[7d5a]::pin::{impl#5}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:97 ~ futures_io[a960]::if_std::{impl#9}::poll_seek)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:30 ~ futures_io[a960]::if_std::AsyncSeek::poll_seek)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10098 ~ core[7d5a]::pin::{impl#5}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:65 ~ futures_io[a960]::if_std::{impl#10}::poll_seek)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:30 ~ futures_io[a960]::if_std::AsyncSeek::poll_seek)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10106 ~ core[7d5a]::pin::{impl#7}::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10123 ~ core[7d5a]::pin::{impl#10}::get_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:98 ~ futures_io[a960]::if_std::{impl#11}::poll_fill_buf)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:32 ~ futures_io[a960]::if_std::AsyncBufRead::poll_fill_buf)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:10098 ~ core[7d5a]::pin::{impl#5}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10123 ~ core[7d5a]::pin::{impl#10}::get_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:99 ~ futures_io[a960]::if_std::{impl#11}::consume)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:33 ~ futures_io[a960]::if_std::AsyncBufRead::consume)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:10098 ~ core[7d5a]::pin::{impl#5}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:100 ~ futures_io[a960]::if_std::{impl#12}::poll_fill_buf)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:32 ~ futures_io[a960]::if_std::AsyncBufRead::poll_fill_buf)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10098 ~ core[7d5a]::pin::{impl#5}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10123 ~ core[7d5a]::pin::{impl#10}::get_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:101 ~ futures_io[a960]::if_std::{impl#12}::consume)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:33 ~ futures_io[a960]::if_std::AsyncBufRead::consume)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10098 ~ core[7d5a]::pin::{impl#5}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:73 ~ futures_io[a960]::if_std::{impl#13}::poll_fill_buf)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:32 ~ futures_io[a960]::if_std::AsyncBufRead::poll_fill_buf)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10106 ~ core[7d5a]::pin::{impl#7}::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10123 ~ core[7d5a]::pin::{impl#10}::get_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:74 ~ futures_io[a960]::if_std::{impl#13}::consume)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:33 ~ futures_io[a960]::if_std::AsyncBufRead::consume)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10106 ~ core[7d5a]::pin::{impl#7}::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10123 ~ core[7d5a]::pin::{impl#10}::get_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:102 ~ futures_io[a960]::if_std::{impl#14}::poll_fill_buf)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3814 ~ std[e3cd]::io::BufRead::fill_buf)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:10123 ~ core[7d5a]::pin::{impl#10}::get_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:103 ~ futures_io[a960]::if_std::{impl#14}::consume)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3815 ~ std[e3cd]::io::BufRead::consume)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:10123 ~ core[7d5a]::pin::{impl#10}::get_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }

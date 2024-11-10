@@ -1,0 +1,390 @@
+[DEBUG] Trying to get func ty of defid DefId(0:94 ~ libsqlite3_sys[15e6]::error::{impl#3}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:97 ~ libsqlite3_sys[15e6]::error::{impl#5}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11181 ~ core[7d5a]::fmt::{impl#9}::write_str)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:100 ~ libsqlite3_sys[15e6]::error::{impl#7}::eq)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:1919 ~ core[7d5a]::intrinsics::{extern#1}::discriminant_value)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(3:1919 ~ core[7d5a]::intrinsics::{extern#1}::discriminant_value)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Checking binary expression with...
+[DEBUG] > LHS: Expr { hir_id: HirId(DefId(0:100 ~ libsqlite3_sys[15e6]::error::{impl#7}::eq).26), kind: Path(Resolved(None, Path { span: libsqlite3-sys/src/error.rs:6:30: 6:39 (#16), res: Local(HirId(DefId(0:100 ~ libsqlite3_sys[15e6]::error::{impl#7}::eq).14)), segments: [PathSegment { ident: __self_discr#16, hir_id: HirId(DefId(0:100 ~ libsqlite3_sys[15e6]::error::{impl#7}::eq).27), res: Local(HirId(DefId(0:100 ~ libsqlite3_sys[15e6]::error::{impl#7}::eq).14)), args: None, infer_args: true }] })), span: libsqlite3-sys/src/error.rs:6:30: 6:39 (#16) }
+[DEBUG] > RHS: Expr { hir_id: HirId(DefId(0:100 ~ libsqlite3_sys[15e6]::error::{impl#7}::eq).28), kind: Path(Resolved(None, Path { span: libsqlite3-sys/src/error.rs:6:30: 6:39 (#16), res: Local(HirId(DefId(0:100 ~ libsqlite3_sys[15e6]::error::{impl#7}::eq).24)), segments: [PathSegment { ident: __arg1_discr#16, hir_id: HirId(DefId(0:100 ~ libsqlite3_sys[15e6]::error::{impl#7}::eq).29), res: Local(HirId(DefId(0:100 ~ libsqlite3_sys[15e6]::error::{impl#7}::eq).24)), args: None, infer_args: true }] })), span: libsqlite3-sys/src/error.rs:6:30: 6:39 (#16) }
+[DEBUG]   > LHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG]   > RHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:102 ~ libsqlite3_sys[15e6]::error::{impl#8}::assert_receiver_is_total_eq)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:107 ~ libsqlite3_sys[15e6]::error::{impl#9}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:110 ~ libsqlite3_sys[15e6]::error::{impl#11}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11198 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field2_finish)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Checking binary expression with...
+[DEBUG] > LHS: Expr { hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).6), kind: Binary(Spanned { node: Eq, span: libsqlite3-sys/src/error.rs:61:5: 61:24 (#21) }, Expr { hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).7), kind: Field(Expr { hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).8), kind: Path(Resolved(None, Path { span: libsqlite3-sys/src/error.rs:59:30: 59:30 (#21), res: Local(HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).2)), segments: [PathSegment { ident: self#0, hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).9), res: Local(HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).2)), args: None, infer_args: true }] })), span: libsqlite3-sys/src/error.rs:59:30: 59:39 (#21) }, code#0), span: libsqlite3-sys/src/error.rs:61:5: 61:24 (#21) }, Expr { hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).10), kind: Field(Expr { hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).11), kind: Path(Resolved(None, Path { span: libsqlite3-sys/src/error.rs:59:30: 59:39 (#21), res: Local(HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).4)), segments: [PathSegment { ident: other#21, hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).12), res: Local(HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).4)), args: None, infer_args: true }] })), span: libsqlite3-sys/src/error.rs:59:30: 59:39 (#21) }, code#0), span: libsqlite3-sys/src/error.rs:61:5: 61:24 (#21) }), span: libsqlite3-sys/src/error.rs:61:5: 61:24 (#21) }
+[DEBUG] > RHS: Expr { hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).13), kind: Binary(Spanned { node: Eq, span: libsqlite3-sys/src/error.rs:62:5: 62:29 (#21) }, Expr { hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).14), kind: Field(Expr { hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).15), kind: Path(Resolved(None, Path { span: libsqlite3-sys/src/error.rs:59:30: 59:30 (#21), res: Local(HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).2)), segments: [PathSegment { ident: self#0, hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).16), res: Local(HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).2)), args: None, infer_args: true }] })), span: libsqlite3-sys/src/error.rs:59:30: 59:39 (#21) }, extended_code#0), span: libsqlite3-sys/src/error.rs:62:5: 62:29 (#21) }, Expr { hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).17), kind: Field(Expr { hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).18), kind: Path(Resolved(None, Path { span: libsqlite3-sys/src/error.rs:59:30: 59:39 (#21), res: Local(HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).4)), segments: [PathSegment { ident: other#21, hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).19), res: Local(HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).4)), args: None, infer_args: true }] })), span: libsqlite3-sys/src/error.rs:59:30: 59:39 (#21) }, extended_code#0), span: libsqlite3-sys/src/error.rs:62:5: 62:29 (#21) }), span: libsqlite3-sys/src/error.rs:62:5: 62:29 (#21) }
+[DEBUG] Checking binary expression with...
+[DEBUG] > LHS: Expr { hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).7), kind: Field(Expr { hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).8), kind: Path(Resolved(None, Path { span: libsqlite3-sys/src/error.rs:59:30: 59:30 (#21), res: Local(HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).2)), segments: [PathSegment { ident: self#0, hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).9), res: Local(HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).2)), args: None, infer_args: true }] })), span: libsqlite3-sys/src/error.rs:59:30: 59:39 (#21) }, code#0), span: libsqlite3-sys/src/error.rs:61:5: 61:24 (#21) }
+[DEBUG] > RHS: Expr { hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).10), kind: Field(Expr { hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).11), kind: Path(Resolved(None, Path { span: libsqlite3-sys/src/error.rs:59:30: 59:39 (#21), res: Local(HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).4)), segments: [PathSegment { ident: other#21, hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).12), res: Local(HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).4)), args: None, infer_args: true }] })), span: libsqlite3-sys/src/error.rs:59:30: 59:39 (#21) }, code#0), span: libsqlite3-sys/src/error.rs:61:5: 61:24 (#21) }
+[DEBUG]   > LHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG]   > RHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Checking binary expression with...
+[DEBUG] > LHS: Expr { hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).14), kind: Field(Expr { hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).15), kind: Path(Resolved(None, Path { span: libsqlite3-sys/src/error.rs:59:30: 59:30 (#21), res: Local(HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).2)), segments: [PathSegment { ident: self#0, hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).16), res: Local(HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).2)), args: None, infer_args: true }] })), span: libsqlite3-sys/src/error.rs:59:30: 59:39 (#21) }, extended_code#0), span: libsqlite3-sys/src/error.rs:62:5: 62:29 (#21) }
+[DEBUG] > RHS: Expr { hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).17), kind: Field(Expr { hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).18), kind: Path(Resolved(None, Path { span: libsqlite3-sys/src/error.rs:59:30: 59:39 (#21), res: Local(HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).4)), segments: [PathSegment { ident: other#21, hir_id: HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).19), res: Local(HirId(DefId(0:113 ~ libsqlite3_sys[15e6]::error::{impl#13}::eq).4)), args: None, infer_args: true }] })), span: libsqlite3-sys/src/error.rs:59:30: 59:39 (#21) }, extended_code#0), span: libsqlite3-sys/src/error.rs:62:5: 62:29 (#21) }
+[DEBUG]   > LHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG]   > RHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG]   > LHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG]   > RHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:115 ~ libsqlite3_sys[15e6]::error::{impl#14}::assert_receiver_is_total_eq)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:10 ~ libsqlite3_sys[15e6]::error::{impl#0}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Checking binary expression with...
+[DEBUG] > LHS: Expr { hir_id: HirId(DefId(0:10 ~ libsqlite3_sys[15e6]::error::{impl#0}::new).6), kind: Path(Resolved(None, Path { span: libsqlite3-sys/src/error.rs:68:26: 68:37 (#0), res: Local(HirId(DefId(0:10 ~ libsqlite3_sys[15e6]::error::{impl#0}::new).2)), segments: [PathSegment { ident: result_code#0, hir_id: HirId(DefId(0:10 ~ libsqlite3_sys[15e6]::error::{impl#0}::new).7), res: Local(HirId(DefId(0:10 ~ libsqlite3_sys[15e6]::error::{impl#0}::new).2)), args: None, infer_args: true }] })), span: libsqlite3-sys/src/error.rs:68:26: 68:37 (#0) }
+[DEBUG] > RHS: Expr { hir_id: HirId(DefId(0:10 ~ libsqlite3_sys[15e6]::error::{impl#0}::new).8), kind: Lit(Spanned { node: Int(Pu128(255), Unsuffixed), span: libsqlite3-sys/src/error.rs:68:40: 68:44 (#0) }), span: libsqlite3-sys/src/error.rs:68:40: 68:44 (#0) }
+[DEBUG]   > LHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG]   > RHS Type is: Ty { property: FlowPair(Specific({"root"}), Specific({"root"})), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:12 ~ libsqlite3_sys[15e6]::error::{impl#1}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11182 ~ core[7d5a]::fmt::{impl#9}::write_fmt)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(3:11117 ~ core[7d5a]::fmt::{impl#2}::new_v1)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(3:11032 ~ core[7d5a]::fmt::rt::{impl#1}::new_display)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(3:11032 ~ core[7d5a]::fmt::rt::{impl#1}::new_display)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:33 ~ libsqlite3_sys[15e6]::error::code_to_str)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:14 ~ libsqlite3_sys[15e6]::error::{impl#2}::description)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:33 ~ libsqlite3_sys[15e6]::error::code_to_str)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:33 ~ libsqlite3_sys[15e6]::error::code_to_str)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:119 ~ libsqlite3_sys[15e6]::error::test::error_new#1)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(6:5738 ~ alloc[5873]::slice::{impl#0}::into_vec)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(6:336 ~ alloc[5873]::boxed::{impl#0}::new)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:10 ~ libsqlite3_sys[15e6]::error::{impl#0}::new)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Checking binary expression with...
+[DEBUG] > LHS: Expr { hir_id: HirId(DefId(0:119 ~ libsqlite3_sys[15e6]::error::test::error_new#1).156), kind: Unary(Deref, Expr { hir_id: HirId(DefId(0:119 ~ libsqlite3_sys[15e6]::error::test::error_new#1).157), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.rustup/toolchains/nightly-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/macros/mod.rs:46:23: 46:31 (#27), res: Local(HirId(DefId(0:119 ~ libsqlite3_sys[15e6]::error::test::error_new#1).148)), segments: [PathSegment { ident: left_val#27, hir_id: HirId(DefId(0:119 ~ libsqlite3_sys[15e6]::error::test::error_new#1).158), res: Local(HirId(DefId(0:119 ~ libsqlite3_sys[15e6]::error::test::error_new#1).148)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.rustup/toolchains/nightly-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/macros/mod.rs:46:23: 46:31 (#27) }), span: /Users/georgeberdovskiy/.rustup/toolchains/nightly-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/macros/mod.rs:46:22: 46:31 (#27) }
+[DEBUG] > RHS: Expr { hir_id: HirId(DefId(0:119 ~ libsqlite3_sys[15e6]::error::test::error_new#1).159), kind: Unary(Deref, Expr { hir_id: HirId(DefId(0:119 ~ libsqlite3_sys[15e6]::error::test::error_new#1).160), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.rustup/toolchains/nightly-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/macros/mod.rs:46:36: 46:45 (#27), res: Local(HirId(DefId(0:119 ~ libsqlite3_sys[15e6]::error::test::error_new#1).149)), segments: [PathSegment { ident: right_val#27, hir_id: HirId(DefId(0:119 ~ libsqlite3_sys[15e6]::error::test::error_new#1).161), res: Local(HirId(DefId(0:119 ~ libsqlite3_sys[15e6]::error::test::error_new#1).149)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.rustup/toolchains/nightly-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/macros/mod.rs:46:36: 46:45 (#27) }), span: /Users/georgeberdovskiy/.rustup/toolchains/nightly-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/macros/mod.rs:46:35: 46:45 (#27) }
+[DEBUG]   > LHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG]   > RHS Type is: Ty { property: FlowPair(Specific({"root"}), Universal), kind: Adt({"extended_code": Ty { property: FlowPair(Universal, Universal), kind: Infer }, "code": Ty { property: FlowPair(Universal, Universal), kind: Infer }}) }
+[DEBUG] Checking `if` influenced by Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(3:10038 ~ core[7d5a]::panicking::assert_failed)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(3:1288 ~ core[7d5a]::hint::must_use)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(6:5104 ~ alloc[5873]::fmt::format)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(3:11117 ~ core[7d5a]::fmt::{impl#2}::new_v1)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11032 ~ core[7d5a]::fmt::rt::{impl#1}::new_display)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(6:6026 ~ alloc[5873]::string::{impl#0}::is_empty)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Checking `if` influenced by Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(3:10023 ~ core[7d5a]::panicking::panic)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:36 ~ libsqlite3_sys[15e6]::SQLITE_STATIC)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:37 ~ libsqlite3_sys[15e6]::SQLITE_TRANSIENT)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:1721 ~ core[7d5a]::intrinsics::{extern#1}::transmute)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:996 ~ libsqlite3_sys[15e6]::bindings::{impl#0}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11196 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field1_finish)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:999 ~ libsqlite3_sys[15e6]::bindings::{impl#2}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1004 ~ libsqlite3_sys[15e6]::bindings::{impl#3}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11196 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field1_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1007 ~ libsqlite3_sys[15e6]::bindings::{impl#5}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1029 ~ libsqlite3_sys[15e6]::bindings::{impl#6}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11206 ~ core[7d5a]::fmt::{impl#9}::debug_struct_fields_finish)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1032 ~ libsqlite3_sys[15e6]::bindings::{impl#8}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1037 ~ libsqlite3_sys[15e6]::bindings::{impl#9}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11196 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field1_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1040 ~ libsqlite3_sys[15e6]::bindings::{impl#11}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1046 ~ libsqlite3_sys[15e6]::bindings::{impl#12}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11196 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field1_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1049 ~ libsqlite3_sys[15e6]::bindings::{impl#14}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1075 ~ libsqlite3_sys[15e6]::bindings::{impl#15}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11206 ~ core[7d5a]::fmt::{impl#9}::debug_struct_fields_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1078 ~ libsqlite3_sys[15e6]::bindings::{impl#17}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1089 ~ libsqlite3_sys[15e6]::bindings::{impl#18}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11206 ~ core[7d5a]::fmt::{impl#9}::debug_struct_fields_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1092 ~ libsqlite3_sys[15e6]::bindings::{impl#20}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1097 ~ libsqlite3_sys[15e6]::bindings::{impl#21}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11196 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field1_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1100 ~ libsqlite3_sys[15e6]::bindings::{impl#23}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1106 ~ libsqlite3_sys[15e6]::bindings::{impl#24}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11196 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field1_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1109 ~ libsqlite3_sys[15e6]::bindings::{impl#26}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1115 ~ libsqlite3_sys[15e6]::bindings::{impl#27}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11196 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field1_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1118 ~ libsqlite3_sys[15e6]::bindings::{impl#29}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1145 ~ libsqlite3_sys[15e6]::bindings::{impl#30}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11206 ~ core[7d5a]::fmt::{impl#9}::debug_struct_fields_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1148 ~ libsqlite3_sys[15e6]::bindings::{impl#32}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1164 ~ libsqlite3_sys[15e6]::bindings::{impl#33}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11206 ~ core[7d5a]::fmt::{impl#9}::debug_struct_fields_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1167 ~ libsqlite3_sys[15e6]::bindings::{impl#35}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1174 ~ libsqlite3_sys[15e6]::bindings::{impl#36}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11202 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field4_finish)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1177 ~ libsqlite3_sys[15e6]::bindings::{impl#38}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1182 ~ libsqlite3_sys[15e6]::bindings::{impl#39}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11198 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field2_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1185 ~ libsqlite3_sys[15e6]::bindings::{impl#41}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1190 ~ libsqlite3_sys[15e6]::bindings::{impl#42}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11198 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field2_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1193 ~ libsqlite3_sys[15e6]::bindings::{impl#44}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1199 ~ libsqlite3_sys[15e6]::bindings::{impl#45}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11200 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field3_finish)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1202 ~ libsqlite3_sys[15e6]::bindings::{impl#47}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1206 ~ libsqlite3_sys[15e6]::bindings::{impl#48}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11196 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field1_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1209 ~ libsqlite3_sys[15e6]::bindings::{impl#50}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1214 ~ libsqlite3_sys[15e6]::bindings::{impl#51}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11196 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field1_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1217 ~ libsqlite3_sys[15e6]::bindings::{impl#53}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1230 ~ libsqlite3_sys[15e6]::bindings::{impl#54}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11206 ~ core[7d5a]::fmt::{impl#9}::debug_struct_fields_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1233 ~ libsqlite3_sys[15e6]::bindings::{impl#56}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1238 ~ libsqlite3_sys[15e6]::bindings::{impl#57}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11196 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field1_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1241 ~ libsqlite3_sys[15e6]::bindings::{impl#59}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1247 ~ libsqlite3_sys[15e6]::bindings::{impl#60}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11198 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field2_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1250 ~ libsqlite3_sys[15e6]::bindings::{impl#62}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1266 ~ libsqlite3_sys[15e6]::bindings::{impl#63}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11206 ~ core[7d5a]::fmt::{impl#9}::debug_struct_fields_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1269 ~ libsqlite3_sys[15e6]::bindings::{impl#65}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1283 ~ libsqlite3_sys[15e6]::bindings::{impl#66}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11206 ~ core[7d5a]::fmt::{impl#9}::debug_struct_fields_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1286 ~ libsqlite3_sys[15e6]::bindings::{impl#68}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1291 ~ libsqlite3_sys[15e6]::bindings::{impl#69}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11196 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field1_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1294 ~ libsqlite3_sys[15e6]::bindings::{impl#71}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1300 ~ libsqlite3_sys[15e6]::bindings::{impl#72}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11196 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field1_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1303 ~ libsqlite3_sys[15e6]::bindings::{impl#74}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1312 ~ libsqlite3_sys[15e6]::bindings::{impl#75}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11204 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field5_finish)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1315 ~ libsqlite3_sys[15e6]::bindings::{impl#77}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1334 ~ libsqlite3_sys[15e6]::bindings::{impl#78}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11206 ~ core[7d5a]::fmt::{impl#9}::debug_struct_fields_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1337 ~ libsqlite3_sys[15e6]::bindings::{impl#80}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1342 ~ libsqlite3_sys[15e6]::bindings::{impl#81}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11196 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field1_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1345 ~ libsqlite3_sys[15e6]::bindings::{impl#83}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1351 ~ libsqlite3_sys[15e6]::bindings::{impl#84}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11196 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field1_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1354 ~ libsqlite3_sys[15e6]::bindings::{impl#86}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1360 ~ libsqlite3_sys[15e6]::bindings::{impl#87}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11196 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field1_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1363 ~ libsqlite3_sys[15e6]::bindings::{impl#89}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1369 ~ libsqlite3_sys[15e6]::bindings::{impl#90}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11196 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field1_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1372 ~ libsqlite3_sys[15e6]::bindings::{impl#92}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1378 ~ libsqlite3_sys[15e6]::bindings::{impl#93}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11198 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field2_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1381 ~ libsqlite3_sys[15e6]::bindings::{impl#95}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1404 ~ libsqlite3_sys[15e6]::bindings::{impl#96}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11206 ~ core[7d5a]::fmt::{impl#9}::debug_struct_fields_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1407 ~ libsqlite3_sys[15e6]::bindings::{impl#98}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1412 ~ libsqlite3_sys[15e6]::bindings::{impl#99}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11196 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field1_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1415 ~ libsqlite3_sys[15e6]::bindings::{impl#101}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1422 ~ libsqlite3_sys[15e6]::bindings::{impl#102}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11200 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field3_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1425 ~ libsqlite3_sys[15e6]::bindings::{impl#104}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:1432 ~ libsqlite3_sys[15e6]::bindings::{impl#105}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:11202 ~ core[7d5a]::fmt::{impl#9}::debug_struct_field4_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1435 ~ libsqlite3_sys[15e6]::bindings::{impl#107}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:41 ~ libsqlite3_sys[15e6]::{impl#0}::default)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:2176 ~ core[7d5a]::mem::zeroed)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:43 ~ libsqlite3_sys[15e6]::{impl#1}::default)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(3:2176 ~ core[7d5a]::mem::zeroed)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:1436 ~ libsqlite3_sys[15e6]::main)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(21:841 ~ test[522f]::test_main_static)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }

@@ -1,0 +1,267 @@
+[DEBUG] Trying to get func ty of defid DefId(0:54 ~ fallible_streaming_iterator[57b4]::{impl#0}::advance)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:9 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::advance)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:55 ~ fallible_streaming_iterator[57b4]::{impl#0}::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:10 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::get)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:56 ~ fallible_streaming_iterator[57b4]::{impl#0}::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:12 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::size_hint)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:57 ~ fallible_streaming_iterator[57b4]::{impl#0}::next)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:11 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::next)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:58 ~ fallible_streaming_iterator[57b4]::convert)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:76 ~ fallible_streaming_iterator[57b4]::{impl#1}::advance)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:8890 ~ core[7d5a]::iter::traits::iterator::Iterator::next)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:77 ~ fallible_streaming_iterator[57b4]::{impl#1}::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:78 ~ fallible_streaming_iterator[57b4]::{impl#1}::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:8894 ~ core[7d5a]::iter::traits::iterator::Iterator::size_hint)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:84 ~ fallible_streaming_iterator[57b4]::{impl#2}::advance_back)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:8782 ~ core[7d5a]::iter::traits::double_ended::DoubleEndedIterator::next_back)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:85 ~ fallible_streaming_iterator[57b4]::empty)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:98 ~ fallible_streaming_iterator[57b4]::{impl#3}::advance)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:99 ~ fallible_streaming_iterator[57b4]::{impl#3}::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:100 ~ fallible_streaming_iterator[57b4]::{impl#3}::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:104 ~ fallible_streaming_iterator[57b4]::{impl#4}::advance_back)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:115 ~ fallible_streaming_iterator[57b4]::{impl#5}::advance)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3892 ~ core[7d5a]::ops::try_trait::Try::branch)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:11 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::next)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:3895 ~ core[7d5a]::ops::try_trait::FromResidual::from_residual)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Checking `if` influenced by Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:115 ~ fallible_streaming_iterator[57b4]::{impl#5}::advance).33), kind: Field(Expr { hir_id: HirId(DefId(0:115 ~ fallible_streaming_iterator[57b4]::{impl#5}::advance).34), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:473:17: 473:21 (#0), res: Local(HirId(DefId(0:115 ~ fallible_streaming_iterator[57b4]::{impl#5}::advance).2)), segments: [PathSegment { ident: self#0, hir_id: HirId(DefId(0:115 ~ fallible_streaming_iterator[57b4]::{impl#5}::advance).35), res: Local(HirId(DefId(0:115 ~ fallible_streaming_iterator[57b4]::{impl#5}::advance).2)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:473:17: 473:21 (#0) }, f#0), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:473:16: 473:24 (#0) }
+[DEBUG] Checking `if` influenced by Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:116 ~ fallible_streaming_iterator[57b4]::{impl#5}::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:10 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:117 ~ fallible_streaming_iterator[57b4]::{impl#5}::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:12 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:115 ~ fallible_streaming_iterator[57b4]::{impl#5}::advance).33), kind: Field(Expr { hir_id: HirId(DefId(0:115 ~ fallible_streaming_iterator[57b4]::{impl#5}::advance).34), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:473:17: 473:21 (#0), res: Local(HirId(DefId(0:115 ~ fallible_streaming_iterator[57b4]::{impl#5}::advance).2)), segments: [PathSegment { ident: self#0, hir_id: HirId(DefId(0:115 ~ fallible_streaming_iterator[57b4]::{impl#5}::advance).35), res: Local(HirId(DefId(0:115 ~ fallible_streaming_iterator[57b4]::{impl#5}::advance).2)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:473:17: 473:21 (#0) }, f#0), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:473:16: 473:24 (#0) }
+[DEBUG] Trying to get func ty of defid DefId(0:254 ~ fallible_streaming_iterator[57b4]::{impl#18}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:126 ~ fallible_streaming_iterator[57b4]::{impl#6}::advance)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:11 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::next)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:11 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::next)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:127 ~ fallible_streaming_iterator[57b4]::{impl#6}::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:10 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:128 ~ fallible_streaming_iterator[57b4]::{impl#6}::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:12 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:129 ~ fallible_streaming_iterator[57b4]::{impl#6}::next)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:11 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::next)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:11 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::next)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:143 ~ fallible_streaming_iterator[57b4]::{impl#7}::advance)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:9676 ~ core[7d5a]::option::{impl#0}::map)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:3892 ~ core[7d5a]::ops::try_trait::Try::branch)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:11 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::next)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:3895 ~ core[7d5a]::ops::try_trait::FromResidual::from_residual)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:144 ~ fallible_streaming_iterator[57b4]::{impl#7}::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:9662 ~ core[7d5a]::option::{impl#0}::as_ref)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:145 ~ fallible_streaming_iterator[57b4]::{impl#7}::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:12 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:150 ~ fallible_streaming_iterator[57b4]::{impl#8}::advance_back)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:9676 ~ core[7d5a]::option::{impl#0}::map)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3892 ~ core[7d5a]::ops::try_trait::Try::branch)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:48 ~ fallible_streaming_iterator[57b4]::DoubleEndedFallibleStreamingIterator::next_back)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:3895 ~ core[7d5a]::ops::try_trait::FromResidual::from_residual)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:162 ~ fallible_streaming_iterator[57b4]::{impl#9}::advance)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:9 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::advance)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:163 ~ fallible_streaming_iterator[57b4]::{impl#9}::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:9676 ~ core[7d5a]::option::{impl#0}::map)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:10 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:164 ~ fallible_streaming_iterator[57b4]::{impl#9}::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:12 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:169 ~ fallible_streaming_iterator[57b4]::{impl#10}::advance_back)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:47 ~ fallible_streaming_iterator[57b4]::DoubleEndedFallibleStreamingIterator::advance_back)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:181 ~ fallible_streaming_iterator[57b4]::{impl#11}::advance)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10405 ~ core[7d5a]::result::{impl#0}::map_err)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:9 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::advance)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:182 ~ fallible_streaming_iterator[57b4]::{impl#11}::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:10 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:183 ~ fallible_streaming_iterator[57b4]::{impl#11}::next)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10405 ~ core[7d5a]::result::{impl#0}::map_err)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:11 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::next)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:184 ~ fallible_streaming_iterator[57b4]::{impl#11}::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:12 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:189 ~ fallible_streaming_iterator[57b4]::{impl#12}::advance_back)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10405 ~ core[7d5a]::result::{impl#0}::map_err)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:47 ~ fallible_streaming_iterator[57b4]::DoubleEndedFallibleStreamingIterator::advance_back)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:190 ~ fallible_streaming_iterator[57b4]::{impl#12}::next_back)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10405 ~ core[7d5a]::result::{impl#0}::map_err)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:48 ~ fallible_streaming_iterator[57b4]::DoubleEndedFallibleStreamingIterator::next_back)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:199 ~ fallible_streaming_iterator[57b4]::{impl#13}::advance)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3892 ~ core[7d5a]::ops::try_trait::Try::branch)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:11 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::next)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:3895 ~ core[7d5a]::ops::try_trait::FromResidual::from_residual)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Checking `if` influenced by Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:9 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::advance)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:200 ~ fallible_streaming_iterator[57b4]::{impl#13}::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:10 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:201 ~ fallible_streaming_iterator[57b4]::{impl#13}::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:12 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:25430 ~ core[7d5a]::num::{impl#11}::saturating_sub)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:9676 ~ core[7d5a]::option::{impl#0}::map)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:25430 ~ core[7d5a]::num::{impl#11}::saturating_sub)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:214 ~ fallible_streaming_iterator[57b4]::{impl#14}::advance)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Checking `if` influenced by Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:10395 ~ core[7d5a]::result::{impl#0}::map)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(0:23 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::find)
+[DEBUG] >> NOT FOUND! Getting extern def
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:214 ~ fallible_streaming_iterator[57b4]::{impl#14}::advance).34), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:778:31: 778:32 (#0), res: Local(HirId(DefId(0:214 ~ fallible_streaming_iterator[57b4]::{impl#14}::advance).21)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:214 ~ fallible_streaming_iterator[57b4]::{impl#14}::advance).35), res: Local(HirId(DefId(0:214 ~ fallible_streaming_iterator[57b4]::{impl#14}::advance).21)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:778:31: 778:32 (#0) }
+[DEBUG] Trying to get func ty of defid DefId(0:9 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::advance)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:217 ~ fallible_streaming_iterator[57b4]::{impl#14}::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:10 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:218 ~ fallible_streaming_iterator[57b4]::{impl#14}::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:12 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Checking `if` influenced by Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:214 ~ fallible_streaming_iterator[57b4]::{impl#14}::advance).34), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:778:31: 778:32 (#0), res: Local(HirId(DefId(0:214 ~ fallible_streaming_iterator[57b4]::{impl#14}::advance).21)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:214 ~ fallible_streaming_iterator[57b4]::{impl#14}::advance).35), res: Local(HirId(DefId(0:214 ~ fallible_streaming_iterator[57b4]::{impl#14}::advance).21)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:778:31: 778:32 (#0) }
+[DEBUG] Trying to get func ty of defid DefId(0:228 ~ fallible_streaming_iterator[57b4]::{impl#15}::advance)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Checking binary expression with...
+[DEBUG] > LHS: Expr { hir_id: HirId(DefId(0:228 ~ fallible_streaming_iterator[57b4]::{impl#15}::advance).5), kind: Field(Expr { hir_id: HirId(DefId(0:228 ~ fallible_streaming_iterator[57b4]::{impl#15}::advance).6), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:816:12: 816:16 (#0), res: Local(HirId(DefId(0:228 ~ fallible_streaming_iterator[57b4]::{impl#15}::advance).2)), segments: [PathSegment { ident: self#0, hir_id: HirId(DefId(0:228 ~ fallible_streaming_iterator[57b4]::{impl#15}::advance).7), res: Local(HirId(DefId(0:228 ~ fallible_streaming_iterator[57b4]::{impl#15}::advance).2)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:816:12: 816:16 (#0) }, n#0), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:816:12: 816:18 (#0) }
+[DEBUG] > RHS: Expr { hir_id: HirId(DefId(0:228 ~ fallible_streaming_iterator[57b4]::{impl#15}::advance).8), kind: Lit(Spanned { node: Int(Pu128(0), Unsuffixed), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:816:22: 816:23 (#0) }), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:816:22: 816:23 (#0) }
+[DEBUG]   > LHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG]   > RHS Type is: Ty { property: FlowPair(Specific({"fallible_streaming_iterator"}), Specific({"fallible_streaming_iterator"})), kind: Infer }
+[DEBUG] Checking `if` influenced by Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:3892 ~ core[7d5a]::ops::try_trait::Try::branch)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:9 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::advance)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:3895 ~ core[7d5a]::ops::try_trait::FromResidual::from_residual)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:229 ~ fallible_streaming_iterator[57b4]::{impl#15}::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Checking `if` influenced by Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:10 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:230 ~ fallible_streaming_iterator[57b4]::{impl#15}::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:12 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3014 ~ core[7d5a]::cmp::min)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:242 ~ fallible_streaming_iterator[57b4]::{impl#16}::advance)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3892 ~ core[7d5a]::ops::try_trait::Try::branch)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:11 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::next)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:3895 ~ core[7d5a]::ops::try_trait::FromResidual::from_residual)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Checking `if` influenced by Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:242 ~ fallible_streaming_iterator[57b4]::{impl#16}::advance).34), kind: Field(Expr { hir_id: HirId(DefId(0:242 ~ fallible_streaming_iterator[57b4]::{impl#16}::advance).35), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:867:18: 867:22 (#0), res: Local(HirId(DefId(0:242 ~ fallible_streaming_iterator[57b4]::{impl#16}::advance).2)), segments: [PathSegment { ident: self#0, hir_id: HirId(DefId(0:242 ~ fallible_streaming_iterator[57b4]::{impl#16}::advance).36), res: Local(HirId(DefId(0:242 ~ fallible_streaming_iterator[57b4]::{impl#16}::advance).2)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:867:18: 867:22 (#0) }, f#0), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:867:17: 867:25 (#0) }
+[DEBUG] Checking `if` influenced by Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:243 ~ fallible_streaming_iterator[57b4]::{impl#16}::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Checking `if` influenced by Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:10 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::get)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:244 ~ fallible_streaming_iterator[57b4]::{impl#16}::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Checking `if` influenced by Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:12 ~ fallible_streaming_iterator[57b4]::FallibleStreamingIterator::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:242 ~ fallible_streaming_iterator[57b4]::{impl#16}::advance).34), kind: Field(Expr { hir_id: HirId(DefId(0:242 ~ fallible_streaming_iterator[57b4]::{impl#16}::advance).35), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:867:18: 867:22 (#0), res: Local(HirId(DefId(0:242 ~ fallible_streaming_iterator[57b4]::{impl#16}::advance).2)), segments: [PathSegment { ident: self#0, hir_id: HirId(DefId(0:242 ~ fallible_streaming_iterator[57b4]::{impl#16}::advance).36), res: Local(HirId(DefId(0:242 ~ fallible_streaming_iterator[57b4]::{impl#16}::advance).2)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:867:18: 867:22 (#0) }, f#0), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/fallible-streaming-iterator-0.1.9/src/lib.rs:867:17: 867:25 (#0) }

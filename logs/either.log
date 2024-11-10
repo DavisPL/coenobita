@@ -1,0 +1,746 @@
+[DEBUG] Trying to get func ty of defid DefId(0:287 ~ either[0cf5]::{impl#30}::eq)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:1919 ~ core[7d5a]::intrinsics::{extern#1}::discriminant_value)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:1919 ~ core[7d5a]::intrinsics::{extern#1}::discriminant_value)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Checking binary expression with...
+[DEBUG] > LHS: Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).26), kind: Binary(Spanned { node: Eq, span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5) }, Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).27), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).14)), segments: [PathSegment { ident: __self_discr#5, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).28), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).14)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5) }, Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).29), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).24)), segments: [PathSegment { ident: __arg1_discr#5, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).30), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).24)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5) }), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5) }
+[DEBUG] > RHS: Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).31), kind: Match(Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).32), kind: Tup([Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).33), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:16 (#5), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).2)), segments: [PathSegment { ident: self#0, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).34), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).2)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5) }, Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).35), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).4)), segments: [PathSegment { ident: other#5, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).36), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5) }]), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5) }, [Arm { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).46), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5), pat: Pat { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).45), kind: Tuple([Pat { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).40), kind: TupleStruct(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:52:5: 52:5 (#5), res: Def(Ctor(Variant, Fn), DefId(0:273 ~ either[0cf5]::Either::Left::{constructor#0})), segments: [PathSegment { ident: Either#0, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).37), res: Def(Enum, DefId(0:269 ~ either[0cf5]::Either)), args: None, infer_args: true }, PathSegment { ident: Left#0, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).38), res: Def(Ctor(Variant, Fn), DefId(0:273 ~ either[0cf5]::Either::Left::{constructor#0})), args: None, infer_args: true }] }), [Pat { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).39), kind: Binding(BindingMode(No, Not), HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).39), __self_0#5, None), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:52:10: 52:11 (#5), default_binding_modes: true }], None), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5), default_binding_modes: true }, Pat { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).44), kind: TupleStruct(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:52:5: 52:5 (#5), res: Def(Ctor(Variant, Fn), DefId(0:273 ~ either[0cf5]::Either::Left::{constructor#0})), segments: [PathSegment { ident: Either#0, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).41), res: Def(Enum, DefId(0:269 ~ either[0cf5]::Either)), args: None, infer_args: true }, PathSegment { ident: Left#0, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).42), res: Def(Ctor(Variant, Fn), DefId(0:273 ~ either[0cf5]::Either::Left::{constructor#0})), args: None, infer_args: true }] }), [Pat { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).43), kind: Binding(BindingMode(No, Not), HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).43), __arg1_0#5, None), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:52:10: 52:11 (#5), default_binding_modes: true }], None), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5), default_binding_modes: true }], None), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5), default_binding_modes: true }, guard: None, body: Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).47), kind: Binary(Spanned { node: Eq, span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:52:10: 52:11 (#5) }, Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).48), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:52:10: 52:11 (#5), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).39)), segments: [PathSegment { ident: __self_0#5, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).49), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).39)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:52:10: 52:11 (#5) }, Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).50), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:52:10: 52:11 (#5), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).43)), segments: [PathSegment { ident: __arg1_0#5, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).51), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).43)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:52:10: 52:11 (#5) }), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:52:10: 52:11 (#5) } }, Arm { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).61), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5), pat: Pat { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).60), kind: Tuple([Pat { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).55), kind: TupleStruct(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:54:5: 54:5 (#5), res: Def(Ctor(Variant, Fn), DefId(0:276 ~ either[0cf5]::Either::Right::{constructor#0})), segments: [PathSegment { ident: Either#0, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).52), res: Def(Enum, DefId(0:269 ~ either[0cf5]::Either)), args: None, infer_args: true }, PathSegment { ident: Right#0, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).53), res: Def(Ctor(Variant, Fn), DefId(0:276 ~ either[0cf5]::Either::Right::{constructor#0})), args: None, infer_args: true }] }), [Pat { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).54), kind: Binding(BindingMode(No, Not), HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).54), __self_0#5, None), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:54:11: 54:12 (#5), default_binding_modes: true }], None), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5), default_binding_modes: true }, Pat { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).59), kind: TupleStruct(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:54:5: 54:5 (#5), res: Def(Ctor(Variant, Fn), DefId(0:276 ~ either[0cf5]::Either::Right::{constructor#0})), segments: [PathSegment { ident: Either#0, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).56), res: Def(Enum, DefId(0:269 ~ either[0cf5]::Either)), args: None, infer_args: true }, PathSegment { ident: Right#0, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).57), res: Def(Ctor(Variant, Fn), DefId(0:276 ~ either[0cf5]::Either::Right::{constructor#0})), args: None, infer_args: true }] }), [Pat { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).58), kind: Binding(BindingMode(No, Not), HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).58), __arg1_0#5, None), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:54:11: 54:12 (#5), default_binding_modes: true }], None), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5), default_binding_modes: true }], None), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5), default_binding_modes: true }, guard: None, body: Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).62), kind: Binary(Spanned { node: Eq, span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:54:11: 54:12 (#5) }, Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).63), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:54:11: 54:12 (#5), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).54)), segments: [PathSegment { ident: __self_0#5, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).64), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).54)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:54:11: 54:12 (#5) }, Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).65), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:54:11: 54:12 (#5), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).58)), segments: [PathSegment { ident: __arg1_0#5, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).66), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).58)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:54:11: 54:12 (#5) }), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:54:11: 54:12 (#5) } }, Arm { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).68), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5), pat: Pat { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).67), kind: Wild, span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5), default_binding_modes: true }, guard: None, body: Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).69), kind: Block(Block { stmts: [], expr: Some(Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).70), kind: Call(Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).71), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:16 (#5), res: Def(Fn, DefId(1:1708 ~ core[7d5a]::intrinsics::{extern#0}::unreachable)), segments: [PathSegment { ident: $crate#5, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).72), res: Err, args: None, infer_args: true }, PathSegment { ident: intrinsics#0, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).73), res: Def(Mod, DefId(1:1290 ~ core[7d5a]::intrinsics)), args: None, infer_args: true }, PathSegment { ident: unreachable#0, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).74), res: Def(Fn, DefId(1:1708 ~ core[7d5a]::intrinsics::{extern#0}::unreachable)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5) }, []), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5) }), hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).75), rules: UnsafeBlock(CompilerGenerated), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5), targeted_by_break: false }, None), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5) } }], Normal), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5) }
+[DEBUG] Checking binary expression with...
+[DEBUG] > LHS: Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).27), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).14)), segments: [PathSegment { ident: __self_discr#5, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).28), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).14)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5) }
+[DEBUG] > RHS: Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).29), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).24)), segments: [PathSegment { ident: __arg1_discr#5, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).30), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).24)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:49:16: 49:25 (#5) }
+[DEBUG]   > LHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG]   > RHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Checking binary expression with...
+[DEBUG] > LHS: Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).48), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:52:10: 52:11 (#5), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).39)), segments: [PathSegment { ident: __self_0#5, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).49), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).39)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:52:10: 52:11 (#5) }
+[DEBUG] > RHS: Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).50), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:52:10: 52:11 (#5), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).43)), segments: [PathSegment { ident: __arg1_0#5, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).51), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).43)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:52:10: 52:11 (#5) }
+[DEBUG]   > LHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG]   > RHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Checking binary expression with...
+[DEBUG] > LHS: Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).63), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:54:11: 54:12 (#5), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).54)), segments: [PathSegment { ident: __self_0#5, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).64), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).54)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:54:11: 54:12 (#5) }
+[DEBUG] > RHS: Expr { hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).65), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:54:11: 54:12 (#5), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).58)), segments: [PathSegment { ident: __arg1_0#5, hir_id: HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).66), res: Local(HirId(DefId(0:287 ~ either[0cf5]::{impl#30}::eq).58)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:54:11: 54:12 (#5) }
+[DEBUG]   > LHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG]   > RHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:1708 ~ core[7d5a]::intrinsics::{extern#0}::unreachable)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG]   > LHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG]   > RHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:291 ~ either[0cf5]::{impl#31}::assert_receiver_is_total_eq)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:295 ~ either[0cf5]::{impl#32}::partial_cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:1919 ~ core[7d5a]::intrinsics::{extern#1}::discriminant_value)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:1919 ~ core[7d5a]::intrinsics::{extern#1}::discriminant_value)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:3008 ~ core[7d5a]::cmp::PartialOrd::partial_cmp)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:3008 ~ core[7d5a]::cmp::PartialOrd::partial_cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:3008 ~ core[7d5a]::cmp::PartialOrd::partial_cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:299 ~ either[0cf5]::{impl#33}::cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:1919 ~ core[7d5a]::intrinsics::{extern#1}::discriminant_value)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:1919 ~ core[7d5a]::intrinsics::{extern#1}::discriminant_value)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:3001 ~ core[7d5a]::cmp::Ord::cmp)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:3001 ~ core[7d5a]::cmp::Ord::cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:3001 ~ core[7d5a]::cmp::Ord::cmp)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:1708 ~ core[7d5a]::intrinsics::{extern#0}::unreachable)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:303 ~ either[0cf5]::{impl#34}::hash)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:1919 ~ core[7d5a]::intrinsics::{extern#1}::discriminant_value)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:11357 ~ core[7d5a]::hash::Hash::hash)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:11357 ~ core[7d5a]::hash::Hash::hash)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:11357 ~ core[7d5a]::hash::Hash::hash)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:308 ~ either[0cf5]::{impl#35}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:11210 ~ core[7d5a]::fmt::{impl#9}::debug_tuple_field1_finish)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:11210 ~ core[7d5a]::fmt::{impl#9}::debug_tuple_field1_finish)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:31 ~ either[0cf5]::{impl#0}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2919 ~ core[7d5a]::clone::Clone::clone)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:2919 ~ core[7d5a]::clone::Clone::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:32 ~ either[0cf5]::{impl#0}::clone_from)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2920 ~ core[7d5a]::clone::Clone::clone_from)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:2920 ~ core[7d5a]::clone::Clone::clone_from)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:2919 ~ core[7d5a]::clone::Clone::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:36 ~ either[0cf5]::{impl#1}::is_left)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:37 ~ either[0cf5]::{impl#1}::is_right)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:36 ~ either[0cf5]::{impl#1}::is_left)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:38 ~ either[0cf5]::{impl#1}::left)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:39 ~ either[0cf5]::{impl#1}::right)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:40 ~ either[0cf5]::{impl#1}::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:41 ~ either[0cf5]::{impl#1}::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:42 ~ either[0cf5]::{impl#1}::as_pin_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10118 ~ core[7d5a]::pin::{impl#9}::get_ref)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:10102 ~ core[7d5a]::pin::{impl#6}::new_unchecked)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:10102 ~ core[7d5a]::pin::{impl#6}::new_unchecked)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:43 ~ either[0cf5]::{impl#1}::as_pin_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10124 ~ core[7d5a]::pin::{impl#10}::get_unchecked_mut)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:10102 ~ core[7d5a]::pin::{impl#6}::new_unchecked)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:10102 ~ core[7d5a]::pin::{impl#6}::new_unchecked)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:44 ~ either[0cf5]::{impl#1}::flip)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:45 ~ either[0cf5]::{impl#1}::map_left)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:45 ~ either[0cf5]::{impl#1}::map_left).16), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:324:29: 324:30 (#0), res: Local(HirId(DefId(0:45 ~ either[0cf5]::{impl#1}::map_left).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:45 ~ either[0cf5]::{impl#1}::map_left).17), res: Local(HirId(DefId(0:45 ~ either[0cf5]::{impl#1}::map_left).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:324:29: 324:30 (#0) }
+[DEBUG] Trying to get func ty of defid DefId(0:48 ~ either[0cf5]::{impl#1}::map_right)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:48 ~ either[0cf5]::{impl#1}::map_right).25), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:347:31: 347:32 (#0), res: Local(HirId(DefId(0:48 ~ either[0cf5]::{impl#1}::map_right).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:48 ~ either[0cf5]::{impl#1}::map_right).26), res: Local(HirId(DefId(0:48 ~ either[0cf5]::{impl#1}::map_right).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:347:31: 347:32 (#0) }
+[DEBUG] Trying to get func ty of defid DefId(0:51 ~ either[0cf5]::{impl#1}::map_either)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:51 ~ either[0cf5]::{impl#1}::map_either).18), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:374:29: 374:30 (#0), res: Local(HirId(DefId(0:51 ~ either[0cf5]::{impl#1}::map_either).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:51 ~ either[0cf5]::{impl#1}::map_either).19), res: Local(HirId(DefId(0:51 ~ either[0cf5]::{impl#1}::map_either).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:374:29: 374:30 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:51 ~ either[0cf5]::{impl#1}::map_either).30), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:375:31: 375:32 (#0), res: Local(HirId(DefId(0:51 ~ either[0cf5]::{impl#1}::map_either).6)), segments: [PathSegment { ident: g#0, hir_id: HirId(DefId(0:51 ~ either[0cf5]::{impl#1}::map_either).31), res: Local(HirId(DefId(0:51 ~ either[0cf5]::{impl#1}::map_either).6)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:375:31: 375:32 (#0) }
+[DEBUG] Trying to get func ty of defid DefId(0:56 ~ either[0cf5]::{impl#1}::map_either_with)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:56 ~ either[0cf5]::{impl#1}::map_either_with).20), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:405:29: 405:30 (#0), res: Local(HirId(DefId(0:56 ~ either[0cf5]::{impl#1}::map_either_with).6)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:56 ~ either[0cf5]::{impl#1}::map_either_with).21), res: Local(HirId(DefId(0:56 ~ either[0cf5]::{impl#1}::map_either_with).6)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:405:29: 405:30 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:56 ~ either[0cf5]::{impl#1}::map_either_with).34), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:406:31: 406:32 (#0), res: Local(HirId(DefId(0:56 ~ either[0cf5]::{impl#1}::map_either_with).8)), segments: [PathSegment { ident: g#0, hir_id: HirId(DefId(0:56 ~ either[0cf5]::{impl#1}::map_either_with).35), res: Local(HirId(DefId(0:56 ~ either[0cf5]::{impl#1}::map_either_with).8)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:406:31: 406:32 (#0) }
+[DEBUG] Trying to get func ty of defid DefId(0:62 ~ either[0cf5]::{impl#1}::either)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:62 ~ either[0cf5]::{impl#1}::either).15), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:432:24: 432:25 (#0), res: Local(HirId(DefId(0:62 ~ either[0cf5]::{impl#1}::either).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:62 ~ either[0cf5]::{impl#1}::either).16), res: Local(HirId(DefId(0:62 ~ either[0cf5]::{impl#1}::either).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:432:24: 432:25 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:62 ~ either[0cf5]::{impl#1}::either).24), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:433:25: 433:26 (#0), res: Local(HirId(DefId(0:62 ~ either[0cf5]::{impl#1}::either).6)), segments: [PathSegment { ident: g#0, hir_id: HirId(DefId(0:62 ~ either[0cf5]::{impl#1}::either).25), res: Local(HirId(DefId(0:62 ~ either[0cf5]::{impl#1}::either).6)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:433:25: 433:26 (#0) }
+[DEBUG] Trying to get func ty of defid DefId(0:66 ~ either[0cf5]::{impl#1}::either_with)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:66 ~ either[0cf5]::{impl#1}::either_with).17), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:462:24: 462:25 (#0), res: Local(HirId(DefId(0:66 ~ either[0cf5]::{impl#1}::either_with).6)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:66 ~ either[0cf5]::{impl#1}::either_with).18), res: Local(HirId(DefId(0:66 ~ either[0cf5]::{impl#1}::either_with).6)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:462:24: 462:25 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:66 ~ either[0cf5]::{impl#1}::either_with).28), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:463:25: 463:26 (#0), res: Local(HirId(DefId(0:66 ~ either[0cf5]::{impl#1}::either_with).8)), segments: [PathSegment { ident: g#0, hir_id: HirId(DefId(0:66 ~ either[0cf5]::{impl#1}::either_with).29), res: Local(HirId(DefId(0:66 ~ either[0cf5]::{impl#1}::either_with).8)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:463:25: 463:26 (#0) }
+[DEBUG] Trying to get func ty of defid DefId(0:71 ~ either[0cf5]::{impl#1}::left_and_then)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:71 ~ either[0cf5]::{impl#1}::left_and_then).13), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:483:24: 483:25 (#0), res: Local(HirId(DefId(0:71 ~ either[0cf5]::{impl#1}::left_and_then).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:71 ~ either[0cf5]::{impl#1}::left_and_then).14), res: Local(HirId(DefId(0:71 ~ either[0cf5]::{impl#1}::left_and_then).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:483:24: 483:25 (#0) }
+[DEBUG] Trying to get func ty of defid DefId(0:74 ~ either[0cf5]::{impl#1}::right_and_then)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:74 ~ either[0cf5]::{impl#1}::right_and_then).22), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:505:25: 505:26 (#0), res: Local(HirId(DefId(0:74 ~ either[0cf5]::{impl#1}::right_and_then).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:74 ~ either[0cf5]::{impl#1}::right_and_then).23), res: Local(HirId(DefId(0:74 ~ either[0cf5]::{impl#1}::right_and_then).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:505:25: 505:26 (#0) }
+[DEBUG] Trying to get func ty of defid DefId(0:77 ~ either[0cf5]::{impl#1}::into_iter)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:8709 ~ core[7d5a]::iter::traits::collect::IntoIterator::into_iter)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:8709 ~ core[7d5a]::iter::traits::collect::IntoIterator::into_iter)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:78 ~ either[0cf5]::{impl#1}::left_or)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:79 ~ either[0cf5]::{impl#1}::left_or_default)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3240 ~ core[7d5a]::default::Default::default)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:80 ~ either[0cf5]::{impl#1}::left_or_else)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:80 ~ either[0cf5]::{impl#1}::left_or_else).21), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:596:33: 596:34 (#0), res: Local(HirId(DefId(0:80 ~ either[0cf5]::{impl#1}::left_or_else).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:80 ~ either[0cf5]::{impl#1}::left_or_else).22), res: Local(HirId(DefId(0:80 ~ either[0cf5]::{impl#1}::left_or_else).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:596:33: 596:34 (#0) }
+[DEBUG] Trying to get func ty of defid DefId(0:82 ~ either[0cf5]::{impl#1}::right_or)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:83 ~ either[0cf5]::{impl#1}::right_or_default)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3240 ~ core[7d5a]::default::Default::default)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:84 ~ either[0cf5]::{impl#1}::right_or_else)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:84 ~ either[0cf5]::{impl#1}::right_or_else).14), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:664:32: 664:33 (#0), res: Local(HirId(DefId(0:84 ~ either[0cf5]::{impl#1}::right_or_else).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:84 ~ either[0cf5]::{impl#1}::right_or_else).15), res: Local(HirId(DefId(0:84 ~ either[0cf5]::{impl#1}::right_or_else).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:664:32: 664:33 (#0) }
+[DEBUG] Trying to get func ty of defid DefId(0:86 ~ either[0cf5]::{impl#1}::unwrap_left)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10015 ~ core[7d5a]::panicking::panic_fmt)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:11117 ~ core[7d5a]::fmt::{impl#2}::new_v1)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:11035 ~ core[7d5a]::fmt::rt::{impl#1}::new_debug)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:87 ~ either[0cf5]::{impl#1}::unwrap_right)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10015 ~ core[7d5a]::panicking::panic_fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:11117 ~ core[7d5a]::fmt::{impl#2}::new_v1)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:11035 ~ core[7d5a]::fmt::rt::{impl#1}::new_debug)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:88 ~ either[0cf5]::{impl#1}::expect_left)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10015 ~ core[7d5a]::panicking::panic_fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:11117 ~ core[7d5a]::fmt::{impl#2}::new_v1)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:11032 ~ core[7d5a]::fmt::rt::{impl#1}::new_display)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:11035 ~ core[7d5a]::fmt::rt::{impl#1}::new_debug)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:89 ~ either[0cf5]::{impl#1}::expect_right)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10015 ~ core[7d5a]::panicking::panic_fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:11117 ~ core[7d5a]::fmt::{impl#2}::new_v1)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:11032 ~ core[7d5a]::fmt::rt::{impl#1}::new_display)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(1:11035 ~ core[7d5a]::fmt::rt::{impl#1}::new_debug)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:90 ~ either[0cf5]::{impl#1}::either_into)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3163 ~ core[7d5a]::convert::Into::into)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:3163 ~ core[7d5a]::convert::Into::into)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:45 ~ either[0cf5]::{impl#1}::map_left).16), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:324:29: 324:30 (#0), res: Local(HirId(DefId(0:45 ~ either[0cf5]::{impl#1}::map_left).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:45 ~ either[0cf5]::{impl#1}::map_left).17), res: Local(HirId(DefId(0:45 ~ either[0cf5]::{impl#1}::map_left).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:324:29: 324:30 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:48 ~ either[0cf5]::{impl#1}::map_right).25), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:347:31: 347:32 (#0), res: Local(HirId(DefId(0:48 ~ either[0cf5]::{impl#1}::map_right).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:48 ~ either[0cf5]::{impl#1}::map_right).26), res: Local(HirId(DefId(0:48 ~ either[0cf5]::{impl#1}::map_right).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:347:31: 347:32 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:51 ~ either[0cf5]::{impl#1}::map_either).18), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:374:29: 374:30 (#0), res: Local(HirId(DefId(0:51 ~ either[0cf5]::{impl#1}::map_either).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:51 ~ either[0cf5]::{impl#1}::map_either).19), res: Local(HirId(DefId(0:51 ~ either[0cf5]::{impl#1}::map_either).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:374:29: 374:30 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:51 ~ either[0cf5]::{impl#1}::map_either).30), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:375:31: 375:32 (#0), res: Local(HirId(DefId(0:51 ~ either[0cf5]::{impl#1}::map_either).6)), segments: [PathSegment { ident: g#0, hir_id: HirId(DefId(0:51 ~ either[0cf5]::{impl#1}::map_either).31), res: Local(HirId(DefId(0:51 ~ either[0cf5]::{impl#1}::map_either).6)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:375:31: 375:32 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:56 ~ either[0cf5]::{impl#1}::map_either_with).20), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:405:29: 405:30 (#0), res: Local(HirId(DefId(0:56 ~ either[0cf5]::{impl#1}::map_either_with).6)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:56 ~ either[0cf5]::{impl#1}::map_either_with).21), res: Local(HirId(DefId(0:56 ~ either[0cf5]::{impl#1}::map_either_with).6)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:405:29: 405:30 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:56 ~ either[0cf5]::{impl#1}::map_either_with).34), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:406:31: 406:32 (#0), res: Local(HirId(DefId(0:56 ~ either[0cf5]::{impl#1}::map_either_with).8)), segments: [PathSegment { ident: g#0, hir_id: HirId(DefId(0:56 ~ either[0cf5]::{impl#1}::map_either_with).35), res: Local(HirId(DefId(0:56 ~ either[0cf5]::{impl#1}::map_either_with).8)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:406:31: 406:32 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:62 ~ either[0cf5]::{impl#1}::either).15), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:432:24: 432:25 (#0), res: Local(HirId(DefId(0:62 ~ either[0cf5]::{impl#1}::either).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:62 ~ either[0cf5]::{impl#1}::either).16), res: Local(HirId(DefId(0:62 ~ either[0cf5]::{impl#1}::either).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:432:24: 432:25 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:62 ~ either[0cf5]::{impl#1}::either).24), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:433:25: 433:26 (#0), res: Local(HirId(DefId(0:62 ~ either[0cf5]::{impl#1}::either).6)), segments: [PathSegment { ident: g#0, hir_id: HirId(DefId(0:62 ~ either[0cf5]::{impl#1}::either).25), res: Local(HirId(DefId(0:62 ~ either[0cf5]::{impl#1}::either).6)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:433:25: 433:26 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:66 ~ either[0cf5]::{impl#1}::either_with).17), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:462:24: 462:25 (#0), res: Local(HirId(DefId(0:66 ~ either[0cf5]::{impl#1}::either_with).6)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:66 ~ either[0cf5]::{impl#1}::either_with).18), res: Local(HirId(DefId(0:66 ~ either[0cf5]::{impl#1}::either_with).6)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:462:24: 462:25 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:66 ~ either[0cf5]::{impl#1}::either_with).28), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:463:25: 463:26 (#0), res: Local(HirId(DefId(0:66 ~ either[0cf5]::{impl#1}::either_with).8)), segments: [PathSegment { ident: g#0, hir_id: HirId(DefId(0:66 ~ either[0cf5]::{impl#1}::either_with).29), res: Local(HirId(DefId(0:66 ~ either[0cf5]::{impl#1}::either_with).8)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:463:25: 463:26 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:71 ~ either[0cf5]::{impl#1}::left_and_then).13), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:483:24: 483:25 (#0), res: Local(HirId(DefId(0:71 ~ either[0cf5]::{impl#1}::left_and_then).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:71 ~ either[0cf5]::{impl#1}::left_and_then).14), res: Local(HirId(DefId(0:71 ~ either[0cf5]::{impl#1}::left_and_then).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:483:24: 483:25 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:74 ~ either[0cf5]::{impl#1}::right_and_then).22), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:505:25: 505:26 (#0), res: Local(HirId(DefId(0:74 ~ either[0cf5]::{impl#1}::right_and_then).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:74 ~ either[0cf5]::{impl#1}::right_and_then).23), res: Local(HirId(DefId(0:74 ~ either[0cf5]::{impl#1}::right_and_then).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:505:25: 505:26 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:80 ~ either[0cf5]::{impl#1}::left_or_else).21), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:596:33: 596:34 (#0), res: Local(HirId(DefId(0:80 ~ either[0cf5]::{impl#1}::left_or_else).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:80 ~ either[0cf5]::{impl#1}::left_or_else).22), res: Local(HirId(DefId(0:80 ~ either[0cf5]::{impl#1}::left_or_else).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:596:33: 596:34 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:84 ~ either[0cf5]::{impl#1}::right_or_else).14), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:664:32: 664:33 (#0), res: Local(HirId(DefId(0:84 ~ either[0cf5]::{impl#1}::right_or_else).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:84 ~ either[0cf5]::{impl#1}::right_or_else).15), res: Local(HirId(DefId(0:84 ~ either[0cf5]::{impl#1}::right_or_else).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:664:32: 664:33 (#0) }
+[DEBUG] Trying to get func ty of defid DefId(0:95 ~ either[0cf5]::{impl#2}::factor_none)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:9676 ~ core[7d5a]::option::{impl#0}::map)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:9676 ~ core[7d5a]::option::{impl#0}::map)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:100 ~ either[0cf5]::{impl#3}::factor_err)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10395 ~ core[7d5a]::result::{impl#0}::map)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:10395 ~ core[7d5a]::result::{impl#0}::map)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:105 ~ either[0cf5]::{impl#4}::factor_ok)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:10405 ~ core[7d5a]::result::{impl#0}::map_err)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:10405 ~ core[7d5a]::result::{impl#0}::map_err)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:110 ~ either[0cf5]::{impl#5}::factor_first)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:115 ~ either[0cf5]::{impl#6}::factor_second)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:118 ~ either[0cf5]::{impl#7}::into_inner)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:119 ~ either[0cf5]::{impl#7}::map)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:119 ~ either[0cf5]::{impl#7}::map).16), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:952:29: 952:30 (#0), res: Local(HirId(DefId(0:119 ~ either[0cf5]::{impl#7}::map).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:119 ~ either[0cf5]::{impl#7}::map).17), res: Local(HirId(DefId(0:119 ~ either[0cf5]::{impl#7}::map).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:952:29: 952:30 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:119 ~ either[0cf5]::{impl#7}::map).28), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:953:31: 953:32 (#0), res: Local(HirId(DefId(0:119 ~ either[0cf5]::{impl#7}::map).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:119 ~ either[0cf5]::{impl#7}::map).29), res: Local(HirId(DefId(0:119 ~ either[0cf5]::{impl#7}::map).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:953:31: 953:32 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:119 ~ either[0cf5]::{impl#7}::map).16), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:952:29: 952:30 (#0), res: Local(HirId(DefId(0:119 ~ either[0cf5]::{impl#7}::map).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:119 ~ either[0cf5]::{impl#7}::map).17), res: Local(HirId(DefId(0:119 ~ either[0cf5]::{impl#7}::map).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:952:29: 952:30 (#0) }
+[WARN] Cannot tell if expression is a function - Expr { hir_id: HirId(DefId(0:119 ~ either[0cf5]::{impl#7}::map).28), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:953:31: 953:32 (#0), res: Local(HirId(DefId(0:119 ~ either[0cf5]::{impl#7}::map).4)), segments: [PathSegment { ident: f#0, hir_id: HirId(DefId(0:119 ~ either[0cf5]::{impl#7}::map).29), res: Local(HirId(DefId(0:119 ~ either[0cf5]::{impl#7}::map).4)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.9.0/src/lib.rs:953:31: 953:32 (#0) }
+[DEBUG] Trying to get func ty of defid DefId(0:125 ~ either[0cf5]::{impl#8}::from)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:129 ~ either[0cf5]::{impl#9}::into)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:134 ~ either[0cf5]::{impl#10}::extend)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:8717 ~ core[7d5a]::iter::traits::collect::Extend::extend)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:8717 ~ core[7d5a]::iter::traits::collect::Extend::extend)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:140 ~ either[0cf5]::{impl#11}::next)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:8890 ~ core[7d5a]::iter::traits::iterator::Iterator::next)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:8890 ~ core[7d5a]::iter::traits::iterator::Iterator::next)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:141 ~ either[0cf5]::{impl#11}::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:8894 ~ core[7d5a]::iter::traits::iterator::Iterator::size_hint)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:8894 ~ core[7d5a]::iter::traits::iterator::Iterator::size_hint)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:142 ~ either[0cf5]::{impl#11}::fold)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:9000 ~ core[7d5a]::iter::traits::iterator::Iterator::fold)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:9000 ~ core[7d5a]::iter::traits::iterator::Iterator::fold)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:145 ~ either[0cf5]::{impl#11}::for_each)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:8913 ~ core[7d5a]::iter::traits::iterator::Iterator::for_each)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:8913 ~ core[7d5a]::iter::traits::iterator::Iterator::for_each)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:147 ~ either[0cf5]::{impl#11}::count)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:8895 ~ core[7d5a]::iter::traits::iterator::Iterator::count)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:8895 ~ core[7d5a]::iter::traits::iterator::Iterator::count)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:148 ~ either[0cf5]::{impl#11}::last)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:8897 ~ core[7d5a]::iter::traits::iterator::Iterator::last)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:8897 ~ core[7d5a]::iter::traits::iterator::Iterator::last)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:149 ~ either[0cf5]::{impl#11}::nth)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:8901 ~ core[7d5a]::iter::traits::iterator::Iterator::nth)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:8901 ~ core[7d5a]::iter::traits::iterator::Iterator::nth)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:150 ~ either[0cf5]::{impl#11}::collect)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:8953 ~ core[7d5a]::iter::traits::iterator::Iterator::collect)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:8953 ~ core[7d5a]::iter::traits::iterator::Iterator::collect)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:152 ~ either[0cf5]::{impl#11}::partition)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:8960 ~ core[7d5a]::iter::traits::iterator::Iterator::partition)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:8960 ~ core[7d5a]::iter::traits::iterator::Iterator::partition)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:155 ~ either[0cf5]::{impl#11}::all)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:9008 ~ core[7d5a]::iter::traits::iterator::Iterator::all)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:9008 ~ core[7d5a]::iter::traits::iterator::Iterator::all)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:157 ~ either[0cf5]::{impl#11}::any)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:9015 ~ core[7d5a]::iter::traits::iterator::Iterator::any)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:9015 ~ core[7d5a]::iter::traits::iterator::Iterator::any)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:159 ~ either[0cf5]::{impl#11}::find)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:9022 ~ core[7d5a]::iter::traits::iterator::Iterator::find)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:9022 ~ core[7d5a]::iter::traits::iterator::Iterator::find)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:161 ~ either[0cf5]::{impl#11}::find_map)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:9029 ~ core[7d5a]::iter::traits::iterator::Iterator::find_map)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:9029 ~ core[7d5a]::iter::traits::iterator::Iterator::find_map)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:164 ~ either[0cf5]::{impl#11}::position)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:9048 ~ core[7d5a]::iter::traits::iterator::Iterator::position)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:9048 ~ core[7d5a]::iter::traits::iterator::Iterator::position)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:169 ~ either[0cf5]::{impl#12}::next_back)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:8782 ~ core[7d5a]::iter::traits::double_ended::DoubleEndedIterator::next_back)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:8782 ~ core[7d5a]::iter::traits::double_ended::DoubleEndedIterator::next_back)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:170 ~ either[0cf5]::{impl#12}::rfold)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:8789 ~ core[7d5a]::iter::traits::double_ended::DoubleEndedIterator::rfold)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:8789 ~ core[7d5a]::iter::traits::double_ended::DoubleEndedIterator::rfold)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:173 ~ either[0cf5]::{impl#12}::rfind)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:8792 ~ core[7d5a]::iter::traits::double_ended::DoubleEndedIterator::rfind)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:8792 ~ core[7d5a]::iter::traits::double_ended::DoubleEndedIterator::rfind)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:178 ~ either[0cf5]::{impl#13}::len)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:8837 ~ core[7d5a]::iter::traits::exact_size::ExactSizeIterator::len)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:8837 ~ core[7d5a]::iter::traits::exact_size::ExactSizeIterator::len)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:186 ~ either[0cf5]::{impl#15}::poll)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:43 ~ either[0cf5]::{impl#1}::as_pin_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:40212 ~ core[7d5a]::future::future::Future::poll)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:40212 ~ core[7d5a]::future::future::Future::poll)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:190 ~ either[0cf5]::{impl#16}::read)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3729 ~ std[e3cd]::io::Read::read)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(4:3729 ~ std[e3cd]::io::Read::read)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:191 ~ either[0cf5]::{impl#16}::read_exact)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3735 ~ std[e3cd]::io::Read::read_exact)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(4:3735 ~ std[e3cd]::io::Read::read_exact)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:192 ~ either[0cf5]::{impl#16}::read_to_end)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3733 ~ std[e3cd]::io::Read::read_to_end)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(4:3733 ~ std[e3cd]::io::Read::read_to_end)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:193 ~ either[0cf5]::{impl#16}::read_to_string)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3734 ~ std[e3cd]::io::Read::read_to_string)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(4:3734 ~ std[e3cd]::io::Read::read_to_string)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:197 ~ either[0cf5]::{impl#17}::seek)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3804 ~ std[e3cd]::io::Seek::seek)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(4:3804 ~ std[e3cd]::io::Seek::seek)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:201 ~ either[0cf5]::{impl#18}::fill_buf)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3814 ~ std[e3cd]::io::BufRead::fill_buf)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(4:3814 ~ std[e3cd]::io::BufRead::fill_buf)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:202 ~ either[0cf5]::{impl#18}::consume)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3815 ~ std[e3cd]::io::BufRead::consume)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(4:3815 ~ std[e3cd]::io::BufRead::consume)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:203 ~ either[0cf5]::{impl#18}::read_until)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3818 ~ std[e3cd]::io::BufRead::read_until)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(4:3818 ~ std[e3cd]::io::BufRead::read_until)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:204 ~ either[0cf5]::{impl#18}::read_line)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3820 ~ std[e3cd]::io::BufRead::read_line)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(4:3820 ~ std[e3cd]::io::BufRead::read_line)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:208 ~ either[0cf5]::{impl#19}::write)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3786 ~ std[e3cd]::io::Write::write)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(4:3786 ~ std[e3cd]::io::Write::write)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:209 ~ either[0cf5]::{impl#19}::write_all)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3791 ~ std[e3cd]::io::Write::write_all)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(4:3791 ~ std[e3cd]::io::Write::write_all)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:210 ~ either[0cf5]::{impl#19}::write_fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3793 ~ std[e3cd]::io::Write::write_fmt)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(4:3793 ~ std[e3cd]::io::Write::write_fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:211 ~ either[0cf5]::{impl#19}::flush)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(4:3790 ~ std[e3cd]::io::Write::flush)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(4:3790 ~ std[e3cd]::io::Write::flush)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:216 ~ either[0cf5]::{impl#20}::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:312 ~ either[0cf5]::{impl#36}::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:316 ~ either[0cf5]::{impl#37}::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3160 ~ core[7d5a]::convert::AsMut::as_mut)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:3160 ~ core[7d5a]::convert::AsMut::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:320 ~ either[0cf5]::{impl#38}::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:324 ~ either[0cf5]::{impl#39}::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3160 ~ core[7d5a]::convert::AsMut::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3160 ~ core[7d5a]::convert::AsMut::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:328 ~ either[0cf5]::{impl#40}::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:332 ~ either[0cf5]::{impl#41}::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3160 ~ core[7d5a]::convert::AsMut::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3160 ~ core[7d5a]::convert::AsMut::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:336 ~ either[0cf5]::{impl#42}::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:340 ~ either[0cf5]::{impl#43}::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3160 ~ core[7d5a]::convert::AsMut::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3160 ~ core[7d5a]::convert::AsMut::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:222 ~ either[0cf5]::{impl#21}::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3157 ~ core[7d5a]::convert::AsRef::as_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:227 ~ either[0cf5]::{impl#22}::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3160 ~ core[7d5a]::convert::AsMut::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3160 ~ core[7d5a]::convert::AsMut::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:232 ~ either[0cf5]::{impl#23}::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3160 ~ core[7d5a]::convert::AsMut::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3160 ~ core[7d5a]::convert::AsMut::as_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:237 ~ either[0cf5]::{impl#24}::deref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:241 ~ either[0cf5]::{impl#25}::deref_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:245 ~ either[0cf5]::{impl#26}::source)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3251 ~ core[7d5a]::error::Error::source)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:3251 ~ core[7d5a]::error::Error::source)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:246 ~ either[0cf5]::{impl#26}::description)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3253 ~ core[7d5a]::error::Error::description)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:3253 ~ core[7d5a]::error::Error::description)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:247 ~ either[0cf5]::{impl#26}::cause)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:3254 ~ core[7d5a]::error::Error::cause)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:3254 ~ core[7d5a]::error::Error::cause)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:251 ~ either[0cf5]::{impl#27}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:11142 ~ core[7d5a]::fmt::Display::fmt)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Trying to get func ty of defid DefId(1:11142 ~ core[7d5a]::fmt::Display::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:253 ~ either[0cf5]::_unsized_ref_propagation)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:341 ~ either[0cf5]::_unsized_ref_propagation::check_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:343 ~ either[0cf5]::_unsized_ref_propagation::propagate_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:341 ~ either[0cf5]::_unsized_ref_propagation::check_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:346 ~ either[0cf5]::_unsized_ref_propagation::check_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:348 ~ either[0cf5]::_unsized_ref_propagation::propagate_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:346 ~ either[0cf5]::_unsized_ref_propagation::check_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:254 ~ either[0cf5]::_unsized_ref_propagation::check_array_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:257 ~ either[0cf5]::_unsized_ref_propagation::check_array_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:260 ~ either[0cf5]::_unsized_ref_propagation::propagate_array_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:254 ~ either[0cf5]::_unsized_ref_propagation::check_array_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:264 ~ either[0cf5]::_unsized_ref_propagation::propagate_array_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:257 ~ either[0cf5]::_unsized_ref_propagation::check_array_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:341 ~ either[0cf5]::_unsized_ref_propagation::check_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:343 ~ either[0cf5]::_unsized_ref_propagation::propagate_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:341 ~ either[0cf5]::_unsized_ref_propagation::check_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:346 ~ either[0cf5]::_unsized_ref_propagation::check_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:348 ~ either[0cf5]::_unsized_ref_propagation::propagate_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:346 ~ either[0cf5]::_unsized_ref_propagation::check_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:254 ~ either[0cf5]::_unsized_ref_propagation::check_array_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:257 ~ either[0cf5]::_unsized_ref_propagation::check_array_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:260 ~ either[0cf5]::_unsized_ref_propagation::propagate_array_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:254 ~ either[0cf5]::_unsized_ref_propagation::check_array_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:264 ~ either[0cf5]::_unsized_ref_propagation::propagate_array_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:257 ~ either[0cf5]::_unsized_ref_propagation::check_array_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:268 ~ either[0cf5]::_unsized_std_propagation)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:351 ~ either[0cf5]::_unsized_std_propagation::check_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:353 ~ either[0cf5]::_unsized_std_propagation::propagate_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:351 ~ either[0cf5]::_unsized_std_propagation::check_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:356 ~ either[0cf5]::_unsized_std_propagation::check_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:358 ~ either[0cf5]::_unsized_std_propagation::propagate_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:356 ~ either[0cf5]::_unsized_std_propagation::check_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:361 ~ either[0cf5]::_unsized_std_propagation::check_ref#1)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:363 ~ either[0cf5]::_unsized_std_propagation::propagate_ref#1)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:361 ~ either[0cf5]::_unsized_std_propagation::check_ref#1)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:366 ~ either[0cf5]::_unsized_std_propagation::check_mut#1)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:368 ~ either[0cf5]::_unsized_std_propagation::propagate_mut#1)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:366 ~ either[0cf5]::_unsized_std_propagation::check_mut#1)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:371 ~ either[0cf5]::_unsized_std_propagation::check_ref#2)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:373 ~ either[0cf5]::_unsized_std_propagation::propagate_ref#2)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:371 ~ either[0cf5]::_unsized_std_propagation::check_ref#2)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:376 ~ either[0cf5]::_unsized_std_propagation::check_mut#2)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:378 ~ either[0cf5]::_unsized_std_propagation::propagate_mut#2)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:376 ~ either[0cf5]::_unsized_std_propagation::check_mut#2)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:351 ~ either[0cf5]::_unsized_std_propagation::check_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:353 ~ either[0cf5]::_unsized_std_propagation::propagate_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:351 ~ either[0cf5]::_unsized_std_propagation::check_ref)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:356 ~ either[0cf5]::_unsized_std_propagation::check_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:358 ~ either[0cf5]::_unsized_std_propagation::propagate_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:356 ~ either[0cf5]::_unsized_std_propagation::check_mut)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:361 ~ either[0cf5]::_unsized_std_propagation::check_ref#1)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:363 ~ either[0cf5]::_unsized_std_propagation::propagate_ref#1)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:361 ~ either[0cf5]::_unsized_std_propagation::check_ref#1)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:366 ~ either[0cf5]::_unsized_std_propagation::check_mut#1)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:368 ~ either[0cf5]::_unsized_std_propagation::propagate_mut#1)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:366 ~ either[0cf5]::_unsized_std_propagation::check_mut#1)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:371 ~ either[0cf5]::_unsized_std_propagation::check_ref#2)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:373 ~ either[0cf5]::_unsized_std_propagation::propagate_ref#2)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:371 ~ either[0cf5]::_unsized_std_propagation::check_ref#2)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:376 ~ either[0cf5]::_unsized_std_propagation::check_mut#2)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:378 ~ either[0cf5]::_unsized_std_propagation::propagate_mut#2)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:376 ~ either[0cf5]::_unsized_std_propagation::check_mut#2)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }

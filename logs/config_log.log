@@ -1,0 +1,2 @@
+[DEBUG] Trying to get func ty of defid DefId(0:3 ~ config_log[57f4]::main)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }

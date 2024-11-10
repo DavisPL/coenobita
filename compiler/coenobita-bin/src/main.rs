@@ -22,19 +22,6 @@ use rustc_driver::RunCompiler;
 use simplelog::{Config, ConfigBuilder, WriteLogger};
 
 fn main() {
-    // Set up logging
-    let log = File::create("coenobita.log").expect("Could not create Coenobita logging file");
-
-    let config = ConfigBuilder::new()
-        .set_time_level(log::LevelFilter::Off) // Don't show time
-        .set_target_level(log::LevelFilter::Off) // Don't show target (like "(1)")
-        .set_thread_level(log::LevelFilter::Off) // Don't show thread ID
-        .set_location_level(log::LevelFilter::Off) // Don't show file/line location
-        .build();
-
-    WriteLogger::init(simplelog::LevelFilter::Debug, config, log)
-        .expect("Could not initialize Coenobita logger");
-
     // Collect all the arguments passed to us by Cargo
     let mut args: Vec<String> = env::args().skip(1).collect();
 
@@ -56,9 +43,23 @@ fn main() {
         })
         .unwrap_or("-".into());
 
-    // if crate_name != "cstd" {
-    //     args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/debug/libcstd.rlib".to_string());
-    // }
+    // Set up logging
+    let log = File::create(format!("/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/logs/{crate_name}.log"))
+        .expect("Could not create Coenobita logging file");
+
+    let config = ConfigBuilder::new()
+        .set_time_level(log::LevelFilter::Off) // Don't show time
+        .set_target_level(log::LevelFilter::Off) // Don't show target (like "(1)")
+        .set_thread_level(log::LevelFilter::Off) // Don't show thread ID
+        .set_location_level(log::LevelFilter::Off) // Don't show file/line location
+        .build();
+    
+    WriteLogger::init(simplelog::LevelFilter::Debug, config, log)
+        .expect("Could not initialize Coenobita logger");
+
+    if crate_name != "std" {
+        args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/debug/libstd.rlib".to_string());
+    }
 
     // Create callbacks and run the compiler
     let mut callbacks = CoenobitaCallbacks::new(crate_name, crate_type);
@@ -79,7 +80,7 @@ fn crate_type(args: &[String]) -> Option<String> {
     args.windows(2)
         .find_map(|pair| match [pair[0].as_str(), &pair[1]] {
             ["--test", _] | [_, "--test"] => Some("root".to_owned()),
-            ["--crate-name", "cstd"] => Some("root".to_owned()),
+            ["--crate-name", "std"] => Some("root".to_owned()),
             ["--crate-type", "bin"] => Some("root".to_owned()),
             ["--crate-type", _] => Some("lib".to_owned()),
             _ => None,

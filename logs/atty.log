@@ -1,0 +1,22 @@
+[DEBUG] Trying to get func ty of defid DefId(0:16 ~ atty[6ff1]::{impl#0}::clone)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:19 ~ atty[6ff1]::{impl#2}::fmt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }, Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(1:11181 ~ core[7d5a]::fmt::{impl#9}::write_str)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:5 ~ atty[6ff1]::is)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Checking binary expression with...
+[DEBUG] > LHS: Expr { hir_id: HirId(DefId(0:5 ~ atty[6ff1]::is).33), kind: Call(Expr { hir_id: HirId(DefId(0:5 ~ atty[6ff1]::is).34), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/atty-0.2.14/src/lib.rs:48:14: 48:26 (#0), res: Def(Fn, DefId(4:292 ~ libc[a291]::unix::{extern#2}::isatty)), segments: [PathSegment { ident: libc#0, hir_id: HirId(DefId(0:5 ~ atty[6ff1]::is).35), res: Def(Mod, DefId(4:0 ~ libc[a291])), args: None, infer_args: true }, PathSegment { ident: isatty#0, hir_id: HirId(DefId(0:5 ~ atty[6ff1]::is).36), res: Def(Fn, DefId(4:292 ~ libc[a291]::unix::{extern#2}::isatty)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/atty-0.2.14/src/lib.rs:48:14: 48:26 (#0) }, [Expr { hir_id: HirId(DefId(0:5 ~ atty[6ff1]::is).37), kind: Path(Resolved(None, Path { span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/atty-0.2.14/src/lib.rs:48:27: 48:29 (#0), res: Local(HirId(DefId(0:5 ~ atty[6ff1]::is).30)), segments: [PathSegment { ident: fd#0, hir_id: HirId(DefId(0:5 ~ atty[6ff1]::is).38), res: Local(HirId(DefId(0:5 ~ atty[6ff1]::is).30)), args: None, infer_args: true }] })), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/atty-0.2.14/src/lib.rs:48:27: 48:29 (#0) }]), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/atty-0.2.14/src/lib.rs:48:14: 48:30 (#0) }
+[DEBUG] > RHS: Expr { hir_id: HirId(DefId(0:5 ~ atty[6ff1]::is).39), kind: Lit(Spanned { node: Int(Pu128(0), Unsuffixed), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/atty-0.2.14/src/lib.rs:48:34: 48:35 (#0) }), span: /Users/georgeberdovskiy/.cargo/registry/src/index.crates.io-6f17d22bba15001f/atty-0.2.14/src/lib.rs:48:34: 48:35 (#0) }
+[DEBUG] Trying to get func ty of defid DefId(4:292 ~ libc[a291]::unix::{extern#2}::isatty)
+[DEBUG] >> NOT FOUND! Getting extern def
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG]   > LHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG]   > RHS Type is: Ty { property: FlowPair(Universal, Universal), kind: Infer }
+[DEBUG] Trying to get func ty of defid DefId(0:7 ~ atty[6ff1]::isnt)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Trying to get func ty of defid DefId(0:5 ~ atty[6ff1]::is)
+[DEBUG] >> FOUND IT! It's Ty { property: FlowPair(Universal, Universal), kind: Fn([Ty { property: FlowPair(Universal, Universal), kind: Infer }], Ty { property: FlowPair(Universal, Universal), kind: Infer }) }
+[DEBUG] Done checking call expression with ret ty: Ty { property: FlowPair(Universal, Universal), kind: Infer }
