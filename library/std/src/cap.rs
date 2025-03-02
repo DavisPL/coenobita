@@ -1,13 +1,11 @@
-use std::convert;
+use std::{convert, ffi::OsStr};
 
-pub trait From<T>: convert::From<T> {
-    #[inline(always)]
+use crate::path::{Path, PathBuf};
+
+pub type JoinFn = fn(&OsStr, &OsStr) -> PathBuf;
+pub type PushFn = fn(&mut Path, &OsStr);
+
+pub trait From<T> {
     #[cnbt::provenance((*,*) fn((*, root)) -> (*,root))]
-    fn from(value: T) -> Self {
-        convert::From::from(value)
-    }
+    fn from(value: T) -> Self;
 }
-
-pub trait AsRef<T: ?Sized>: convert::AsRef<T> {}
-
-impl<T: ?Sized, U: ?Sized> AsRef<T> for &U where U: AsRef<T> {}

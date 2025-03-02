@@ -20,6 +20,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "coenobita-check"
+version = "0.1.0"
+dependencies = [
+ "coenobita-ast",
+ "coenobita-middle",
+ "coenobita-parse",
+ "itertools",
+ "log",
+]
+
+[[package]]
 name = "coenobita-integrityck"
 version = "0.1.0"
 dependencies = [

@@ -1,7 +1,8 @@
+use std::hash::{Hash, Hasher};
+use std::ops::DerefMut;
 pub use std::path::{self, *};
 
 use crate::borrow::{Borrow, Cow};
-use crate::cap::AsRef;
 use crate::cmp;
 use crate::collections::TryReserveError;
 use crate::convert;
@@ -121,6 +122,12 @@ impl PathBuf {
     }
 }
 
+impl crate::hash::Hash for PathBuf {
+    fn hash<H: Hasher>(&self, h: &mut H) {
+        self.inner.hash(h);
+    }
+}
+
 impl Eq for PathBuf {}
 
 impl PartialEq for PathBuf {
@@ -150,6 +157,13 @@ impl Deref for PathBuf {
     #[inline(always)]
     fn deref(&self) -> &Path {
         unsafe { &*(self.inner.as_ref() as *const OsStr as *const Path) }
+    }
+}
+
+impl DerefMut for PathBuf {
+    #[inline(always)]
+    fn deref_mut(&mut self) -> &mut Path {
+        Path::from_inner_mut( self.inner.as_mut_os_str())
     }
 }
 
@@ -183,12 +197,11 @@ pub struct Path {
     pub(crate) inner: path::Path,
 }
 
-pub struct StripPrefixError(());
-
 impl Path {
-    #[inline(always)]
+    #[cnbt::integrity({root}{root} fn({root}{root}) -> {*}{*})]
     #[cnbt::provenance((*,*) fn((*,root)) -> (*,root))]
-    pub fn new<S: convert::AsRef<OsStr> + ?Sized>(s: &S) -> &Path {
+    #[inline(always)]
+    pub fn new<S: AsRef<OsStr> + ?Sized>(s: &S) -> &Path {
         unsafe { &*(s.as_ref() as *const OsStr as *const Path) }
     }
 
@@ -278,7 +291,7 @@ impl Path {
 
     #[inline(always)]
     #[cnbt::provenance((*,*) fn((*,root), (*,root)) -> (*,root))]
-    pub fn join<P: convert::AsRef<Path>>(&self, path: P) -> PathBuf {
+    pub fn join<P: AsRef<Path>>(&self, path: P) -> PathBuf {
         transmute!(self.inner.join(&path.as_ref().inner))
     }
 
@@ -363,60 +376,54 @@ impl Path {
     pub fn into_path_buf(self: Box<Path>) -> PathBuf {
         self.to_path_buf()
     }
+
+    #[inline(always)]
+    fn from_inner_mut(inner: &mut OsStr) -> &mut Path {
+        unsafe { &mut *(inner as *mut OsStr as *mut Path) }
+    }
 }
 
-impl convert::AsRef<Path> for Path {
+impl ToOwned for Path {
+    type Owned = PathBuf;
+
+    #[inline(always)]
+    fn to_owned(&self) -> PathBuf {
+        self.to_path_buf()
+    }
+
+    #[inline(always)]
+    fn clone_into(&self, target: &mut PathBuf) {
+        self.inner.clone_into(&mut target.inner);
+    }
+}
+
+impl AsRef<Path> for Path {
     #[inline(always)]
     fn as_ref(&self) -> &Path {
         self
     }
 }
 
-impl convert::AsRef<Path> for PathBuf {
+impl AsRef<Path> for PathBuf {
     #[inline(always)]
     fn as_ref(&self) -> &Path {
         self
     }
 }
 
-impl convert::AsRef<OsStr> for Path {
+impl AsRef<OsStr> for Path {
     #[inline(always)]
     fn as_ref(&self) -> &OsStr {
         self.inner.as_ref()
     }
 }
 
-impl convert::AsRef<OsStr> for PathBuf {
+impl AsRef<OsStr> for PathBuf {
     #[inline(always)]
     fn as_ref(&self) -> &OsStr {
         self.inner.as_ref()
     }
 }
-
-impl convert::AsRef<Path> for OsStr {
-    #[inline(always)]
-    fn as_ref(&self) -> &Path {
-        transmute!(self)
-    }
-}
-
-impl convert::AsRef<Path> for str {
-    #[inline(always)]
-    fn as_ref(&self) -> &Path {
-        transmute!(self)
-    }
-}
-
-impl convert::AsRef<Path> for String {
-    #[inline(always)]
-    fn as_ref(&self) -> &Path {
-        transmute!(self.as_str())
-    }
-}
-
-impl AsRef<Path> for Path {}
-
-impl AsRef<Path> for PathBuf {}
 
 impl PartialEq for Path {
     #[inline(always)]
@@ -483,7 +490,7 @@ macro_rules! impl_cmp {
 impl_cmp!(<> PathBuf, Path);
 impl_cmp!(<'a> PathBuf, &'a Path);
 
-impl<T: ?Sized + convert::AsRef<OsStr>> From<&T> for PathBuf {
+impl<T: ?Sized + AsRef<OsStr>> From<&T> for PathBuf {
     #[inline(always)]
     fn from(s: &T) -> PathBuf {
         PathBuf {
@@ -511,5 +518,19 @@ impl From<String> for PathBuf {
     #[cnbt::provenance((*,*) fn((*,root)) -> (*,root))]
     fn from(s: String) -> PathBuf {
         PathBuf { inner: s.into() }
+    }
+}
+
+impl From<Box<Path>> for PathBuf {
+    #[inline(always)]
+    fn from(boxed: Box<Path>) -> PathBuf {
+        boxed.into_path_buf()
+    }
+}
+
+impl From<PathBuf> for Box<Path> {
+    #[inline(always)]
+    fn from(p: PathBuf) -> Box<Path> {
+        p.into_boxed_path()
     }
 }

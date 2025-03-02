@@ -454,6 +454,8 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
 
                     if let Some(expr) = local.init {
                         self.check_expr(expr, &Expectation::ExpectHasType(expected.clone()), false)?;
+                    } else {
+                        self.process_pattern(local.pat.kind, self.context.universal(), local.pat.hir_id);
                     }
                 };
 
@@ -467,8 +469,7 @@ impl<'cnbt, 'tcx> Checker<'cnbt, 'tcx> {
                 self.check_expr(expr, &Expectation::NoExpectation, false)?;
                 self.process_pattern(local.pat.kind, self.context.universal(), local.pat.hir_id);
             } else {
-                // TODO: Think about what should happen here
-                self.hir_map.insert(local.pat.hir_id, self.context.universal());
+                self.process_pattern(local.pat.kind, self.context.universal(), local.pat.hir_id);
             }
         }
 

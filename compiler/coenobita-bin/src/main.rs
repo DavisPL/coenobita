@@ -13,7 +13,7 @@ extern crate rustc_parse;
 extern crate rustc_session;
 extern crate rustc_span;
 
-use log::{debug, error, info, warn};
+use log::{debug, error, info, warn, LevelFilter};
 use std::{env, fs::File, path::Path};
 
 use callbacks::CoenobitaCallbacks;
@@ -24,10 +24,6 @@ use simplelog::{Config, ConfigBuilder, WriteLogger};
 fn main() {
     // Collect all the arguments passed to us by Cargo
     let mut args: Vec<String> = env::args().skip(1).collect();
-
-    // Add some extra arguments
-    args.push("-Zcrate-attr=feature(register_tool)".to_string());
-    args.push("-Zcrate-attr=register_tool(cnbt)".to_string());
 
     let crate_name = crate_name(&args)
         .and_then(|s| {
@@ -43,24 +39,26 @@ fn main() {
         })
         .unwrap_or("-".into());
 
+    let is_release = crate_release(&args);
+
     // Set up logging
-    let log = File::create(format!(
-        "/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/logs/{crate_name}.log"
-    ))
-    .expect("Could not create Coenobita logging file");
+    logging_setup(&crate_name);
 
-    let config = ConfigBuilder::new()
-        .set_time_level(log::LevelFilter::Off) // Don't show time
-        .set_target_level(log::LevelFilter::Off) // Don't show target (like "(1)")
-        .set_thread_level(log::LevelFilter::Off) // Don't show thread ID
-        .set_location_level(log::LevelFilter::Off) // Don't show file/line location
-        .build();
-
-    WriteLogger::init(simplelog::LevelFilter::Debug, config, log)
-        .expect("Could not initialize Coenobita logger");
+    // Add some extra arguments
+    args.push("-Zcrate-attr=feature(register_tool)".to_string());
+    args.push("-Zcrate-attr=register_tool(cnbt)".to_string());
 
     if crate_name != "std" {
-        args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/debug/libstd.rlib".to_string());
+        // if is_release {
+        //     debug!("Linking release standard lib");
+        //     args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/release/libstd.rlib".to_string());
+        // } else {
+        //     debug!("Linking debug standard lib");
+        //     args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/debug/libstd.rlib".to_string());
+        // }
+
+        debug!("linking release std lib");
+        args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/release/libstd.rlib".to_string());
     }
 
     // Create callbacks and run the compiler
@@ -87,4 +85,42 @@ fn crate_type(args: &[String]) -> Option<String> {
             ["--crate-type", _] => Some("lib".to_owned()),
             _ => None,
         })
+}
+
+fn crate_release(args: &[String]) -> bool {
+    return args.contains(&"--release".to_owned());
+}
+
+fn logging_setup(crate_name: &str) {
+    // Check the environment variable
+    let log_level = env::var("COENOBITA_LOG_LEVEL").unwrap_or_else(|_| "OFF".to_string());
+
+    // Decide the level filter based on the environment variable
+    let level_filter = match log_level.as_str() {
+        "DEBUG" => LevelFilter::Debug,
+        "INFO" => LevelFilter::Info,
+        "WARN" => LevelFilter::Warn,
+        "ERROR" => LevelFilter::Error,
+        _ => LevelFilter::Off,
+    };
+
+    // If logging is set to off, skip initialization
+    if level_filter == LevelFilter::Off {
+        return;
+    }
+
+    let log = File::create(format!(
+        "/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/logs/{crate_name}.log"
+    ))
+    .expect("Could not create Coenobita logging file");
+
+    let config = ConfigBuilder::new()
+        .set_time_level(log::LevelFilter::Off) // Don't show time
+        .set_target_level(log::LevelFilter::Off) // Don't show target (like "(1)")
+        .set_thread_level(log::LevelFilter::Off) // Don't show thread ID
+        .set_location_level(log::LevelFilter::Off) // Don't show file/line location
+        .build();
+
+    WriteLogger::init(simplelog::LevelFilter::Debug, config, log)
+        .expect("Could not initialize Coenobita logger");
 }

@@ -1,0 +1,15 @@
+[package]
+name = "coenobita-check"
+version = "0.1.0"
+edition.workspace = true
+
+[package.metadata.rust-analyzer]
+rustc_private = true
+
+[dependencies]
+coenobita-ast.workspace = true
+coenobita-middle.workspace = true
+coenobita-parse.workspace = true
+
+itertools.workspace = true
+log.workspace = true
