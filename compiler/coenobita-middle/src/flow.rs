@@ -3,7 +3,9 @@ use std::{collections::HashSet, fmt::Display};
 use coenobita_ast::flow;
 use itertools::Itertools;
 
-#[derive(Clone, Debug, PartialEq)]
+use crate::property::Property;
+
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct FlowPair(pub FlowSet, pub FlowSet);
 
 impl FlowPair {
@@ -67,6 +69,12 @@ impl FlowSet {
     }
 }
 
+impl Default for FlowSet {
+    fn default() -> Self {
+        Self::Universal
+    }
+}
+
 impl From<flow::FlowSet> for FlowSet {
     fn from(value: flow::FlowSet) -> Self {
         match value {
@@ -90,5 +98,14 @@ impl Display for FlowSet {
                 write!(f, "{{*}}")
             }
         }
+    }
+}
+
+impl Property for FlowPair {
+    fn satisfies(&self, other: &Self) -> bool {
+        let explicit = self.explicit().is_subset(other.explicit());
+        let implicit = self.implicit().is_subset(other.implicit());
+
+        explicit && implicit
     }
 }

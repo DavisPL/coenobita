@@ -2,7 +2,9 @@ use std::fmt::Display;
 
 use coenobita_ast::provenance;
 
-#[derive(Debug, Clone, PartialEq)]
+use crate::property::Property;
+
+#[derive(Debug, Default, Clone, PartialEq)]
 pub struct ProvenancePair(pub Provenance, pub Provenance);
 
 impl ProvenancePair {
@@ -33,6 +35,12 @@ pub enum Provenance {
     Universal,
 }
 
+impl Default for Provenance {
+    fn default() -> Self {
+        Self::Universal
+    }
+}
+
 impl From<provenance::Provenance> for Provenance {
     fn from(value: provenance::Provenance) -> Self {
         match value {
@@ -48,5 +56,23 @@ impl Display for Provenance {
             Self::Specific(origin) => write!(f, "{origin}"),
             Self::Universal => write!(f, "*"),
         }
+    }
+}
+
+impl Property for ProvenancePair {
+    fn satisfies(&self, other: &Self) -> bool {
+        let first = match (self.first(), other.first()) {
+            (_, Provenance::Universal) => true,
+            (Provenance::Specific(o1), Provenance::Specific(o2)) => o1 == o2,
+            _ => false,
+        };
+
+        let last = match (self.last(), other.last()) {
+            (_, Provenance::Universal) => true,
+            (Provenance::Specific(o1), Provenance::Specific(o2)) => o1 == o2,
+            _ => false,
+        };
+
+        first && last
     }
 }
