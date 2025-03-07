@@ -1,6 +1,7 @@
 use std::{collections::HashMap, fmt::Display};
 
-use crate::flow::{FlowPair, FlowSet};
+use crate::flow::FlowPair;
+use crate::origin::OriginSet;
 use crate::property::Property;
 use itertools::Itertools;
 use rustc_span::Symbol;
@@ -93,13 +94,13 @@ impl<P: Property> Ty<P> {
 }
 
 impl Ty<FlowPair> {
-    pub fn with_explicit(mut self, explicit: FlowSet) -> Self {
+    pub fn with_explicit(mut self, explicit: OriginSet) -> Self {
         self.property.explicit = explicit;
         self
     }
 
     pub fn ty_adt(n: usize) -> Ty<FlowPair> {
-        let default_flow_pair = FlowPair::new(FlowSet::Universal, FlowSet::Universal);
+        let default_flow_pair = FlowPair::new(OriginSet::Universal, OriginSet::Universal);
         let default_ty = Ty::new(default_flow_pair.clone(), TyKind::Infer);
 
         let args = vec![default_ty.clone(); n]; // Create `n` copies of `default_ty`

@@ -6,24 +6,25 @@ use rustc_span::Symbol;
 
 use log::debug;
 
+use crate::origin::OriginSet;
 use crate::property::Property;
 
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct FlowPair {
-    pub(crate) explicit: FlowSet,
-    pub(crate) implicit: FlowSet,
+    pub(crate) explicit: OriginSet,
+    pub(crate) implicit: OriginSet,
 }
 
 impl FlowPair {
-    pub fn new(explicit: FlowSet, implicit: FlowSet) -> Self {
+    pub fn new(explicit: OriginSet, implicit: OriginSet) -> Self {
         FlowPair { explicit, implicit }
     }
 
-    pub fn explicit(&self) -> &FlowSet {
+    pub fn explicit(&self) -> &OriginSet {
         &self.explicit
     }
 
-    pub fn implicit(&self) -> &FlowSet {
+    pub fn implicit(&self) -> &OriginSet {
         &self.implicit
     }
 }
@@ -34,57 +35,57 @@ impl fmt::Display for FlowPair {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
-pub enum FlowSet {
-    Specific(HashSet<String>),
-    Universal,
-}
+// #[derive(Clone, Debug, PartialEq)]
+// pub enum OriginSet {
+//     Specific(HashSet<String>),
+//     Universal,
+// }
 
-impl FlowSet {
-    pub fn union(&self, other: &FlowSet) -> FlowSet {
-        match self {
-            FlowSet::Universal => FlowSet::Universal,
-            FlowSet::Specific(s1) => match other {
-                FlowSet::Universal => FlowSet::Universal,
-                FlowSet::Specific(s2) => FlowSet::Specific(s1.union(&s2).cloned().collect()),
-            },
-        }
-    }
+// impl OriginSet {
+//     pub fn union(&self, other: &OriginSet) -> OriginSet {
+//         match self {
+//             OriginSet::Universal => OriginSet::Universal,
+//             OriginSet::Specific(s1) => match other {
+//                 OriginSet::Universal => OriginSet::Universal,
+//                 OriginSet::Specific(s2) => OriginSet::Specific(s1.union(&s2).cloned().collect()),
+//             },
+//         }
+//     }
 
-    pub fn is_subset(&self, other: &FlowSet) -> bool {
-        match self {
-            FlowSet::Universal => match other {
-                FlowSet::Universal => true,
-                _ => false,
-            },
-            FlowSet::Specific(s1) => match other {
-                FlowSet::Specific(s2) => s1.is_subset(&s2),
-                _ => true,
-            },
-        }
-    }
-}
+//     pub fn is_subset(&self, other: &OriginSet) -> bool {
+//         match self {
+//             OriginSet::Universal => match other {
+//                 OriginSet::Universal => true,
+//                 _ => false,
+//             },
+//             OriginSet::Specific(s1) => match other {
+//                 OriginSet::Specific(s2) => s1.is_subset(&s2),
+//                 _ => true,
+//             },
+//         }
+//     }
+// }
 
-impl Default for FlowSet {
-    fn default() -> Self {
-        Self::Universal
-    }
-}
+// impl Default for OriginSet {
+//     fn default() -> Self {
+//         Self::Universal
+//     }
+// }
 
-impl fmt::Display for FlowSet {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Specific(origins) => {
-                let origins = origins.iter().map(|ident| ident.to_string()).sorted().join(",");
-                write!(f, "{{{origins}}}")
-            }
+// impl fmt::Display for OriginSet {
+//     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+//         match self {
+//             Self::Specific(origins) => {
+//                 let origins = origins.iter().map(|ident| ident.to_string()).sorted().join(",");
+//                 write!(f, "{{{origins}}}")
+//             }
 
-            Self::Universal => {
-                write!(f, "{{*}}")
-            }
-        }
-    }
-}
+//             Self::Universal => {
+//                 write!(f, "{{*}}")
+//             }
+//         }
+//     }
+// }
 
 impl Property for FlowPair {
     fn satisfies(&self, other: &Self) -> bool {
@@ -119,15 +120,15 @@ impl Property for FlowPair {
         set.insert(origin);
 
         Self {
-            explicit: FlowSet::Specific(set.clone()),
-            implicit: FlowSet::Specific(set),
+            explicit: OriginSet::Specific(set.clone()),
+            implicit: OriginSet::Specific(set),
         }
     }
 
     fn top() -> Self {
         Self {
-            explicit: FlowSet::Universal,
-            implicit: FlowSet::Universal,
+            explicit: OriginSet::Universal,
+            implicit: OriginSet::Universal,
         }
     }
 
