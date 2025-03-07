@@ -97,4 +97,12 @@ impl Property for FlowPair {
 
         Self { explicit, implicit }
     }
+
+    fn bottom() -> Self {
+        unimplemented!()
+    }
+
+    fn top() -> Self {
+        unimplemented!()
+    }
 }

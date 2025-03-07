@@ -4,4 +4,8 @@ pub trait Property: Clone + Default + Display {
     fn satisfies(&self, other: &Self) -> bool;
 
     fn merge(&self, other: Self) -> Self;
+
+    fn bottom() -> Self;
+
+    fn top() -> Self;
 }

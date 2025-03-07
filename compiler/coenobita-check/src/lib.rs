@@ -14,6 +14,7 @@ extern crate rustc_target;
 use std::collections::HashMap;
 
 use coenobita_ast::{TyAST, TyKindAST as ATyKind};
+use coenobita_middle::flow::FlowPair;
 use coenobita_middle::property::Property;
 use coenobita_middle::ty::{Ty, TyKind};
 
@@ -274,7 +275,31 @@ pub trait Check<'tcx, P: Property + Parse> {
     }
 
     // ======== NONLOCAL ITEMS ======== //
-    fn check_item_fn_nonlocal(&mut self, def_id: DefId) -> Result;
+    fn check_item_fn_nonlocal(&mut self, def_id: DefId) -> Result {
+        let expected = self
+            .get_tcx()
+            .fn_sig(def_id)
+            .skip_binder()
+            .inputs()
+            .iter()
+            .count();
+
+        let mut default = self.influence(Ty::ty_fn(expected));
+
+        match self.get_tcx().get_attrs_by_path(def_id, &self.get_attr()).next() {
+            Some(attr) => {
+                if let Ok(ty) = self.parse_attr(attr) {
+                    default = ty.into();
+                };
+            }
+
+            None => {}
+        };
+
+        self.get_items_mut().insert(def_id, default);
+
+        Ok(())
+    }
 
     // ======== LOCAL ITEMS ======== //
     fn check_item(&mut self, item: &Item) -> Result {
@@ -1085,5 +1110,77 @@ pub trait Check<'tcx, P: Property + Parse> {
         parser
             .parse_ty()
             .map_err(|err| self.get_tcx().dcx().span_err(err.span.clone(), "failed to parse"))
+    }
+}
+
+pub struct Checker<'tcx, P: Property> {
+    /// Contains the attribute we are targeting as a sequence of symbols.
+    attr: Vec<Symbol>,
+
+    /// Contains type checking results for the entire crate.
+    tcx: TyCtxt<'tcx>,
+
+    /// Maps item `DefId`s to their properties.
+    items: HashMap<DefId, Ty<P>>,
+
+    /// Maps local `HirId`s to their properties.
+    locals: HashMap<HirId, Ty<P>>,
+
+    context: Vec<Ty<P>>,
+}
+
+impl<'tcx, P: Property + Parse> Check<'tcx, P> for Checker<'tcx, P> {
+    fn get_attr(&self) -> &[Symbol] {
+        &self.attr
+    }
+
+    fn get_tcx(&self) -> &TyCtxt<'tcx> {
+        &self.tcx
+    }
+
+    fn get_tcx_mut(&mut self) -> &mut TyCtxt<'tcx> {
+        &mut self.tcx
+    }
+
+    fn get_items(&self) -> &HashMap<DefId, Ty<P>> {
+        &self.items
+    }
+
+    fn get_items_mut(&mut self) -> &mut HashMap<DefId, Ty<P>> {
+        &mut self.items
+    }
+
+    fn get_locals(&self) -> &HashMap<HirId, Ty<P>> {
+        &self.locals
+    }
+
+    fn get_locals_mut(&mut self) -> &mut HashMap<HirId, Ty<P>> {
+        &mut self.locals
+    }
+
+    fn enter_scope(&mut self, ty: &Ty<P>) {
+        self.context.push(ty.clone())
+    }
+
+    fn exit_scope(&mut self) {
+        self.context.pop();
+    }
+
+    fn influence(&self, ty: Ty<P>) -> Ty<P> {
+        let mut result = ty;
+
+        for infl in &self.context {
+            result = infl.merge(result);
+        }
+
+        result
+    }
+
+    fn ty_bottom(&self) -> Ty<P> {
+        self.influence(Ty::new(P::bottom(), TyKind::Infer))
+    }
+
+    fn ty_top(&self) -> Ty<P> {
+        Ty::new(P::top(), TyKind::Infer)
     }
 }

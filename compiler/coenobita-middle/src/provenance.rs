@@ -66,6 +66,14 @@ impl Property for ProvenancePair {
     }
 
     fn merge(&self, other: Self) -> Self {
-        todo!()
+        unimplemented!()
+    }
+
+    fn bottom() -> Self {
+        unimplemented!()
+    }
+
+    fn top() -> Self {
+        unimplemented!()
     }
 }
