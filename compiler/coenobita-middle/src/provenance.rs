@@ -1,6 +1,6 @@
-use std::fmt::Display;
+use std::{collections::HashSet, fmt::Display};
 
-use coenobita_ast::provenance;
+use itertools::Itertools;
 
 use crate::property::Property;
 
@@ -17,12 +17,6 @@ impl ProvenancePair {
     }
 }
 
-impl From<provenance::ProvenancePair> for ProvenancePair {
-    fn from(value: provenance::ProvenancePair) -> Self {
-        ProvenancePair(value.first.into(), value.last.into())
-    }
-}
-
 impl Display for ProvenancePair {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "({},{})", self.first(), self.last())
@@ -31,7 +25,7 @@ impl Display for ProvenancePair {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Provenance {
-    Specific(String),
+    Specific(HashSet<String>),
     Universal,
 }
 
@@ -41,19 +35,14 @@ impl Default for Provenance {
     }
 }
 
-impl From<provenance::Provenance> for Provenance {
-    fn from(value: provenance::Provenance) -> Self {
-        match value {
-            provenance::Provenance::Universal(_) => Self::Universal,
-            provenance::Provenance::Specific(origin, _) => Self::Specific(origin.to_string()),
-        }
-    }
-}
-
 impl Display for Provenance {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Specific(origin) => write!(f, "{origin}"),
+            Self::Specific(origins) => {
+                let origins = origins.iter().sorted().join(",");
+                write!(f, "{origins}")
+            }
+
             Self::Universal => write!(f, "*"),
         }
     }
@@ -74,5 +63,9 @@ impl Property for ProvenancePair {
         };
 
         first && last
+    }
+
+    fn merge(&self, other: Self) -> Self {
+        todo!()
     }
 }

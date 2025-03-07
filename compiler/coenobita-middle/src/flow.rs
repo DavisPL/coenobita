@@ -1,47 +1,40 @@
-use std::{collections::HashSet, fmt::Display};
+use std::collections::HashSet;
+use std::fmt;
 
-use coenobita_ast::flow;
 use itertools::Itertools;
 
 use crate::property::Property;
 
 #[derive(Clone, Debug, Default, PartialEq)]
-pub struct FlowPair(pub FlowSet, pub FlowSet);
+pub struct FlowPair {
+    pub(crate) explicit: FlowSet,
+    pub(crate) implicit: FlowSet,
+}
 
 impl FlowPair {
     pub fn new(explicit: FlowSet, implicit: FlowSet) -> Self {
-        FlowPair(explicit, implicit)
-    }
-
-    pub fn origins(&self) -> Vec<String> {
-        todo!()
+        FlowPair { explicit, implicit }
     }
 
     pub fn explicit(&self) -> &FlowSet {
-        &self.0
+        &self.explicit
     }
 
     pub fn implicit(&self) -> &FlowSet {
-        &self.1
+        &self.implicit
     }
 }
 
-impl From<flow::FlowPair> for FlowPair {
-    fn from(value: flow::FlowPair) -> Self {
-        FlowPair(value.explicit.into(), value.implicit.into())
-    }
-}
-
-impl Display for FlowPair {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for FlowPair {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}{}", self.explicit(), self.implicit())
     }
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum FlowSet {
-    Universal,
     Specific(HashSet<String>),
+    Universal,
 }
 
 impl FlowSet {
@@ -75,19 +68,8 @@ impl Default for FlowSet {
     }
 }
 
-impl From<flow::FlowSet> for FlowSet {
-    fn from(value: flow::FlowSet) -> Self {
-        match value {
-            flow::FlowSet::Universal(_) => Self::Universal,
-            flow::FlowSet::Specific(origins, _) => {
-                Self::Specific(origins.iter().map(|ident| ident.to_string()).collect())
-            }
-        }
-    }
-}
-
-impl Display for FlowSet {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for FlowSet {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Specific(origins) => {
                 let origins = origins.iter().map(|ident| ident.to_string()).sorted().join(",");
@@ -107,5 +89,12 @@ impl Property for FlowPair {
         let implicit = self.implicit().is_subset(other.implicit());
 
         explicit && implicit
+    }
+
+    fn merge(&self, other: Self) -> Self {
+        let explicit = self.explicit().union(other.explicit());
+        let implicit = self.implicit().union(other.implicit());
+
+        Self { explicit, implicit }
     }
 }

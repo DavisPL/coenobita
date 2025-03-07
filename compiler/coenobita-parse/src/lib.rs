@@ -12,7 +12,8 @@ extern crate rustc_span;
 use std::io;
 use std::sync::Arc;
 
-use coenobita_ast::flow::FlowPair;
+use coenobita_middle::property::Property;
+use coenobita_middle::ty::Ty;
 use parse::{CoenobitaParser, Parse};
 use rustc_ast::token::Delimiter;
 use rustc_ast::token::TokenKind::{self, CloseDelim, Comma, OpenDelim};
@@ -37,26 +38,25 @@ use rustc_span::source_map::SourceMap;
 use rustc_span::symbol::kw;
 use rustc_span::{BytePos, Span};
 
-use coenobita_ast::ast::{Ty, TyKind};
+use coenobita_ast::{TyAST, TyKindAST};
 
-mod parse;
+pub mod parse;
 
 impl<'cnbt> CoenobitaParser<'cnbt> {
     pub fn new(parser: Parser<'cnbt>) -> Self {
         CoenobitaParser { parser }
     }
 
-    pub fn parse_ty<T: Parse>(&mut self) -> PResult<'cnbt, Ty<T>> {
+    pub fn parse_ty<P: Property + Parse>(&mut self) -> PResult<'cnbt, TyAST<P>> {
         let start = self.start();
 
-        Ok(Ty {
-            property: T::parse(self)?,
-            kind: self.parse_ty_kind()?,
+        Ok(TyAST {
+            inner: Ty::new(P::parse(self)?, self.parse_ty_kind()?.into()),
             span: self.end(start),
         })
     }
 
-    pub fn parse_ty_kind<T: Parse>(&mut self) -> PResult<'cnbt, TyKind<T>> {
+    pub fn parse_ty_kind<P: Property + Parse>(&mut self) -> PResult<'cnbt, TyKindAST<P>> {
         if self.parser.eat_keyword(kw::Fn) {
             // We are parsing a function type
             self.parser.expect(&OpenDelim(Delimiter::Parenthesis))?;
@@ -73,7 +73,7 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
             self.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
             self.parser.expect(&TokenKind::RArrow)?;
 
-            Ok(TyKind::Fn(args, Box::new(self.parse_ty()?)))
+            Ok(TyKindAST::Fn(args, Box::new(self.parse_ty()?)))
         } else if self.parser.eat_keyword(kw::Struct) {
             // We are parsing a struct type
             if self.parser.token.kind == OpenDelim(Delimiter::Brace) {
@@ -93,7 +93,7 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
                 }
 
                 self.parser.expect(&CloseDelim(Delimiter::Brace))?;
-                Ok(TyKind::Struct(fields))
+                Ok(TyKindAST::Struct(fields))
             } else {
                 // We are parsing a `( ... )` struct
                 self.parser.expect(&OpenDelim(Delimiter::Parenthesis))?;
@@ -108,7 +108,7 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
                 }
 
                 self.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
-                Ok(TyKind::StructTuple(elements))
+                Ok(TyKindAST::StructTuple(elements))
             }
         } else if self.parser.eat(&OpenDelim(Delimiter::Parenthesis)) {
             // We are parsing a tuple type
@@ -122,14 +122,14 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
             }
 
             self.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
-            Ok(TyKind::Tuple(elements))
+            Ok(TyKindAST::Tuple(elements))
         } else if self.parser.eat(&OpenDelim(Delimiter::Bracket)) {
             // We are parsing an array type
             let element = self.parse_ty()?;
             self.parser.expect(&CloseDelim(Delimiter::Bracket))?;
-            Ok(TyKind::Array(Box::new(element)))
+            Ok(TyKindAST::Array(Box::new(element)))
         } else {
-            Ok(TyKind::Opaque)
+            Ok(TyKindAST::Opaque)
         }
     }
 

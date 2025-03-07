@@ -1,10 +1,11 @@
-use coenobita_ast::provenance::{Provenance, ProvenancePair};
+use std::collections::HashSet;
+
+use coenobita_middle::flow::{FlowPair, FlowSet};
+use coenobita_middle::provenance::{Provenance, ProvenancePair};
 use rustc_ast::token::TokenKind::{self, BinOp, CloseDelim, Comma, OpenDelim};
 use rustc_ast::token::{BinOpToken, Delimiter};
 use rustc_errors::PResult;
 use rustc_parse::parser::Parser;
-
-use coenobita_ast::flow::{FlowPair, FlowSet};
 
 pub struct CoenobitaParser<'cnbt> {
     pub parser: Parser<'cnbt>,
@@ -26,11 +27,7 @@ impl Parse for ProvenancePair {
 
         parser.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
 
-        Ok(ProvenancePair {
-            first,
-            last,
-            span: parser.end(start),
-        })
+        Ok(ProvenancePair(first, last))
     }
 }
 
@@ -39,40 +36,36 @@ impl Parse for Provenance {
         let start = parser.start();
 
         if parser.parser.eat(&BinOp(BinOpToken::Star)) {
-            Ok(Provenance::Universal(parser.end(start)))
+            Ok(Provenance::Universal)
         } else {
-            Ok(Provenance::Specific(
-                parser.parser.parse_ident()?,
-                parser.end(start),
-            ))
+            let mut origins = HashSet::new();
+            origins.insert(parser.parser.parse_ident()?.to_string());
+
+            Ok(Provenance::Specific(origins))
         }
     }
 }
 
 impl Parse for FlowPair {
     fn parse<'cnbt>(parser: &mut CoenobitaParser<'cnbt>) -> PResult<'cnbt, Self> {
-        let start = parser.start();
+        let explicit = FlowSet::parse(parser)?;
+        let implicit = FlowSet::parse(parser)?;
 
-        Ok(FlowPair {
-            explicit: FlowSet::parse(parser)?,
-            implicit: FlowSet::parse(parser)?,
-            span: parser.end(start),
-        })
+        Ok(FlowPair::new(explicit, implicit))
     }
 }
 
 impl Parse for FlowSet {
     fn parse<'cnbt>(parser: &mut CoenobitaParser<'cnbt>) -> PResult<'cnbt, Self> {
-        let start = parser.start();
         parser.parser.expect(&OpenDelim(Delimiter::Brace))?;
 
         if parser.parser.eat(&BinOp(BinOpToken::Star)) {
             parser.parser.expect(&CloseDelim(Delimiter::Brace))?;
-            Ok(FlowSet::Universal(parser.end(start)))
+            Ok(FlowSet::Universal)
         } else {
-            let mut origins = vec![];
+            let mut origins = HashSet::new();
             while parser.parser.token != CloseDelim(Delimiter::Brace) {
-                origins.push(parser.parser.parse_ident()?);
+                origins.insert(parser.parser.parse_ident()?.to_string());
 
                 if parser.parser.token != CloseDelim(Delimiter::Brace) {
                     parser.parser.expect(&Comma)?;
@@ -80,7 +73,7 @@ impl Parse for FlowSet {
             }
 
             parser.parser.expect(&CloseDelim(Delimiter::Brace))?;
-            Ok(FlowSet::Specific(origins, parser.end(start)))
+            Ok(FlowSet::Specific(origins))
         }
     }
 }

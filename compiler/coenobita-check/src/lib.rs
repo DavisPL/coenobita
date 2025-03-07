@@ -13,13 +13,13 @@ extern crate rustc_target;
 
 use std::collections::HashMap;
 
-use coenobita_ast::ast::TyKind as ATyKind;
+use coenobita_ast::{TyAST, TyKindAST as ATyKind};
 use coenobita_middle::property::Property;
 use coenobita_middle::ty::{Ty, TyKind};
 
-use coenobita_parse::{create_parser, create_psess};
+use coenobita_parse::{create_parser, create_psess, parse::Parse};
 use expectation::Expectation;
-use rustc_ast::AttrKind;
+use rustc_ast::{AttrKind, Attribute};
 use rustc_hir::def::{CtorOf, DefKind, Res};
 use rustc_hir::def_id::DefId;
 use rustc_hir::{
@@ -81,11 +81,14 @@ mod shared;
 
 pub type Result<T = ()> = std::result::Result<T, ErrorGuaranteed>;
 
-pub trait Check<'tcx, P: Property> {
+pub trait Check<'tcx, P: Property + Parse> {
     // ======== GETTERS ======== //
 
     /// Return a shared reference to the attribute we are seeking.
     fn get_attr(&self) -> &[Symbol];
+
+    /// Return an immutable reference to the global typing context.
+    fn get_tcx(&self) -> &TyCtxt<'tcx>;
 
     /// Return a mutable reference to the global typing context.
     fn get_tcx_mut(&mut self) -> &mut TyCtxt<'tcx>;
@@ -318,7 +321,67 @@ pub trait Check<'tcx, P: Property> {
     }
 
     fn check_item_fn(&mut self, signature: &FnSig, body_id: BodyId) -> Result {
-        unimplemented!()
+        let def_id = body_id.hir_id.owner.to_def_id();
+        let expected = signature.decl.inputs.iter().count();
+
+        let mut default = self.influence(Ty::ty_fn(expected));
+
+        match self
+            .get_tcx_mut()
+            .get_attrs_by_path(def_id, self.get_attr())
+            .next()
+        {
+            Some(attr) => {
+                if let Ok(ty) = self.parse_attr(attr) {
+                    match ty.inner.kind() {
+                        TyKind::Fn(ref arg_tys, _) => {
+                            // Make sure the number of arguments matches
+                            let actual = arg_tys.len();
+
+                            if actual == expected {
+                                // Note that we currently don't check whether types have the correct shape
+                                default = self.influence(ty.into());
+                            } else {
+                                let msg = format!(
+                                    "Function must have {expected} arguments, but its Coenobita signature has {actual}"
+                                );
+
+                                self.get_tcx().dcx().span_err(ty.span, msg);
+                            }
+                        }
+
+                        _ => {
+                            let msg = format!("Expected function type, found {}", ty);
+                            self.get_tcx().dcx().span_err(ty.span, msg);
+                        }
+                    }
+                };
+            }
+
+            None => {}
+        }
+
+        self.get_items_mut().insert(def_id, default);
+
+        let TyKind::Fn(args, expected) = self.fn_ty(def_id).kind else {
+            panic!()
+        };
+
+        let body = self.get_tcx().hir().body(body_id);
+
+        for (param, arg) in body.params.iter().zip(args) {
+            self.get_locals_mut().insert(param.pat.hir_id, arg);
+        }
+
+        let expr = body.value;
+        let actual = self.check_expr(&body.value, &Expectation::ExpectHasType(*expected.clone()), false)?;
+
+        if !actual.satisfies(&expected) {
+            let msg = format!("Expected {expected}, found {actual}");
+            self.get_tcx_mut().dcx().span_err(expr.span, msg);
+        }
+
+        Ok(())
     }
 
     fn check_impl_item(&mut self, item: &ImplItem) -> Result {
@@ -349,11 +412,98 @@ pub trait Check<'tcx, P: Property> {
     }
 
     fn check_item_struct(&mut self, def_id: DefId, field_defs: &[FieldDef]) -> Result {
-        unimplemented!()
+        let fields = match self.get_tcx().get_attrs_by_path(def_id, &self.get_attr()).next() {
+            Some(attr) => {
+                let mut map = HashMap::new();
+
+                if let Ok(ty) = self.parse_attr(attr) {
+                    match ty.inner.kind() {
+                        TyKind::Adt(elements) => {
+                            for (name, ty) in elements {
+                                map.insert(name, self.influence(ty.clone().into()));
+                            }
+                        }
+
+                        TyKind::Tuple(ref elements) => {
+                            let len = elements.len();
+                            for (i, ty) in (0..len).zip(elements) {
+                                map.insert(Symbol::intern(&i.to_string()), ty.clone().into());
+                            }
+                        }
+
+                        _ => {}
+                    }
+                };
+
+                map
+            }
+
+            None => {
+                // There is no attribute on the struct as a whole, so we will check for attributes on its fields
+                let mut fields = HashMap::new();
+
+                for field in field_defs {
+                    match self
+                        .get_tcx()
+                        .get_attrs_by_path(field.did, &self.get_attr())
+                        .next()
+                    {
+                        Some(attr) => {
+                            if let Ok(ty) = self.parse_attr(attr) {
+                                fields.insert(field.name, ty.into());
+                            };
+                        }
+
+                        _ => {
+                            fields.insert(field.name, self.ty_top());
+                        }
+                    };
+                }
+
+                fields
+            }
+        };
+
+        // Since this type is a struct definition, its flow pair will never be used and is only here for consistency
+        let mut ty = self.ty_bottom();
+        ty.kind = TyKind::Adt(fields);
+
+        self.get_items_mut().insert(def_id, ty);
+
+        Ok(())
     }
 
     fn check_let_stmt(&mut self, local: &LetStmt) -> Result {
-        unimplemented!()
+        let mut processed = false;
+
+        for attr in self.get_tcx_mut().hir().attrs(local.hir_id) {
+            if attr.path_matches(&self.get_attr()) {
+                if let Ok(ty) = self.parse_attr(attr) {
+                    let expected: Ty<P> = ty.into();
+                    self.process_pattern(local.pat.kind, expected.clone(), local.pat.hir_id);
+
+                    if let Some(expr) = local.init {
+                        self.check_expr(expr, &Expectation::ExpectHasType(expected.clone()), false)?;
+                    } else {
+                        self.process_pattern(local.pat.kind, self.ty_top(), local.pat.hir_id);
+                    }
+                };
+
+                processed = true;
+            }
+        }
+
+        if !processed {
+            // There was no tag, so we cannot make any assumptions about the intended type
+            if let Some(expr) = local.init {
+                self.check_expr(expr, &Expectation::NoExpectation, false)?;
+                self.process_pattern(local.pat.kind, self.ty_top(), local.pat.hir_id);
+            } else {
+                self.process_pattern(local.pat.kind, self.ty_top(), local.pat.hir_id);
+            }
+        }
+
+        Ok(())
     }
 
     // ======== EXPRESSIONS ======== //
@@ -635,8 +785,7 @@ pub trait Check<'tcx, P: Property> {
         let mut rty = self.check_expr(then_expr, expectation, false)?;
 
         if let Some(else_expr) = else_expr {
-            unimplemented!()
-            // rty = rty.merge(self.check_expr(else_expr, expectation, false)?);
+            rty = rty.merge(self.check_expr(else_expr, expectation, false)?);
         }
 
         self.exit_scope();
@@ -670,9 +819,7 @@ pub trait Check<'tcx, P: Property> {
 
         for arm in arms {
             self.process_pattern(arm.pat.kind, ity.clone(), arm.pat.hir_id);
-
-            unimplemented!()
-            // result = result.merge(self.check_expr(arm.body, expectation, false)?)
+            result = result.merge(self.check_expr(arm.body, expectation, false)?)
         }
 
         self.exit_scope();
@@ -692,8 +839,7 @@ pub trait Check<'tcx, P: Property> {
     fn check_expr_binary(&mut self, lhs: &Expr, rhs: &Expr, expectation: &Expectation<P>) -> Result<Ty<P>> {
         let lty = self.check_expr(lhs, expectation, false)?;
         let rty = self.check_expr(rhs, expectation, false)?;
-
-        let ty = unimplemented!(); // lty.merge(rty);
+        let ty = lty.merge(rty);
 
         Ok(ty)
     }
@@ -743,8 +889,8 @@ pub trait Check<'tcx, P: Property> {
                     let mut result = self.ty_bottom();
 
                     for field in fields {
-                        unimplemented!()
-                        // result = result.merge(self.check_expr(field.expr, &Expectation::NoExpectation, false)?);
+                        result =
+                            result.merge(self.check_expr(field.expr, &Expectation::NoExpectation, false)?);
                     }
 
                     result
@@ -786,8 +932,7 @@ pub trait Check<'tcx, P: Property> {
         let mut item = self.ty_bottom();
 
         for expr in exprs {
-            unimplemented!()
-            // item = item.merge(self.check_expr(expr, &Expectation::NoExpectation, false)?);
+            item = item.merge(self.check_expr(expr, &Expectation::NoExpectation, false)?);
         }
 
         result.kind = TyKind::Array(Box::new(item));
@@ -925,5 +1070,20 @@ pub trait Check<'tcx, P: Property> {
                 Ok(self.ty_bottom())
             }
         }
+    }
+
+    // ======== ATTRIBUTE PARSING ======== //
+
+    fn parse_attr(&self, attr: &Attribute) -> Result<TyAST<P>> {
+        let AttrKind::Normal(normal) = &attr.kind else {
+            unreachable!()
+        };
+
+        let psess = create_psess(self.get_tcx());
+        let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
+
+        parser
+            .parse_ty()
+            .map_err(|err| self.get_tcx().dcx().span_err(err.span.clone(), "failed to parse"))
     }
 }

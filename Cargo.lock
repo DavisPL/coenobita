@@ -6,6 +6,7 @@ version = 3
 name = "coenobita-ast"
 version = "0.1.0"
 dependencies = [
+ "coenobita-middle",
  "itertools",
 ]
 
@@ -45,7 +46,6 @@ dependencies = [
 name = "coenobita-middle"
 version = "0.1.0"
 dependencies = [
- "coenobita-ast",
  "itertools",
 ]
 
@@ -54,6 +54,7 @@ name = "coenobita-parse"
 version = "0.1.0"
 dependencies = [
  "coenobita-ast",
+ "coenobita-middle",
 ]
 
 [[package]]

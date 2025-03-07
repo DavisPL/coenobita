@@ -7,4 +7,5 @@ edition = "2021"
 rustc_private = true
 
 [dependencies]
+coenobita-middle.workspace = true
 itertools.workspace = true

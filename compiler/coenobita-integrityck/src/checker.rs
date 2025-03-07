@@ -1,7 +1,7 @@
 use log::{debug, warn};
 use std::collections::HashMap;
 
-use coenobita_ast::ast::TyKind as ATyKind;
+use coenobita_ast::TyKindAST as ATyKind;
 use coenobita_middle::map::Map;
 use coenobita_middle::ty::TyKind;
 
