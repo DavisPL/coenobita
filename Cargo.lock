@@ -32,17 +32,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "coenobita-integrityck"
-version = "0.1.0"
-dependencies = [
- "coenobita-ast",
- "coenobita-middle",
- "coenobita-parse",
- "itertools",
- "log",
-]
-
-[[package]]
 name = "coenobita-middle"
 version = "0.1.0"
 dependencies = [
@@ -56,16 +45,6 @@ version = "0.1.0"
 dependencies = [
  "coenobita-ast",
  "coenobita-middle",
-]
-
-[[package]]
-name = "coenobita-provck"
-version = "0.1.0"
-dependencies = [
- "coenobita-ast",
- "coenobita-middle",
- "coenobita-parse",
- "log",
 ]
 
 [[package]]

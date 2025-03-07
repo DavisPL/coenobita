@@ -117,7 +117,7 @@ fn logging_setup(crate_name: &str) {
     let root_dir = env!("CARGO_MANIFEST_DIR");
 
     // Create logging directory if it doesn't already exist
-    let log_dir = Path::new(root_dir).join("logs");
+    let log_dir = Path::new(root_dir).join("../..").join("logs");
     fs::create_dir_all(&log_dir).expect(&format!(
         "Failed to create Coenobita logging directory at {}",
         log_dir.display()
