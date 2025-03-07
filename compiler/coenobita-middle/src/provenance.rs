@@ -1,6 +1,7 @@
 use std::{collections::HashSet, fmt::Display};
 
 use itertools::Itertools;
+use rustc_span::Symbol;
 
 use crate::property::Property;
 
@@ -27,6 +28,18 @@ impl Display for ProvenancePair {
 pub enum Provenance {
     Specific(HashSet<String>),
     Universal,
+}
+
+impl Provenance {
+    pub fn union(&self, other: &Self) -> Self {
+        match self {
+            Self::Universal => Self::Universal,
+            Self::Specific(s1) => match other {
+                Self::Universal => Self::Universal,
+                Self::Specific(s2) => Self::Specific(s1.union(&s2).cloned().collect()),
+            },
+        }
+    }
 }
 
 impl Default for Provenance {
@@ -66,14 +79,21 @@ impl Property for ProvenancePair {
     }
 
     fn merge(&self, other: Self) -> Self {
-        unimplemented!()
+        Self(self.first().union(other.first()), self.last().union(other.last()))
     }
 
-    fn bottom() -> Self {
-        unimplemented!()
+    fn bottom(origin: String) -> Self {
+        let mut set = HashSet::new();
+        set.insert(origin);
+
+        Self(Provenance::Specific(set.clone()), Provenance::Specific(set))
     }
 
     fn top() -> Self {
-        unimplemented!()
+        Self(Provenance::Universal, Provenance::Universal)
+    }
+
+    fn attr() -> Vec<Symbol> {
+        vec![Symbol::intern("cnbt"), Symbol::intern("observation")]
     }
 }

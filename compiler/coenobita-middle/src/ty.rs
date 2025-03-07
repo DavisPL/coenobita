@@ -5,8 +5,10 @@ use crate::property::Property;
 use itertools::Itertools;
 use rustc_span::Symbol;
 
+use log::debug;
+
 #[derive(Debug, Clone, PartialEq)]
-pub struct Ty<P> {
+pub struct Ty<P: Property> {
     pub property: P,
 
     pub kind: TyKind<P>,
@@ -32,50 +34,53 @@ impl<P: Property> Ty<P> {
     }
 
     pub fn satisfies(&self, other: &Ty<P>) -> bool {
-        self.property.satisfies(&other.property)
-            && match (self.kind(), other.kind()) {
-                // TODO: `Abs` should really be `Infer`
-                (_, TyKind::Opaque) => true,
-                (_, TyKind::Infer) => true,
-                (TyKind::Adt(f1), TyKind::Adt(f2)) => {
-                    if f1.len() != f2.len() {
-                        false
-                    } else {
-                        for (field, ty) in f1 {
-                            if !f2.contains_key(&field) || !ty.satisfies(&f2[&field]) {
-                                return false;
-                            }
-                        }
+        let s = self.property.satisfies(&other.property);
 
-                        true
-                    }
-                }
-                (TyKind::Array(t1), TyKind::Array(t2)) => t1.satisfies(&t2),
-                (TyKind::Fn(as1, r1), TyKind::Fn(as2, r2)) => {
-                    // Subtyping is contravariant for argument types
-                    if as1.len() != as2.len() {
-                        return false;
-                    } else {
-                        for (a1, a2) in as1.iter().zip(as2) {
-                            if !a1.satisfies(&a2) {
-                                return false;
-                            }
-                        }
-                    }
+        debug!("does {} satisfy {}? {s}", self.property, other.property);
 
-                    r1.satisfies(&r2)
-                }
-                (TyKind::Tuple(items1), TyKind::Tuple(items2)) => {
-                    for (i1, i2) in items1.iter().zip(items2) {
-                        if !i1.satisfies(&i2) {
+        s && match (self.kind(), other.kind()) {
+            // TODO: `Abs` should really be `Infer`
+            (_, TyKind::Opaque) => true,
+            (_, TyKind::Infer) => true,
+            (TyKind::Adt(f1), TyKind::Adt(f2)) => {
+                if f1.len() != f2.len() {
+                    false
+                } else {
+                    for (field, ty) in f1 {
+                        if !f2.contains_key(&field) || !ty.satisfies(&f2[&field]) {
                             return false;
                         }
                     }
 
                     true
                 }
-                _ => false,
             }
+            (TyKind::Array(t1), TyKind::Array(t2)) => t1.satisfies(&t2),
+            (TyKind::Fn(as1, r1), TyKind::Fn(as2, r2)) => {
+                // Subtyping is contravariant for argument types
+                if as1.len() != as2.len() {
+                    return false;
+                } else {
+                    for (a1, a2) in as1.iter().zip(as2) {
+                        if !a1.satisfies(&a2) {
+                            return false;
+                        }
+                    }
+                }
+
+                r1.satisfies(&r2)
+            }
+            (TyKind::Tuple(items1), TyKind::Tuple(items2)) => {
+                for (i1, i2) in items1.iter().zip(items2) {
+                    if !i1.satisfies(&i2) {
+                        return false;
+                    }
+                }
+
+                true
+            }
+            _ => false,
+        }
     }
 
     pub fn merge(&self, other: Self) -> Self {
@@ -111,23 +116,23 @@ impl Ty<FlowPair> {
     }
 }
 
-impl<T: Display> Display for Ty<T> {
+impl<P: Property> Display for Ty<P> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}{}", self.property, self.kind)
     }
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum TyKind<T> {
+pub enum TyKind<P: Property> {
     Opaque,
-    Fn(Vec<Ty<T>>, Box<Ty<T>>),
-    Tuple(Vec<Ty<T>>),
-    Array(Box<Ty<T>>),
-    Adt(HashMap<Symbol, Ty<T>>),
+    Fn(Vec<Ty<P>>, Box<Ty<P>>),
+    Tuple(Vec<Ty<P>>),
+    Array(Box<Ty<P>>),
+    Adt(HashMap<Symbol, Ty<P>>),
     Infer,
 }
 
-impl<T: Display> Display for TyKind<T> {
+impl<P: Property> Display for TyKind<P> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Fn(arg_tys, ret_ty) => {

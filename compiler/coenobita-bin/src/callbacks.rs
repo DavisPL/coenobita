@@ -1,10 +1,9 @@
+use coenobita_check::{Check, Checker};
+use coenobita_middle::{flow::FlowPair, provenance::ProvenancePair};
 use rustc_driver::{Callbacks, Compilation};
 use rustc_hir::{intravisit::Visitor, Item};
 use rustc_interface::{interface::Compiler, Queries};
 use rustc_middle::{hir::nested_filter::OnlyBodies, ty::TyCtxt};
-
-use coenobita_integrityck::{checker::Checker as IChecker, context::Context as IContext};
-use coenobita_provck::{checker::Checker as PChecker, context::Context as PContext};
 
 pub struct CoenobitaCallbacks {
     crate_name: String,
@@ -56,20 +55,17 @@ impl Callbacks for CoenobitaCallbacks {
 struct CoenobitaVisitor<'cnbt, 'tcx> {
     crate_name: &'cnbt str,
     tcx: TyCtxt<'tcx>,
-    ichecker: IChecker<'cnbt, 'tcx>,
-    pchecker: PChecker<'cnbt, 'tcx>,
+    ichecker: Checker<'tcx, FlowPair>,
+    pchecker: Checker<'tcx, ProvenancePair>,
 }
 
 impl<'c, 'tcx> CoenobitaVisitor<'c, 'tcx> {
     pub fn new(crate_name: &'c str, crate_type: &'c str, tcx: TyCtxt<'tcx>) -> Self {
-        let icontext = IContext::new(crate_name, crate_type);
-        let pcontext = PContext::new(crate_name, crate_type);
-
         CoenobitaVisitor {
             crate_name,
             tcx,
-            ichecker: IChecker::new(tcx, icontext),
-            pchecker: PChecker::new(tcx, pcontext),
+            ichecker: Checker::new(crate_name.to_owned(), tcx),
+            pchecker: Checker::new(crate_name.to_string(), tcx),
         }
     }
 }

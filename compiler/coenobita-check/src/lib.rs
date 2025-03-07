@@ -11,7 +11,7 @@ extern crate rustc_session;
 extern crate rustc_span;
 extern crate rustc_target;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use coenobita_ast::{TyAST, TyKindAST as ATyKind};
 use coenobita_middle::flow::FlowPair;
@@ -32,7 +32,7 @@ use rustc_span::symbol::Ident;
 use rustc_span::{ErrorGuaranteed, Span, Symbol};
 use rustc_target::abi::{VariantIdx, FIRST_VARIANT};
 
-use log::warn;
+use log::{debug, warn};
 
 mod expectation;
 mod shared;
@@ -127,6 +127,8 @@ pub trait Check<'tcx, P: Property + Parse> {
 
     /// Given the `DefId` of a function, return its type.
     fn fn_ty(&mut self, def_id: DefId) -> Ty<P> {
+        debug!("getting ty of func {:?}", def_id);
+
         if let Some(ty) = self.get_items().get(&def_id) {
             return ty.clone();
         }
@@ -386,9 +388,13 @@ pub trait Check<'tcx, P: Property + Parse> {
             None => {}
         }
 
+        debug!("bindging {:?} to ty {:?}", def_id, default);
+
         self.get_items_mut().insert(def_id, default);
 
-        let TyKind::Fn(args, expected) = self.fn_ty(def_id).kind else {
+        let ty_kind = self.fn_ty(def_id).kind;
+        let TyKind::Fn(args, expected) = ty_kind else {
+            debug!("tykind is not a func but rather {:?}", ty_kind);
             panic!()
         };
 
@@ -708,7 +714,7 @@ pub trait Check<'tcx, P: Property + Parse> {
     fn check_expr_call(&mut self, func: &Expr, args: &[Expr], span: Span) -> Result<Ty<P>> {
         let fty = self.check_expr(func, &Expectation::NoExpectation, false)?;
 
-        match fty.kind() {
+        let ty = match fty.clone().kind() {
             TyKind::Fn(arg_tys, ret_ty) => {
                 if args.len() != arg_tys.len() {
                     // let msg = format!(
@@ -736,14 +742,16 @@ pub trait Check<'tcx, P: Property + Parse> {
                     self.check_expr(arg, &expectation, false)?;
                 }
 
-                Ok(fty)
+                Ok(fty.clone())
             }
 
             _ => {
                 warn!("Cannot tell if expression is a function - {:?}", func);
-                Ok(fty)
+                Ok(fty.clone())
             }
-        }
+        };
+
+        Ok(ty?.merge(fty))
     }
 
     /// Checks the type of a method call.
@@ -1114,6 +1122,9 @@ pub trait Check<'tcx, P: Property + Parse> {
 }
 
 pub struct Checker<'tcx, P: Property> {
+    /// Contains the name of the crate we're checking.
+    crate_name: String,
+
     /// Contains the attribute we are targeting as a sequence of symbols.
     attr: Vec<Symbol>,
 
@@ -1127,6 +1138,19 @@ pub struct Checker<'tcx, P: Property> {
     locals: HashMap<HirId, Ty<P>>,
 
     context: Vec<Ty<P>>,
+}
+
+impl<'tcx, P: Property> Checker<'tcx, P> {
+    pub fn new(crate_name: String, tcx: TyCtxt<'tcx>) -> Self {
+        Self {
+            crate_name: crate_name.clone(),
+            attr: P::attr(),
+            tcx,
+            items: HashMap::new(),
+            locals: HashMap::new(),
+            context: vec![Ty::new(P::bottom(crate_name), TyKind::Infer)],
+        }
+    }
 }
 
 impl<'tcx, P: Property + Parse> Check<'tcx, P> for Checker<'tcx, P> {
@@ -1170,14 +1194,14 @@ impl<'tcx, P: Property + Parse> Check<'tcx, P> for Checker<'tcx, P> {
         let mut result = ty;
 
         for infl in &self.context {
-            result = infl.merge(result);
+            result = result.merge(infl.clone());
         }
 
         result
     }
 
     fn ty_bottom(&self) -> Ty<P> {
-        self.influence(Ty::new(P::bottom(), TyKind::Infer))
+        self.influence(Ty::new(P::bottom(self.crate_name.clone()), TyKind::Infer))
     }
 
     fn ty_top(&self) -> Ty<P> {

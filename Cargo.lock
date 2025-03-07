@@ -14,8 +14,8 @@ dependencies = [
 name = "coenobita-bin"
 version = "0.1.0"
 dependencies = [
- "coenobita-integrityck",
- "coenobita-provck",
+ "coenobita-check",
+ "coenobita-middle",
  "log",
  "simplelog",
 ]
@@ -47,6 +47,7 @@ name = "coenobita-middle"
 version = "0.1.0"
 dependencies = [
  "itertools",
+ "log",
 ]
 
 [[package]]

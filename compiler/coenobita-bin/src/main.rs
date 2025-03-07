@@ -14,7 +14,11 @@ extern crate rustc_session;
 extern crate rustc_span;
 
 use log::{debug, error, info, warn, LevelFilter};
-use std::{env, fs::File, path::Path};
+use std::{
+    env,
+    fs::{self, File, OpenOptions},
+    path::Path,
+};
 
 use callbacks::CoenobitaCallbacks;
 
@@ -58,7 +62,7 @@ fn main() {
         // }
 
         debug!("linking release std lib");
-        args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/release/libstd.rlib".to_string());
+        // args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/release/libstd.rlib".to_string());
     }
 
     // Create callbacks and run the compiler
@@ -93,7 +97,7 @@ fn crate_release(args: &[String]) -> bool {
 
 fn logging_setup(crate_name: &str) {
     // Check the environment variable
-    let log_level = env::var("COENOBITA_LOG_LEVEL").unwrap_or_else(|_| "OFF".to_string());
+    let log_level = env::var("COENOBITA_LOG_LEVEL").unwrap_or_else(|_| "DEBUG".to_string());
 
     // Decide the level filter based on the environment variable
     let level_filter = match log_level.as_str() {
@@ -109,10 +113,26 @@ fn logging_setup(crate_name: &str) {
         return;
     }
 
-    let log = File::create(format!(
-        "/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/logs/{crate_name}.log"
-    ))
-    .expect("Could not create Coenobita logging file");
+    // Determine the root directory
+    let root_dir = env!("CARGO_MANIFEST_DIR");
+
+    // Create logging directory if it doesn't already exist
+    let log_dir = Path::new(root_dir).join("logs");
+    fs::create_dir_all(&log_dir).expect(&format!(
+        "Failed to create Coenobita logging directory at {}",
+        log_dir.display()
+    ));
+
+    let path = log_dir.join(crate_name).with_extension("log");
+    let log = OpenOptions::new()
+        .write(true)
+        .truncate(true)
+        .create(true)
+        .open(&path)
+        .expect(&format!(
+            "Failed to create Whelk logging file at {}",
+            path.display()
+        ));
 
     let config = ConfigBuilder::new()
         .set_time_level(log::LevelFilter::Off) // Don't show time

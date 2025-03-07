@@ -2,6 +2,9 @@ use std::collections::HashSet;
 use std::fmt;
 
 use itertools::Itertools;
+use rustc_span::Symbol;
+
+use log::debug;
 
 use crate::property::Property;
 
@@ -88,6 +91,19 @@ impl Property for FlowPair {
         let explicit = self.explicit().is_subset(other.explicit());
         let implicit = self.implicit().is_subset(other.implicit());
 
+        debug!(
+            "is {} a subset of {}? {}",
+            self.explicit(),
+            other.explicit(),
+            explicit
+        );
+        debug!(
+            "is {} a subset of {}? {}",
+            self.implicit(),
+            other.implicit(),
+            implicit
+        );
+
         explicit && implicit
     }
 
@@ -98,11 +114,24 @@ impl Property for FlowPair {
         Self { explicit, implicit }
     }
 
-    fn bottom() -> Self {
-        unimplemented!()
+    fn bottom(origin: String) -> Self {
+        let mut set = HashSet::new();
+        set.insert(origin);
+
+        Self {
+            explicit: FlowSet::Specific(set.clone()),
+            implicit: FlowSet::Specific(set),
+        }
     }
 
     fn top() -> Self {
-        unimplemented!()
+        Self {
+            explicit: FlowSet::Universal,
+            implicit: FlowSet::Universal,
+        }
+    }
+
+    fn attr() -> Vec<Symbol> {
+        vec![Symbol::intern("cnbt"), Symbol::intern("flow")]
     }
 }

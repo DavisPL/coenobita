@@ -3,13 +3,14 @@
 extern crate rustc_span;
 
 use itertools::Itertools;
+use std::collections::HashMap;
 use std::fmt;
 
 use coenobita_middle::property::Property;
 use coenobita_middle::ty::{Ty, TyKind};
 
 use rustc_span::symbol::Ident;
-use rustc_span::Span;
+use rustc_span::{Span, Symbol};
 
 #[derive(Clone, Debug)]
 pub struct TyAST<P: Property> {
@@ -53,7 +54,33 @@ impl<P: Property> Into<Ty<P>> for TyAST<P> {
 
 impl<P: Property> Into<TyKind<P>> for TyKindAST<P> {
     fn into(self) -> TyKind<P> {
-        unimplemented!()
+        match self {
+            Self::Fn(args, ret) => TyKind::Fn(
+                args.into_iter().map(|t| t.into()).collect(),
+                Box::new(ret.inner.into()),
+            ),
+            Self::Tuple(fields) => TyKind::Tuple(fields.into_iter().map(|t| t.into()).collect()),
+            Self::Array(ty) => TyKind::Array(Box::new(ty.inner)),
+            Self::Struct(fields) => {
+                let mut map = HashMap::new();
+
+                for (ident, ty) in fields {
+                    map.insert(ident.name, ty.into());
+                }
+
+                TyKind::Adt(map)
+            }
+            Self::StructTuple(elements) => {
+                let mut map = HashMap::new();
+
+                for (i, ty) in elements.into_iter().enumerate() {
+                    map.insert(Symbol::intern(&i.to_string()), ty.into());
+                }
+
+                TyKind::Adt(map)
+            }
+            Self::Opaque => TyKind::Opaque,
+        }
     }
 }
 

@@ -11,8 +11,9 @@ coenobita-ast = { path = "./compiler/coenobita-ast" }
 coenobita-bin = { path = "./compiler/coenobita-bin" }
 coenobita-middle = { path = "./compiler/coenobita-middle" }
 coenobita-parse = { path = "./compiler/coenobita-parse" }
-coenobita-integrityck = { path = "./compiler/coenobita-integrityck" }
-coenobita-provck = { path = "./compiler/coenobita-provck" }
+coenobita-check = { path = "./compiler/coenobita-check" }
+# coenobita-integrityck = { path = "./compiler/coenobita-integrityck" }
+# coenobita-provck = { path = "./compiler/coenobita-provck" }
 
 itertools = "0.13.0"
 simplelog = "0.12"
