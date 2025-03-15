@@ -9,3 +9,5 @@ rustc_private = true
 [dependencies]
 itertools.workspace = true
 log.workspace = true
+serde.workspace = true
+serde_json.workspace = true

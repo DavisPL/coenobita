@@ -1,15 +1,14 @@
 use std::collections::HashSet;
 use std::fmt;
+use std::path::Path;
 
-use itertools::Itertools;
 use rustc_span::Symbol;
-
-use log::debug;
+use serde::{Deserialize, Serialize};
 
 use crate::origin::OriginSet;
 use crate::property::Property;
 
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct FlowPair {
     pub(crate) explicit: OriginSet,
     pub(crate) implicit: OriginSet,
@@ -35,75 +34,10 @@ impl fmt::Display for FlowPair {
     }
 }
 
-// #[derive(Clone, Debug, PartialEq)]
-// pub enum OriginSet {
-//     Specific(HashSet<String>),
-//     Universal,
-// }
-
-// impl OriginSet {
-//     pub fn union(&self, other: &OriginSet) -> OriginSet {
-//         match self {
-//             OriginSet::Universal => OriginSet::Universal,
-//             OriginSet::Specific(s1) => match other {
-//                 OriginSet::Universal => OriginSet::Universal,
-//                 OriginSet::Specific(s2) => OriginSet::Specific(s1.union(&s2).cloned().collect()),
-//             },
-//         }
-//     }
-
-//     pub fn is_subset(&self, other: &OriginSet) -> bool {
-//         match self {
-//             OriginSet::Universal => match other {
-//                 OriginSet::Universal => true,
-//                 _ => false,
-//             },
-//             OriginSet::Specific(s1) => match other {
-//                 OriginSet::Specific(s2) => s1.is_subset(&s2),
-//                 _ => true,
-//             },
-//         }
-//     }
-// }
-
-// impl Default for OriginSet {
-//     fn default() -> Self {
-//         Self::Universal
-//     }
-// }
-
-// impl fmt::Display for OriginSet {
-//     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-//         match self {
-//             Self::Specific(origins) => {
-//                 let origins = origins.iter().map(|ident| ident.to_string()).sorted().join(",");
-//                 write!(f, "{{{origins}}}")
-//             }
-
-//             Self::Universal => {
-//                 write!(f, "{{*}}")
-//             }
-//         }
-//     }
-// }
-
 impl Property for FlowPair {
     fn satisfies(&self, other: &Self) -> bool {
         let explicit = self.explicit().is_subset(other.explicit());
         let implicit = self.implicit().is_subset(other.implicit());
-
-        debug!(
-            "is {} a subset of {}? {}",
-            self.explicit(),
-            other.explicit(),
-            explicit
-        );
-        debug!(
-            "is {} a subset of {}? {}",
-            self.implicit(),
-            other.implicit(),
-            implicit
-        );
 
         explicit && implicit
     }
@@ -113,6 +47,15 @@ impl Property for FlowPair {
         let implicit = self.implicit().union(other.implicit());
 
         Self { explicit, implicit }
+    }
+
+    fn influence(&self, other: Self) -> Self {
+        let implicit = self.implicit().union(other.implicit());
+
+        Self {
+            explicit: self.explicit().clone(),
+            implicit,
+        }
     }
 
     fn bottom(origin: String) -> Self {
@@ -134,5 +77,12 @@ impl Property for FlowPair {
 
     fn attr() -> Vec<Symbol> {
         vec![Symbol::intern("cnbt"), Symbol::intern("flow")]
+    }
+
+    fn intrinsics_path() -> std::path::PathBuf {
+        Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../..")
+            .join("intrinsics")
+            .join("integrity")
     }
 }

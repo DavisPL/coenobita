@@ -13,3 +13,7 @@ coenobita-parse.workspace = true
 
 itertools.workspace = true
 log.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+clippy_utils = "0.1.87"

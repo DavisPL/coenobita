@@ -1,26 +1,32 @@
 #![feature(rustc_private)]
 
+extern crate rustc_abi;
 extern crate rustc_ast;
 extern crate rustc_data_structures;
 extern crate rustc_driver;
 extern crate rustc_errors;
 extern crate rustc_hir;
+extern crate rustc_infer;
 extern crate rustc_middle;
 extern crate rustc_parse;
 extern crate rustc_session;
 extern crate rustc_span;
 extern crate rustc_target;
+extern crate rustc_trait_selection;
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
+use std::fs;
 
-use coenobita_ast::{TyAST, TyKindAST as ATyKind};
-use coenobita_middle::flow::FlowPair;
+use coenobita_ast::TyAST;
 use coenobita_middle::property::Property;
 use coenobita_middle::ty::{Ty, TyKind};
+use rustc_abi::{VariantIdx, FIRST_VARIANT};
 
 use coenobita_parse::{create_parser, create_psess, parse::Parse};
 use expectation::Expectation;
-use rustc_ast::{AttrKind, Attribute};
+
+use rustc_hir::{AttrArgs, AttrKind, Attribute};
+
 use rustc_hir::def::{CtorOf, DefKind, Res};
 use rustc_hir::def_id::DefId;
 use rustc_hir::{
@@ -30,60 +36,20 @@ use rustc_hir::{
 use rustc_middle::ty::{self, FieldDef, TyCtxt};
 use rustc_span::symbol::Ident;
 use rustc_span::{ErrorGuaranteed, Span, Symbol};
-use rustc_target::abi::{VariantIdx, FIRST_VARIANT};
 
 use log::{debug, warn};
+use serde::de::DeserializeOwned;
 
 mod expectation;
 mod shared;
-
-/// Describes the behaviors that a context must have. You can supplement your static analysis
-/// with custom context behavior by initializing a `Checker` with something implementing `Context`.
-// pub trait Context<P> {
-//     /// Push a type onto the context stack, influencing all results until `pop` is called.
-//     fn push(&mut self, ty: &T);
-
-//     /// Pop the last type off the context stack unless it's the last one remaining.
-//     fn pop(&mut self);
-
-//     /// Influence a type using the current context.
-//     fn influence(&self, property: T) -> T;
-
-//     /// Return the ⊥ type in this context.
-//     fn bottom(&self) -> T;
-
-//     /// Return the ⊤ type in this context.
-//     fn top(&self) -> T;
-
-//     /// Return an iterator over shared type references.
-//     fn stack<'a>(&'a self) -> impl Iterator<Item = &'a Ty<P>>
-//     where
-//         P: 'a;
-// }
-
-// /// A checking structure generic in (1) the property being checked and
-// /// (2) the context used to influence properties during checking.
-// pub struct Checker<'tcx, T, C: Context<Ty<P>>> {
-//     /// Contains the attribute we are targeting as a sequence of symbols.
-//     attr: Vec<Symbol>,
-
-//     /// Contains type checking results for the entire crate.
-//     tcx: TyCtxt<'tcx>,
-
-//     /// Maps item `DefId`s to their properties.
-//     items: HashMap<DefId, Ty<P>>,
-
-//     /// Maps local `HirId`s to their properties.
-//     locals: HashMap<HirId, Ty<P>>,
-
-//     /// Can be used to influence properties during checking.
-//     context: C,
-// }
 
 pub type Result<T = ()> = std::result::Result<T, ErrorGuaranteed>;
 
 pub trait Check<'tcx, P: Property + Parse> {
     // ======== GETTERS ======== //
+
+    /// Return a shared reference to the intrinsic annotations.
+    fn get_intrinsics(&self) -> &HashMap<String, Ty<P>>;
 
     /// Return a shared reference to the attribute we are seeking.
     fn get_attr(&self) -> &[Symbol];
@@ -127,8 +93,6 @@ pub trait Check<'tcx, P: Property + Parse> {
 
     /// Given the `DefId` of a function, return its type.
     fn fn_ty(&mut self, def_id: DefId) -> Ty<P> {
-        debug!("getting ty of func {:?}", def_id);
-
         if let Some(ty) = self.get_items().get(&def_id) {
             return ty.clone();
         }
@@ -177,7 +141,7 @@ pub trait Check<'tcx, P: Property + Parse> {
             Ok(ty) => match ty.kind() {
                 TyKind::Adt(map) => {
                     for field in fields {
-                        let ty = self.influence(map[&field.ident.name].clone());
+                        let ty = self.influence(map[&field.ident.to_string()].clone());
                         self.process_pattern(field.pat.kind, ty, field.pat.hir_id);
                     }
                 }
@@ -206,11 +170,13 @@ pub trait Check<'tcx, P: Property + Parse> {
                 self.get_locals_mut().insert(hir_id, ty.clone());
             }
 
+            PatKind::Guard(pat, _) => self.process_pattern(pat.kind, ty, pat.hir_id),
+
             PatKind::Struct(qpath, fields, _) => self.process_pattern_struct(hir_id, &qpath, fields),
 
             PatKind::Box(pat) => self.process_pattern(pat.kind, ty, pat.hir_id),
             PatKind::Deref(pat) => self.process_pattern(pat.kind, ty, pat.hir_id),
-            PatKind::Err(_) | PatKind::Lit(_) => {}
+            PatKind::Err(_) => {}
 
             PatKind::TupleStruct(qpath, pats, _) => {
                 let fields: Vec<PatField> = pats
@@ -270,7 +236,7 @@ pub trait Check<'tcx, P: Property + Parse> {
 
             // Nothing to process for now (I've explicitly listed them in case we ever
             // want to know what the other cases are)
-            PatKind::Range(_, _, _) | PatKind::Path(_) | PatKind::Wild | PatKind::Never => {}
+            PatKind::Range(_, _, _) | PatKind::Wild | PatKind::Never | PatKind::Expr(_) => {}
         };
 
         self.exit_scope();
@@ -308,7 +274,13 @@ pub trait Check<'tcx, P: Property + Parse> {
         let def_id = item.owner_id.to_def_id();
 
         match item.kind {
-            ItemKind::Fn(signature, _, body_id) => self.check_item_fn(&signature, body_id),
+            ItemKind::Fn {
+                sig,
+                generics,
+                body,
+                has_body,
+            } => self.check_item_fn(&sig, body),
+
             ItemKind::Impl(impl_) => self.check_item_impl(impl_),
             ItemKind::Enum(enum_def, _) => {
                 for variant in enum_def.variants {
@@ -320,6 +292,8 @@ pub trait Check<'tcx, P: Property + Parse> {
                             did: f.def_id.to_def_id(),
                             name: f.ident.name,
                             vis: self.get_tcx_mut().visibility(f.def_id),
+                            safety: f.safety,
+                            value: None,
                         })
                         .collect();
 
@@ -333,10 +307,12 @@ pub trait Check<'tcx, P: Property + Parse> {
                 let fields: Vec<FieldDef> = var_data
                     .fields()
                     .iter()
-                    .map(|f| ty::FieldDef {
+                    .map(|f| FieldDef {
                         did: f.def_id.to_def_id(),
                         name: f.ident.name,
                         vis: self.get_tcx_mut().visibility(f.def_id),
+                        safety: f.safety,
+                        value: None,
                     })
                     .collect();
 
@@ -388,17 +364,15 @@ pub trait Check<'tcx, P: Property + Parse> {
             None => {}
         }
 
-        debug!("bindging {:?} to ty {:?}", def_id, default);
-
         self.get_items_mut().insert(def_id, default);
 
         let ty_kind = self.fn_ty(def_id).kind;
+
         let TyKind::Fn(args, expected) = ty_kind else {
-            debug!("tykind is not a func but rather {:?}", ty_kind);
             panic!()
         };
 
-        let body = self.get_tcx().hir().body(body_id);
+        let body = self.get_tcx().hir_body(body_id);
 
         for (param, arg) in body.params.iter().zip(args) {
             self.get_locals_mut().insert(param.pat.hir_id, arg);
@@ -435,7 +409,7 @@ pub trait Check<'tcx, P: Property + Parse> {
     fn check_item_impl(&mut self, impl_: &Impl) -> Result {
         for item_ref in impl_.items {
             // Get the impl item
-            let impl_item = self.get_tcx_mut().hir().impl_item(item_ref.id);
+            let impl_item = self.get_tcx_mut().hir_impl_item(item_ref.id);
             self.check_impl_item(impl_item)?;
         }
 
@@ -458,7 +432,7 @@ pub trait Check<'tcx, P: Property + Parse> {
                         TyKind::Tuple(ref elements) => {
                             let len = elements.len();
                             for (i, ty) in (0..len).zip(elements) {
-                                map.insert(Symbol::intern(&i.to_string()), ty.clone().into());
+                                map.insert(i.to_string(), ty.clone().into());
                             }
                         }
 
@@ -481,12 +455,12 @@ pub trait Check<'tcx, P: Property + Parse> {
                     {
                         Some(attr) => {
                             if let Ok(ty) = self.parse_attr(attr) {
-                                fields.insert(field.name, ty.into());
+                                fields.insert(field.name.to_string(), ty.into());
                             };
                         }
 
                         _ => {
-                            fields.insert(field.name, self.ty_top());
+                            fields.insert(field.name.to_string(), self.ty_top());
                         }
                     };
                 }
@@ -609,50 +583,31 @@ pub trait Check<'tcx, P: Property + Parse> {
         let res = self.get_tcx_mut().typeck(local_def_id).qpath_res(qpath, hir_id);
         let ty = match res {
             Res::Local(hir_id) => self.local_ty(hir_id),
-            Res::Def(def_kind, def_id) => match def_kind {
-                // TODO: Check that `AssocFn` is handled properly
-                DefKind::Fn | DefKind::AssocFn => self.fn_ty(def_id),
+            Res::Def(def_kind, def_id) => {
+                let canonical_path = self.get_tcx().def_path_str(def_id);
+                let intrinsics = self.get_intrinsics();
 
-                DefKind::Struct => self.adt_ty(def_id, def_id, FIRST_VARIANT),
-
-                DefKind::Variant => {
-                    // The variant DefId
-                    let id = def_id;
-
-                    // The parent DefId
-                    let def_id = self.get_tcx_mut().parent(def_id);
-
-                    // The parent ADT definition
-                    let adt = self.get_tcx_mut().adt_def(def_id);
-
-                    // The index of this variant in particular
-                    let idx = adt
-                        .variants()
-                        .iter()
-                        .enumerate()
-                        .find(|(_, vdef)| vdef.def_id == id)
-                        .unwrap()
-                        .0;
-
-                    self.adt_ty(def_id, id, idx.into())
+                if intrinsics.contains_key(&canonical_path) {
+                    return Ok(intrinsics[&canonical_path].clone());
                 }
 
-                // TODO: Test this thoroughly
-                DefKind::Ctor(ctor_of, _) => match ctor_of {
-                    CtorOf::Struct => {
+                match def_kind {
+                    // TODO: Check that `AssocFn` is handled properly
+                    DefKind::Fn | DefKind::AssocFn => self.fn_ty(def_id),
+
+                    DefKind::Struct => self.adt_ty(def_id, def_id, FIRST_VARIANT),
+
+                    DefKind::Variant => {
+                        // The variant DefId
+                        let id = def_id;
+
+                        // The parent DefId
                         let def_id = self.get_tcx_mut().parent(def_id);
 
-                        self.adt_ty(def_id, def_id, FIRST_VARIANT)
-                    }
-
-                    CtorOf::Variant => {
-                        // Get the DefId of the variant
-                        let id = self.get_tcx_mut().parent(def_id);
-
-                        // Get the DefId of the enum holding this variant
-                        let def_id = self.get_tcx_mut().parent(id);
+                        // The parent ADT definition
                         let adt = self.get_tcx_mut().adt_def(def_id);
 
+                        // The index of this variant in particular
                         let idx = adt
                             .variants()
                             .iter()
@@ -663,33 +618,61 @@ pub trait Check<'tcx, P: Property + Parse> {
 
                         self.adt_ty(def_id, id, idx.into())
                     }
-                },
 
-                // TODO: Implement actual logic
-                DefKind::Static { .. } => self.ty_bottom(),
+                    // TODO: Test this thoroughly
+                    DefKind::Ctor(ctor_of, _) => match ctor_of {
+                        CtorOf::Struct => {
+                            let def_id = self.get_tcx_mut().parent(def_id);
 
-                // TODO: Implement actual logic
-                DefKind::AssocConst | DefKind::Const | DefKind::ConstParam => self.ty_bottom(),
-
-                DefKind::Union => {
-                    warn!("Silently skipping union usage");
-                    self.ty_bottom()
-                }
-
-                DefKind::TyAlias => {
-                    let ty = self.get_tcx_mut().type_of(def_id).skip_binder();
-                    let kind = ty.kind();
-
-                    match kind {
-                        ty::TyKind::Adt(adt_def, _) => {
-                            self.adt_ty(adt_def.did(), adt_def.did(), FIRST_VARIANT)
+                            self.adt_ty(def_id, def_id, FIRST_VARIANT)
                         }
-                        _ => todo!(),
-                    }
-                }
 
-                _ => todo!(),
-            },
+                        CtorOf::Variant => {
+                            // Get the DefId of the variant
+                            let id = self.get_tcx_mut().parent(def_id);
+
+                            // Get the DefId of the enum holding this variant
+                            let def_id = self.get_tcx_mut().parent(id);
+                            let adt = self.get_tcx_mut().adt_def(def_id);
+
+                            let idx = adt
+                                .variants()
+                                .iter()
+                                .enumerate()
+                                .find(|(_, vdef)| vdef.def_id == id)
+                                .unwrap()
+                                .0;
+
+                            self.adt_ty(def_id, id, idx.into())
+                        }
+                    },
+
+                    // TODO: Implement actual logic
+                    DefKind::Static { .. } => self.ty_bottom(),
+
+                    // TODO: Implement actual logic
+                    DefKind::AssocConst | DefKind::Const | DefKind::ConstParam => self.ty_bottom(),
+
+                    DefKind::Union => {
+                        warn!("Silently skipping union usage");
+                        self.ty_bottom()
+                    }
+
+                    DefKind::TyAlias => {
+                        let ty = self.get_tcx_mut().type_of(def_id).skip_binder();
+                        let kind = ty.kind();
+
+                        match kind {
+                            ty::TyKind::Adt(adt_def, _) => {
+                                self.adt_ty(adt_def.did(), adt_def.did(), FIRST_VARIANT)
+                            }
+                            _ => todo!(),
+                        }
+                    }
+
+                    _ => todo!(),
+                }
+            }
 
             Res::SelfCtor(alias_to) | Res::SelfTyAlias { alias_to, .. } => {
                 match self.get_tcx_mut().type_of(alias_to).skip_binder().kind() {
@@ -711,19 +694,62 @@ pub trait Check<'tcx, P: Property + Parse> {
     }
 
     /// Checks the type of a call expression.
-    fn check_expr_call(&mut self, func: &Expr, args: &[Expr], span: Span) -> Result<Ty<P>> {
-        let fty = self.check_expr(func, &Expectation::NoExpectation, false)?;
+    fn check_expr_call(&mut self, fun: &Expr, args: &[Expr], span: Span) -> Result<Ty<P>> {
+        // === GRAB FUNCTION NAMES === //
+
+        let owner_id = fun.hir_id.owner;
+        let owner_def_kind = self.get_tcx().def_kind(owner_id);
+
+        debug!("Fun: {:#?}", fun);
+
+        if owner_def_kind.is_fn_like() {
+            let local_def_id = owner_id.to_def_id().as_local().unwrap();
+
+            if let ExprKind::Path(qpath) = fun.kind {
+                let typeck_results = self.get_tcx().typeck(local_def_id);
+
+                if let Res::Def(def_kind, def_id) = typeck_results.qpath_res(&qpath, fun.hir_id) {
+                    match def_kind {
+                        DefKind::Fn => {
+                            let name = self.get_tcx().def_path_str(def_id);
+                            debug!("Checking call to {name}");
+
+                            let fn_sig = self.get_tcx_mut().fn_sig(def_id).skip_binder();
+
+                            for arg_ty in fn_sig.inputs().iter() {
+                                // Do something here
+                            }
+
+                            debug!("FnSig: {:#?}", fn_sig);
+
+                            // for arg_ty in fn_sig.inputs().iter() {
+
+                            //     arg_ty.
+
+                            //     let impl_asref = has_asref_path_bound(arg_ty.skip_binder(), self.get_tcx());
+                            //     debug!("Impl asref<path>? {impl_asref}");
+                            // }
+                        }
+
+                        DefKind::Ctor(ctor_of, ctor_kind) => {
+                            let name = self.get_tcx().def_path_str(def_id);
+                            debug!("Checking constructor of {name}")
+                        }
+
+                        _ => {}
+                    }
+                }
+            } else {
+                debug!("The kind is {:?}", fun.kind)
+            }
+        }
+        // === GRAB FUNCTION NAMES === //
+
+        let fty = self.check_expr(fun, &Expectation::NoExpectation, false)?;
 
         let ty = match fty.clone().kind() {
             TyKind::Fn(arg_tys, ret_ty) => {
                 if args.len() != arg_tys.len() {
-                    // let msg = format!(
-                    //     "expected {} argument(s), found {}",
-                    //     arg_tys.len(),
-                    //     args.len()
-                    // );
-
-                    // return Err(self.tcx.dcx().span_err(span, msg));
                     warn!("arg ct doesnt match up");
                 }
 
@@ -732,26 +758,26 @@ pub trait Check<'tcx, P: Property + Parse> {
                     self.check_expr(expr, &expectation, false)?;
                 }
 
-                Ok(*ret_ty)
+                *ret_ty
             }
 
             TyKind::Adt(elements) => {
                 for (i, arg) in args.iter().enumerate() {
-                    let ty = elements[&Symbol::intern(&i.to_string())].clone();
+                    let ty = elements[&i.to_string()].clone();
                     let expectation = Expectation::ExpectHasType(ty);
                     self.check_expr(arg, &expectation, false)?;
                 }
 
-                Ok(fty.clone())
+                fty.clone()
             }
 
             _ => {
-                warn!("Cannot tell if expression is a function - {:?}", func);
-                Ok(fty.clone())
+                warn!("Cannot tell if expression is a function - {:?}", fun);
+                fty.clone()
             }
         };
 
-        Ok(ty?.merge(fty))
+        Ok(ty.merge(fty))
     }
 
     /// Checks the type of a method call.
@@ -915,6 +941,8 @@ pub trait Check<'tcx, P: Property + Parse> {
 
     /// Checks the type of a struct expression.
     fn check_expr_struct(&mut self, hir_id: HirId, qpath: &QPath, fields: &[ExprField]) -> Result<Ty<P>> {
+        debug!("{:?}", hir_id);
+
         let ty = match qpath {
             QPath::LangItem(item, _) => match item {
                 LangItem::Range => {
@@ -941,7 +969,7 @@ pub trait Check<'tcx, P: Property + Parse> {
         match ty.kind() {
             TyKind::Adt(tys) => {
                 for field in fields {
-                    let ty = tys[&field.ident.name].clone();
+                    let ty = tys[&field.ident.to_string()].clone();
                     let expectation = Expectation::ExpectHasType(ty);
                     self.check_expr(field.expr, &expectation, false)?;
                 }
@@ -1014,7 +1042,7 @@ pub trait Check<'tcx, P: Property + Parse> {
                 }
 
                 // Then, type check the body
-                let body = self.get_tcx_mut().hir().body(closure.body);
+                let body = self.get_tcx_mut().hir_body(closure.body);
 
                 for (param, arg) in body.params.iter().zip(args.clone()) {
                     // TODO: Use `process_pattern` instead
@@ -1037,7 +1065,7 @@ pub trait Check<'tcx, P: Property + Parse> {
                 let args: Vec<Ty<P>> = (0..count).map(|_| self.ty_bottom()).collect();
 
                 // Then, type check the body
-                let body = self.get_tcx_mut().hir().body(closure.body);
+                let body = self.get_tcx_mut().hir_body(closure.body);
 
                 for (param, arg) in body.params.iter().zip(args.clone()) {
                     // TODO: Use `process_pattern` instead
@@ -1058,11 +1086,11 @@ pub trait Check<'tcx, P: Property + Parse> {
     fn check_expr_field(&mut self, object: &Expr, field: Ident) -> Result<Ty<P>> {
         match self.check_expr(object, &Expectation::NoExpectation, false)?.kind {
             TyKind::Adt(field_map) => {
-                if !field_map.contains_key(&field.name) {
+                if !field_map.contains_key(&field.to_string()) {
                     let msg = format!("unknown field '{}'", field.name);
                     Err(self.get_tcx_mut().dcx().span_err(field.span, msg))
                 } else {
-                    Ok(field_map[&field.name].clone())
+                    Ok(field_map[&field.to_string()].clone())
                 }
             }
 
@@ -1098,7 +1126,7 @@ pub trait Check<'tcx, P: Property + Parse> {
             StmtKind::Expr(expr) => self.check_expr(expr, expectation, false),
             StmtKind::Semi(expr) => self.check_expr(expr, expectation, false),
             StmtKind::Item(item_id) => {
-                let item = self.get_tcx_mut().hir().item(item_id);
+                let item = self.get_tcx_mut().hir_item(item_id);
                 self.check_item(item)?;
                 Ok(self.ty_bottom())
             }
@@ -1113,11 +1141,16 @@ pub trait Check<'tcx, P: Property + Parse> {
         };
 
         let psess = create_psess(self.get_tcx());
-        let mut parser = create_parser(&psess, normal.item.args.inner_tokens());
 
-        parser
-            .parse_ty()
-            .map_err(|err| self.get_tcx().dcx().span_err(err.span.clone(), "failed to parse"))
+        if let AttrArgs::Delimited(delim_args) = normal.args.clone() {
+            let mut parser = create_parser(&psess, delim_args.tokens);
+
+            parser
+                .parse_ty()
+                .map_err(|err| self.get_tcx().dcx().span_err(err.span.clone(), "failed to parse"))
+        } else {
+            panic!()
+        }
     }
 }
 
@@ -1138,10 +1171,18 @@ pub struct Checker<'tcx, P: Property> {
     locals: HashMap<HirId, Ty<P>>,
 
     context: Vec<Ty<P>>,
+
+    intrinsics: HashMap<String, Ty<P>>,
 }
 
-impl<'tcx, P: Property> Checker<'tcx, P> {
+impl<'tcx, P: Property + DeserializeOwned> Checker<'tcx, P> {
     pub fn new(crate_name: String, tcx: TyCtxt<'tcx>) -> Self {
+        // Collect intrinsic annotations for this property
+        let path = P::intrinsics_path().with_extension("json");
+        let map = fs::read_to_string(&path).unwrap();
+
+        let intrinsics: HashMap<String, Ty<P>> = serde_json::from_str(&map).unwrap();
+
         Self {
             crate_name: crate_name.clone(),
             attr: P::attr(),
@@ -1149,11 +1190,16 @@ impl<'tcx, P: Property> Checker<'tcx, P> {
             items: HashMap::new(),
             locals: HashMap::new(),
             context: vec![Ty::new(P::bottom(crate_name), TyKind::Infer)],
+            intrinsics,
         }
     }
 }
 
-impl<'tcx, P: Property + Parse> Check<'tcx, P> for Checker<'tcx, P> {
+impl<'tcx, P: Property + Parse + DeserializeOwned> Check<'tcx, P> for Checker<'tcx, P> {
+    fn get_intrinsics(&self) -> &HashMap<String, Ty<P>> {
+        &self.intrinsics
+    }
+
     fn get_attr(&self) -> &[Symbol] {
         &self.attr
     }
@@ -1194,7 +1240,7 @@ impl<'tcx, P: Property + Parse> Check<'tcx, P> for Checker<'tcx, P> {
         let mut result = ty;
 
         for infl in &self.context {
-            result = result.merge(infl.clone());
+            result = result.influence(infl.clone());
         }
 
         result

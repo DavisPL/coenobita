@@ -1,10 +1,11 @@
-use std::{collections::HashSet, fmt::Display};
+use std::{collections::HashSet, fmt::Display, path::Path};
 
 use rustc_span::Symbol;
+use serde::{Deserialize, Serialize};
 
 use crate::{origin::OriginSet, property::Property};
 
-#[derive(Debug, Default, Clone, PartialEq)]
+#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ProvenancePair {
     authors: OriginSet,
     suppliers: OriginSet,
@@ -47,6 +48,10 @@ impl Property for ProvenancePair {
         first && last
     }
 
+    fn influence(&self, other: Self) -> Self {
+        other
+    }
+
     fn merge(&self, other: Self) -> Self {
         Self {
             authors: self.first().union(other.first()),
@@ -73,5 +78,12 @@ impl Property for ProvenancePair {
 
     fn attr() -> Vec<Symbol> {
         vec![Symbol::intern("cnbt"), Symbol::intern("observation")]
+    }
+
+    fn intrinsics_path() -> std::path::PathBuf {
+        Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../..")
+            .join("intrinsics")
+            .join("provenance")
     }
 }

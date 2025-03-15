@@ -1,0 +1,23 @@
+{
+    "coenobita::Capability": {
+        "property": {
+            "authors": "Universal",
+            "suppliers": "Universal"
+        },
+        "kind": {
+            "Adt": {
+                "0": {
+                    "property": {
+                        "authors": "Universal",
+                        "suppliers": {
+                            "Specific": [
+                                "root"
+                            ]
+                        }
+                    },
+                    "kind": "Opaque"
+                }
+            }
+        }
+    }
+}

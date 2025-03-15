@@ -65,7 +65,7 @@ impl<P: Property> Into<TyKind<P>> for TyKindAST<P> {
                 let mut map = HashMap::new();
 
                 for (ident, ty) in fields {
-                    map.insert(ident.name, ty.into());
+                    map.insert(ident.name.to_ident_string(), ty.into());
                 }
 
                 TyKind::Adt(map)
@@ -74,7 +74,7 @@ impl<P: Property> Into<TyKind<P>> for TyKindAST<P> {
                 let mut map = HashMap::new();
 
                 for (i, ty) in elements.into_iter().enumerate() {
-                    map.insert(Symbol::intern(&i.to_string()), ty.into());
+                    map.insert(i.to_string(), ty.into());
                 }
 
                 TyKind::Adt(map)

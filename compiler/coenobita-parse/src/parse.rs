@@ -3,10 +3,12 @@ use std::collections::HashSet;
 use coenobita_middle::flow::FlowPair;
 use coenobita_middle::origin::OriginSet;
 use coenobita_middle::provenance::ProvenancePair;
-use rustc_ast::token::TokenKind::{self, BinOp, CloseDelim, Comma, OpenDelim};
-use rustc_ast::token::{BinOpToken, Delimiter};
+use rustc_ast::token::Delimiter;
+use rustc_ast::token::TokenKind::CloseDelim;
 use rustc_errors::PResult;
 use rustc_parse::parser::Parser;
+
+use crate::token::*;
 
 pub struct CoenobitaParser<'cnbt> {
     pub parser: Parser<'cnbt>,
@@ -18,15 +20,13 @@ pub trait Parse: Sized {
 
 impl Parse for ProvenancePair {
     fn parse<'cnbt>(parser: &mut CoenobitaParser<'cnbt>) -> PResult<'cnbt, Self> {
-        let start = parser.start();
-
-        parser.parser.expect(&OpenDelim(Delimiter::Parenthesis))?;
+        parser.parser.expect(OPEN_PAREN)?;
 
         let first = OriginSet::parse(parser)?;
-        parser.parser.expect(&TokenKind::Comma)?;
+        parser.parser.expect(COMMA)?;
         let last = OriginSet::parse(parser)?;
 
-        parser.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
+        parser.parser.expect(CLOSE_PAREN)?;
 
         Ok(ProvenancePair::new(first, last))
     }
@@ -43,10 +43,10 @@ impl Parse for FlowPair {
 
 impl Parse for OriginSet {
     fn parse<'cnbt>(parser: &mut CoenobitaParser<'cnbt>) -> PResult<'cnbt, Self> {
-        parser.parser.expect(&OpenDelim(Delimiter::Brace))?;
+        parser.parser.expect(OPEN_BRACE)?;
 
-        if parser.parser.eat(&BinOp(BinOpToken::Star)) {
-            parser.parser.expect(&CloseDelim(Delimiter::Brace))?;
+        if parser.parser.eat(STAR) {
+            parser.parser.expect(CLOSE_BRACE)?;
             Ok(OriginSet::Universal)
         } else {
             let mut origins = HashSet::new();
@@ -54,11 +54,11 @@ impl Parse for OriginSet {
                 origins.insert(parser.parser.parse_ident()?.to_string());
 
                 if parser.parser.token != CloseDelim(Delimiter::Brace) {
-                    parser.parser.expect(&Comma)?;
+                    parser.parser.expect(COMMA)?;
                 }
             }
 
-            parser.parser.expect(&CloseDelim(Delimiter::Brace))?;
+            parser.parser.expect(CLOSE_BRACE)?;
             Ok(OriginSet::Specific(origins))
         }
     }

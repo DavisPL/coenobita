@@ -4,18 +4,17 @@ use crate::flow::FlowPair;
 use crate::origin::OriginSet;
 use crate::property::Property;
 use itertools::Itertools;
-use rustc_span::Symbol;
 
-use log::debug;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Ty<P: Property> {
     pub property: P,
 
     pub kind: TyKind<P>,
 }
 
-impl<P: Property> Ty<P> {
+impl<'a, P: Property> Ty<P> {
     pub fn new(property: P, kind: TyKind<P>) -> Self {
         Ty { property, kind }
     }
@@ -36,8 +35,6 @@ impl<P: Property> Ty<P> {
 
     pub fn satisfies(&self, other: &Ty<P>) -> bool {
         let s = self.property.satisfies(&other.property);
-
-        debug!("does {} satisfy {}? {s}", self.property, other.property);
 
         s && match (self.kind(), other.kind()) {
             // TODO: `Abs` should really be `Infer`
@@ -91,6 +88,14 @@ impl<P: Property> Ty<P> {
             kind: self.kind(),
         }
     }
+
+    pub fn influence(&self, other: Self) -> Self {
+        let property = self.property.influence(other.property);
+        Self {
+            property,
+            kind: self.kind(),
+        }
+    }
 }
 
 impl Ty<FlowPair> {
@@ -107,7 +112,7 @@ impl Ty<FlowPair> {
         let mut map = HashMap::new();
 
         for (i, arg) in (0..n).zip(args) {
-            map.insert(Symbol::intern(&i.to_string()), arg);
+            map.insert(i.to_string(), arg);
         }
 
         Ty {
@@ -123,13 +128,13 @@ impl<P: Property> Display for Ty<P> {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum TyKind<P: Property> {
     Opaque,
     Fn(Vec<Ty<P>>, Box<Ty<P>>),
     Tuple(Vec<Ty<P>>),
     Array(Box<Ty<P>>),
-    Adt(HashMap<Symbol, Ty<P>>),
+    Adt(HashMap<String, Ty<P>>),
     Infer,
 }
 

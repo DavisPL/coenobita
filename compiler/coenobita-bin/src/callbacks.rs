@@ -2,7 +2,7 @@ use coenobita_check::{Check, Checker};
 use coenobita_middle::{flow::FlowPair, provenance::ProvenancePair};
 use rustc_driver::{Callbacks, Compilation};
 use rustc_hir::{intravisit::Visitor, Item};
-use rustc_interface::{interface::Compiler, Queries};
+use rustc_interface::interface::Compiler;
 use rustc_middle::{hir::nested_filter::OnlyBodies, ty::TyCtxt};
 
 pub struct CoenobitaCallbacks {
@@ -19,34 +19,24 @@ impl CoenobitaCallbacks {
     }
 }
 
+const SKIP: [&str; 4] = ["trybuild", "syn", "quote", "proc_macro2"];
+
 impl Callbacks for CoenobitaCallbacks {
-    fn after_analysis<'tcx>(&mut self, _compiler: &Compiler, queries: &'tcx Queries<'tcx>) -> Compilation {
-        queries.global_ctxt().unwrap().enter(|tcx| {
-            let is_proc_macro = tcx
-                .sess
-                .opts
-                .crate_types
-                .contains(&rustc_session::config::CrateType::ProcMacro);
+    fn after_analysis<'tcx>(
+        &mut self,
+        _compiler: &rustc_interface::interface::Compiler,
+        tcx: TyCtxt<'tcx>,
+    ) -> Compilation {
+        let is_proc_macro = tcx
+            .sess
+            .opts
+            .crate_types
+            .contains(&rustc_session::config::CrateType::ProcMacro);
 
-            if is_proc_macro {
-                // It is impossible to make some proc macro crates capability safe, so skip them
-                return;
-            }
-
-            if self.crate_name == "trybuild"
-                || self.crate_name == "syn"
-                || self.crate_name == "quote"
-                || self.crate_name == "proc_macro2"
-            {
-                // Skip trybuild for now
-                return;
-            }
-
-            let hir_map = tcx.hir();
+        if !is_proc_macro && !SKIP.contains(&self.crate_name.as_str()) {
             let mut visitor = CoenobitaVisitor::new(&self.crate_name, &self.crate_type, tcx);
-
-            hir_map.visit_all_item_likes_in_crate(&mut visitor);
-        });
+            tcx.hir_visit_all_item_likes_in_crate(&mut visitor);
+        }
 
         Compilation::Continue
     }
@@ -73,8 +63,8 @@ impl<'c, 'tcx> CoenobitaVisitor<'c, 'tcx> {
 impl<'c, 'tcx> Visitor<'tcx> for CoenobitaVisitor<'c, 'tcx> {
     type NestedFilter = OnlyBodies;
 
-    fn nested_visit_map(&mut self) -> Self::Map {
-        self.tcx.hir()
+    fn maybe_tcx(&mut self) -> Self::MaybeTyCtxt {
+        self.tcx
     }
 
     fn visit_item(&mut self, item: &'tcx Item<'tcx>) -> Self::Result {

@@ -16,7 +16,7 @@ use coenobita_middle::property::Property;
 use coenobita_middle::ty::Ty;
 use parse::{CoenobitaParser, Parse};
 use rustc_ast::token::Delimiter;
-use rustc_ast::token::TokenKind::{self, CloseDelim, Comma, OpenDelim};
+use rustc_ast::token::TokenKind::{CloseDelim, OpenDelim};
 use rustc_ast::tokenstream::TokenStream;
 
 use rustc_data_structures::sync;
@@ -25,7 +25,6 @@ use rustc_driver::DEFAULT_LOCALE_RESOURCES;
 use rustc_errors::annotate_snippet_emitter_writer::AnnotateSnippetEmitter;
 use rustc_errors::emitter::{stderr_destination, Emitter, HumanEmitter, HumanReadableErrorType};
 use rustc_errors::json::JsonEmitter;
-use rustc_errors::registry::Registry;
 use rustc_errors::PResult;
 use rustc_errors::{fallback_fluent_bundle, LazyFallbackBundle};
 
@@ -35,12 +34,14 @@ use rustc_parse::parser::Parser;
 use rustc_session::config::{ErrorOutputType, Options};
 use rustc_session::parse::ParseSess;
 use rustc_span::source_map::SourceMap;
-use rustc_span::symbol::kw;
 use rustc_span::{BytePos, Span};
 
 use coenobita_ast::{TyAST, TyKindAST};
 
 pub mod parse;
+pub(crate) mod token;
+
+use token::*;
 
 impl<'cnbt> CoenobitaParser<'cnbt> {
     pub fn new(parser: Parser<'cnbt>) -> Self {
@@ -57,76 +58,76 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
     }
 
     pub fn parse_ty_kind<P: Property + Parse>(&mut self) -> PResult<'cnbt, TyKindAST<P>> {
-        if self.parser.eat_keyword(kw::Fn) {
+        if self.parser.eat_keyword(KW_FN) {
             // We are parsing a function type
-            self.parser.expect(&OpenDelim(Delimiter::Parenthesis))?;
+            self.parser.expect(OPEN_PAREN)?;
 
             let mut args = vec![];
             while self.parser.token != CloseDelim(Delimiter::Parenthesis) {
                 args.push(self.parse_ty()?);
 
                 if self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                    self.parser.expect(&Comma)?;
+                    self.parser.expect(COMMA)?;
                 }
             }
 
-            self.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
-            self.parser.expect(&TokenKind::RArrow)?;
+            self.parser.expect(CLOSE_PAREN)?;
+            self.parser.expect(RARROW)?;
 
             Ok(TyKindAST::Fn(args, Box::new(self.parse_ty()?)))
-        } else if self.parser.eat_keyword(kw::Struct) {
+        } else if self.parser.eat_keyword(KW_STRUCT) {
             // We are parsing a struct type
             if self.parser.token.kind == OpenDelim(Delimiter::Brace) {
                 // We are parsing a `{ ... }` struct
-                self.parser.expect(&OpenDelim(Delimiter::Brace))?;
+                self.parser.expect(OPEN_BRACE)?;
 
                 let mut fields = vec![];
                 while self.parser.token != CloseDelim(Delimiter::Brace) {
                     let ident = self.parser.parse_ident()?;
-                    self.parser.expect(&TokenKind::Colon)?;
+                    self.parser.expect(COLON)?;
 
                     fields.push((ident, self.parse_ty()?));
 
                     if self.parser.token != CloseDelim(Delimiter::Brace) {
-                        self.parser.expect(&TokenKind::Comma)?;
+                        self.parser.expect(COMMA)?;
                     }
                 }
 
-                self.parser.expect(&CloseDelim(Delimiter::Brace))?;
+                self.parser.expect(CLOSE_BRACE)?;
                 Ok(TyKindAST::Struct(fields))
             } else {
                 // We are parsing a `( ... )` struct
-                self.parser.expect(&OpenDelim(Delimiter::Parenthesis))?;
+                self.parser.expect(OPEN_PAREN)?;
 
                 let mut elements = vec![];
                 while self.parser.token != CloseDelim(Delimiter::Parenthesis) {
                     elements.push(self.parse_ty()?);
 
                     if self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                        self.parser.expect(&TokenKind::Comma)?;
+                        self.parser.expect(COMMA)?;
                     }
                 }
 
-                self.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
+                self.parser.expect(CLOSE_PAREN)?;
                 Ok(TyKindAST::StructTuple(elements))
             }
-        } else if self.parser.eat(&OpenDelim(Delimiter::Parenthesis)) {
+        } else if self.parser.eat(OPEN_PAREN) {
             // We are parsing a tuple type
             let mut elements = vec![];
             while self.parser.token != CloseDelim(Delimiter::Parenthesis) {
                 elements.push(self.parse_ty()?);
 
                 if self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                    self.parser.expect(&Comma)?;
+                    self.parser.expect(COMMA)?;
                 }
             }
 
-            self.parser.expect(&CloseDelim(Delimiter::Parenthesis))?;
+            self.parser.expect(CLOSE_PAREN)?;
             Ok(TyKindAST::Tuple(elements))
-        } else if self.parser.eat(&OpenDelim(Delimiter::Bracket)) {
+        } else if self.parser.eat(OPEN_BRACKET) {
             // We are parsing an array type
             let element = self.parse_ty()?;
-            self.parser.expect(&CloseDelim(Delimiter::Bracket))?;
+            self.parser.expect(CLOSE_BRACKET)?;
             Ok(TyKindAST::Array(Box::new(element)))
         } else {
             Ok(TyKindAST::Opaque)
@@ -192,13 +193,12 @@ pub fn emitter(
         } => Box::new(
             JsonEmitter::new(
                 Box::new(io::BufWriter::new(io::stderr())),
-                source_map,
+                Some(source_map),
                 fallback_bundle,
                 pretty,
                 json_rendered,
                 color_config,
             )
-            .registry(Some(Registry::new(&[])))
             .fluent_bundle(bundle)
             .track_diagnostics(track_diagnostics)
             .diagnostic_width(opts.diagnostic_width)

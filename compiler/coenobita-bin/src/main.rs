@@ -14,6 +14,7 @@ extern crate rustc_session;
 extern crate rustc_span;
 
 use log::{debug, error, info, warn, LevelFilter};
+use rustc_driver::run_compiler;
 use std::{
     env,
     fs::{self, File, OpenOptions},
@@ -22,7 +23,6 @@ use std::{
 
 use callbacks::CoenobitaCallbacks;
 
-use rustc_driver::RunCompiler;
 use simplelog::{Config, ConfigBuilder, WriteLogger};
 
 fn main() {
@@ -52,22 +52,22 @@ fn main() {
     args.push("-Zcrate-attr=feature(register_tool)".to_string());
     args.push("-Zcrate-attr=register_tool(cnbt)".to_string());
 
-    if crate_name != "std" {
-        // if is_release {
-        //     debug!("Linking release standard lib");
-        //     args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/release/libstd.rlib".to_string());
-        // } else {
-        //     debug!("Linking debug standard lib");
-        //     args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/debug/libstd.rlib".to_string());
-        // }
+    // if crate_name != "std" {
+    //     // if is_release {
+    //     //     debug!("Linking release standard lib");
+    //     //     args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/release/libstd.rlib".to_string());
+    //     // } else {
+    //     //     debug!("Linking debug standard lib");
+    //     //     args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/debug/libstd.rlib".to_string());
+    //     // }
 
-        debug!("linking release std lib");
-        // args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/release/libstd.rlib".to_string());
-    }
+    //     debug!("linking release std lib");
+    //     // args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/release/libstd.rlib".to_string());
+    // }
 
     // Create callbacks and run the compiler
     let mut callbacks = CoenobitaCallbacks::new(crate_name, crate_type);
-    let _result = RunCompiler::new(&args, &mut callbacks).run();
+    run_compiler(&args, &mut callbacks);
 }
 
 fn crate_name<'a>(args: &'a [String]) -> Option<String> {
