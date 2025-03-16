@@ -41,11 +41,17 @@ fn bar<B: AsRef<str>>(some: B) -> B {
 
 fn bazinga() {
     let p = "hello.txt";
+
     let mut path = PathBuf::from(p);
 
     path.as_mut_os_str().make_ascii_lowercase();
 
     let _ = fs::read(path);
 
-    bar("dude");
+    bar("dud");
+}
+
+fn main() {
+    bazinga();
+    println!("Hello, world!");
 }

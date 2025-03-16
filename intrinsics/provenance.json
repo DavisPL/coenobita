@@ -1,23 +1,32 @@
 {
-    "coenobita::Capability": {
+    "std::path::Path::as_mut_os_str": {
         "property": {
             "authors": "Universal",
             "suppliers": "Universal"
         },
         "kind": {
-            "Adt": {
-                "0": {
+            "Fn": [
+                [
+                    {
+                        "property": {
+                            "authors": "Universal",
+                            "suppliers": {
+                                "Specific": [
+                                    "root"
+                                ]
+                            }
+                        },
+                        "kind": "Infer"
+                    }
+                ],
+                {
                     "property": {
                         "authors": "Universal",
-                        "suppliers": {
-                            "Specific": [
-                                "root"
-                            ]
-                        }
+                        "suppliers": "Universal"
                     },
-                    "kind": "Opaque"
+                    "kind": "Infer"
                 }
-            }
+            ]
         }
     }
 }

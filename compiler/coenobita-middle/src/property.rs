@@ -6,7 +6,7 @@ use std::{
 use rustc_span::Symbol;
 use serde::Serialize;
 
-pub trait Property: Clone + Default + Display + fmt::Debug + Serialize {
+pub trait Property: Clone + Display + Default + fmt::Debug + Serialize {
     fn satisfies(&self, other: &Self) -> bool;
 
     fn influence(&self, other: Self) -> Self;

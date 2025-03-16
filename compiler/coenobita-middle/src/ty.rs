@@ -89,12 +89,9 @@ impl<'a, P: Property> Ty<P> {
         }
     }
 
-    pub fn influence(&self, other: Self) -> Self {
-        let property = self.property.influence(other.property);
-        Self {
-            property,
-            kind: self.kind(),
-        }
+    pub fn influence(&self, mut other: Self) -> Self {
+        other.property = self.property.influence(other.property);
+        other
     }
 }
 

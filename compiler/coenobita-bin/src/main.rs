@@ -13,40 +13,39 @@ extern crate rustc_parse;
 extern crate rustc_session;
 extern crate rustc_span;
 
-use log::{debug, error, info, warn, LevelFilter};
+use log::{info, LevelFilter};
 use rustc_driver::run_compiler;
 use std::{
     env,
-    fs::{self, File, OpenOptions},
+    fs::{self, OpenOptions},
     path::Path,
 };
 
 use callbacks::CoenobitaCallbacks;
 
-use simplelog::{Config, ConfigBuilder, WriteLogger};
+use simplelog::{ConfigBuilder, WriteLogger};
 
 fn main() {
     // Collect all the arguments passed to us by Cargo
     let mut args: Vec<String> = env::args().skip(1).collect();
 
-    let crate_name = crate_name(&args)
-        .and_then(|s| {
-            debug!("Coenobita invoked for crate '{s}'\n=========");
-            Some(s)
-        })
-        .unwrap_or("-".into());
+    let crate_type = crate_type(&args).unwrap_or("-".into());
 
-    let crate_type = crate_type(&args)
-        .and_then(|s| {
-            debug!("Crate type is {s}");
-            Some(s)
-        })
-        .unwrap_or("-".into());
-
-    let is_release = crate_release(&args);
+    let crate_name = crate_name(&args).unwrap_or("-".into());
 
     // Set up logging
     logging_setup(&crate_name);
+
+    info!("CRATE TYPE: {crate_type}");
+    info!("CRATE NAME (ACTUAL): {crate_name}");
+
+    let crate_name = if crate_type == "root" {
+        "root".to_owned()
+    } else {
+        crate_name
+    };
+
+    info!("CRATE NAME (ANALYSIS): {crate_name}");
 
     // Add some extra arguments
     args.push("-Zcrate-attr=feature(register_tool)".to_string());
@@ -78,6 +77,7 @@ fn crate_type(args: &[String]) -> Option<String> {
         })
 }
 
+#[allow(unused)]
 fn crate_release(args: &[String]) -> bool {
     return args.contains(&"--release".to_owned());
 }

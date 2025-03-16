@@ -48,7 +48,8 @@ impl Property for ProvenancePair {
         first && last
     }
 
-    fn influence(&self, other: Self) -> Self {
+    fn influence(&self, mut other: Self) -> Self {
+        other.suppliers = self.suppliers.clone();
         other
     }
 

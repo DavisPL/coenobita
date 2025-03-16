@@ -18,7 +18,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 
-use clippy_utils::ty::{implements_trait, implements_trait_with_env_from_iter};
+use clippy_utils::ty::implements_trait_with_env_from_iter;
 use coenobita_ast::TyAST;
 use coenobita_middle::property::Property;
 use coenobita_middle::ty::{Ty, TyKind};
@@ -36,10 +36,9 @@ use rustc_hir::{
     ItemKind, LangItem, LetExpr, LetStmt, MatchSource, PatField, PatKind, QPath, Stmt, StmtKind,
 };
 
-use rustc_middle::ty::{self, FieldDef, GenericArg, TyCtxt, TypingEnv};
-use rustc_span::sym::allow;
+use rustc_middle::ty::{self, FieldDef, GenericArg, TyCtxt, TypeckResults, TypingEnv};
 use rustc_span::symbol::Ident;
-use rustc_span::{sym, ErrorGuaranteed, Span, Symbol};
+use rustc_span::{ErrorGuaranteed, Span, Symbol};
 
 use log::{debug, warn};
 use serde::de::DeserializeOwned;
@@ -87,6 +86,8 @@ pub trait Check<'tcx, P: Property + Parse> {
     /// Return a mutable reference to the local map.
     fn get_locals_mut(&mut self) -> &mut HashMap<HirId, Ty<P>>;
 
+    fn get_crate_name_owned(&self) -> String;
+
     // ======== CONTEXT ======== //
 
     /// Enter the scope influenced by type `ty`.
@@ -108,6 +109,17 @@ pub trait Check<'tcx, P: Property + Parse> {
 
     /// Given the `DefId` of a function, return its type.
     fn fn_ty(&mut self, def_id: DefId) -> Ty<P> {
+        let canonical_path = self.get_tcx().def_path_str(def_id);
+        let intrinsics = self.get_type_intrinsics();
+
+        if intrinsics.contains_key(&canonical_path) {
+            let ty = intrinsics[&canonical_path].clone();
+            debug!("intr ty of {canonical_path}:{:#?}", ty);
+            return ty;
+        } else {
+            debug!("couldnt find {canonical_path} in intrinsics: {:#?}", intrinsics);
+        }
+
         if let Some(ty) = self.get_items().get(&def_id) {
             return ty.clone();
         }
@@ -289,13 +301,7 @@ pub trait Check<'tcx, P: Property + Parse> {
         let def_id = item.owner_id.to_def_id();
 
         match item.kind {
-            ItemKind::Fn {
-                sig,
-                generics,
-                body,
-                has_body,
-            } => self.check_item_fn(&sig, body),
-
+            ItemKind::Fn { sig, body, .. } => self.check_item_fn(&sig, body),
             ItemKind::Impl(impl_) => self.check_item_impl(impl_),
             ItemKind::Enum(enum_def, _) => {
                 for variant in enum_def.variants {
@@ -517,10 +523,9 @@ pub trait Check<'tcx, P: Property + Parse> {
             // There was no tag, so we cannot make any assumptions about the intended type
             if let Some(expr) = local.init {
                 self.check_expr(expr, &Expectation::NoExpectation, false)?;
-                self.process_pattern(local.pat.kind, self.ty_top(), local.pat.hir_id);
-            } else {
-                self.process_pattern(local.pat.kind, self.ty_top(), local.pat.hir_id);
             }
+
+            self.process_pattern(local.pat.kind, self.influence(self.ty_top()), local.pat.hir_id);
         }
 
         Ok(())
@@ -599,13 +604,6 @@ pub trait Check<'tcx, P: Property + Parse> {
         let ty = match res {
             Res::Local(hir_id) => self.local_ty(hir_id),
             Res::Def(def_kind, def_id) => {
-                let canonical_path = self.get_tcx().def_path_str(def_id);
-                let intrinsics = self.get_type_intrinsics();
-
-                if intrinsics.contains_key(&canonical_path) {
-                    return Ok(intrinsics[&canonical_path].clone());
-                }
-
                 match def_kind {
                     // TODO: Check that `AssocFn` is handled properly
                     DefKind::Fn | DefKind::AssocFn => self.fn_ty(def_id),
@@ -709,9 +707,7 @@ pub trait Check<'tcx, P: Property + Parse> {
     }
 
     /// Checks the type of a call expression.
-    fn check_expr_call(&mut self, fun: &Expr, args: &[Expr], span: Span) -> Result<Ty<P>> {
-        // === GRAB FUNCTION NAME === //
-
+    fn check_expr_call(&mut self, fun: &Expr, args: &[Expr], _span: Span) -> Result<Ty<P>> {
         let owner_id = fun.hir_id.owner;
         let owner_def_kind = self.get_tcx().def_kind(owner_id);
 
@@ -722,60 +718,10 @@ pub trait Check<'tcx, P: Property + Parse> {
                 let typeck_results = self.get_tcx().typeck(local_def_id);
 
                 if let Res::Def(def_kind, def_id) = typeck_results.qpath_res(&qpath, fun.hir_id) {
-                    match def_kind {
-                        DefKind::Fn => {
-                            let name = self.get_tcx().def_path_str(def_id);
-                            debug!("Checking call to {name}...");
-
-                            let fn_sig = self.get_tcx_mut().fn_sig(def_id).skip_binder();
-
-                            for (expected_ty, actual_expr) in fn_sig.inputs().iter().zip(args) {
-                                let expected_ty = expected_ty.skip_binder();
-                                let actual_ty = typeck_results.expr_ty(actual_expr);
-
-                                if let ty::Param(_) = expected_ty.kind() {
-                                    for trait_data in self.get_trait_intrinsics() {
-                                        let implements = impls_trait(
-                                            expected_ty,
-                                            &trait_data.name,
-                                            &trait_data.args,
-                                            self.get_tcx(),
-                                            def_id,
-                                        );
-
-                                        let allowed_tys: Vec<ty::Ty<'_>> = trait_data
-                                            .allowed
-                                            .iter()
-                                            .map(|name| match self.get_tcx().get_diagnostic_item(sym::Path) {
-                                                Some(def_id) => self.get_tcx().type_of(def_id).skip_binder(),
-                                                None => panic!(),
-                                            })
-                                            .collect();
-
-                                        if implements && !allowed_tys.contains(&actual_ty.peel_refs()) {
-                                            let msg =
-                                                format!("must be one of: {}", trait_data.allowed.join(", "));
-                                            return Err(self
-                                                .get_tcx_mut()
-                                                .dcx()
-                                                .span_err(actual_expr.span, msg));
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        DefKind::Ctor(ctor_of, ctor_kind) => {
-                            let name = self.get_tcx().def_path_str(def_id);
-                        }
-
-                        _ => {}
-                    }
+                    self.check_intrinsic_constraints(def_id, def_kind, args, typeck_results)?;
                 }
             }
         }
-
-        // === GRAB FUNCTION NAMES === //
 
         let fty = self.check_expr(fun, &Expectation::NoExpectation, false)?;
 
@@ -818,29 +764,29 @@ pub trait Check<'tcx, P: Property + Parse> {
         hir_id: HirId,
         receiver: &Expr,
         args: &[Expr],
-        span: Span,
+        _span: Span,
     ) -> Result<Ty<P>> {
-        let (def_kind, def_id) = self
-            .get_tcx_mut()
-            .typeck(hir_id.owner.def_id)
-            .type_dependent_def(hir_id)
-            .unwrap();
+        let typeck_results = self.get_tcx_mut().typeck(hir_id.owner.def_id);
+        let (def_kind, def_id) = typeck_results.type_dependent_def(hir_id).unwrap();
 
         match def_kind {
             DefKind::AssocFn => {
+                // let args = vec![receiver];
+                let mut args_ = vec![receiver.clone()];
+                args_.extend_from_slice(args);
+
+                self.check_intrinsic_constraints(def_id, def_kind, args, typeck_results)?;
+
                 let fty = self.fn_ty(def_id);
+                // KEEP: I can use this to generate intrinsic annotations
+                // let s = serde_json::to_string(&fty).unwrap();
+
+                debug!("METHOD TYPE: {:#?}", fty);
 
                 match fty.kind() {
                     TyKind::Fn(arg_tys, ret_ty) => {
                         // We subtract one to account for the receiver
                         if args.len() != arg_tys.len() - 1 {
-                            // let msg = format!(
-                            //     "expected {} argument(s), found {}",
-                            //     arg_tys.len(),
-                            //     args.len()
-                            // );
-
-                            // return Err(self.tcx.dcx().span_err(span, msg));
                             warn!("arg ct doesnt match up");
                         }
 
@@ -1182,6 +1128,66 @@ pub trait Check<'tcx, P: Property + Parse> {
             panic!()
         }
     }
+
+    // OTHER //
+    fn check_intrinsic_constraints(
+        &mut self,
+        def_id: DefId,
+        def_kind: DefKind,
+        args: &[Expr],
+        typeck_results: &TypeckResults<'tcx>,
+    ) -> Result {
+        match def_kind {
+            DefKind::Fn | DefKind::AssocFn => {
+                let name = self.get_tcx().def_path_str(def_id);
+                debug!("Checking call to {name}...");
+
+                let fn_sig = self.get_tcx_mut().fn_sig(def_id).skip_binder();
+
+                for (expected_ty, actual_expr) in fn_sig.inputs().iter().zip(args) {
+                    let expected_ty = expected_ty.skip_binder();
+                    let actual_ty = typeck_results.expr_ty(actual_expr);
+
+                    if let ty::Param(_) = expected_ty.kind() {
+                        for trait_data in self.get_trait_intrinsics() {
+                            let implements = impls_trait(
+                                expected_ty,
+                                &trait_data.name,
+                                &trait_data.args,
+                                self.get_tcx(),
+                                def_id,
+                            );
+
+                            let allowed_tys: Vec<ty::Ty<'_>> = trait_data
+                                .allowed
+                                .iter()
+                                .map(|name| {
+                                    let ty_symbol = Symbol::intern(name);
+                                    match self.get_tcx().get_diagnostic_item(ty_symbol) {
+                                        Some(def_id) => self.get_tcx().type_of(def_id).skip_binder(),
+                                        None => panic!("Type {name} is not a diagnostic item"),
+                                    }
+                                })
+                                .collect();
+
+                            if implements && !allowed_tys.contains(&actual_ty.peel_refs()) {
+                                let msg = format!("must be one of: {}", trait_data.allowed.join(", "));
+                                return Err(self.get_tcx_mut().dcx().span_err(actual_expr.span, msg));
+                            }
+                        }
+                    }
+                }
+            }
+
+            DefKind::Ctor(ctor_of, ctor_kind) => {
+                let name = self.get_tcx().def_path_str(def_id);
+            }
+
+            _ => {}
+        }
+
+        Ok(())
+    }
 }
 
 pub struct Checker<'tcx, P: Property> {
@@ -1202,7 +1208,7 @@ pub struct Checker<'tcx, P: Property> {
 
     context: Vec<Ty<P>>,
 
-    type_intrinsics: HashMap<String, Ty<P>>,
+    pub type_intrinsics: HashMap<String, Ty<P>>,
 
     trait_intrinsics: Vec<TraitData>,
 }
@@ -1213,7 +1219,10 @@ impl<'tcx, P: Property + DeserializeOwned> Checker<'tcx, P> {
         let path = P::intrinsics_path().with_extension("json");
         let map = fs::read_to_string(&path).unwrap();
 
+        debug!("getitng type intrs from {:?}", path);
         let type_intrinsics: HashMap<String, Ty<P>> = serde_json::from_str(&map).unwrap();
+
+        debug!("intrs are... {:#?}", type_intrinsics);
 
         // Collect all trait intrinsics
         let path = Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -1224,7 +1233,9 @@ impl<'tcx, P: Property + DeserializeOwned> Checker<'tcx, P> {
 
         let trait_intrinsics: Vec<TraitData> = serde_json::from_str(&map).unwrap();
 
-        Self {
+        debug!("intrs are... {:#?}", type_intrinsics);
+
+        let res = Self {
             crate_name: crate_name.clone(),
             attr: P::attr(),
             tcx,
@@ -1233,11 +1244,19 @@ impl<'tcx, P: Property + DeserializeOwned> Checker<'tcx, P> {
             context: vec![Ty::new(P::bottom(crate_name), TyKind::Infer)],
             type_intrinsics,
             trait_intrinsics,
-        }
+        };
+
+        debug!("intrs are... {:#?}", res.type_intrinsics);
+
+        res
     }
 }
 
 impl<'tcx, P: Property + Parse + DeserializeOwned> Check<'tcx, P> for Checker<'tcx, P> {
+    fn get_crate_name_owned(&self) -> String {
+        self.crate_name.clone()
+    }
+
     fn get_type_intrinsics(&self) -> &HashMap<String, Ty<P>> {
         &self.type_intrinsics
     }
@@ -1285,8 +1304,8 @@ impl<'tcx, P: Property + Parse + DeserializeOwned> Check<'tcx, P> for Checker<'t
     fn influence(&self, ty: Ty<P>) -> Ty<P> {
         let mut result = ty;
 
-        for infl in &self.context {
-            result = result.influence(infl.clone());
+        for infl in self.context.iter().rev() {
+            result = infl.clone().influence(result);
         }
 
         result

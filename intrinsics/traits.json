@@ -4,5 +4,11 @@
         "args": ["Path"],
         "allowed": ["Path", "PathBuf"],
         "denied": []
+    },
+    {
+        "name": "Into",
+        "args": ["Path"],
+        "allowed": ["Path", "PathBuf"],
+        "denied": []
     }
 ]

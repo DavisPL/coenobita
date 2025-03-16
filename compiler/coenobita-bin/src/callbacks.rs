@@ -2,7 +2,6 @@ use coenobita_check::{Check, Checker};
 use coenobita_middle::{flow::FlowPair, provenance::ProvenancePair};
 use rustc_driver::{Callbacks, Compilation};
 use rustc_hir::{intravisit::Visitor, Item};
-use rustc_interface::interface::Compiler;
 use rustc_middle::{hir::nested_filter::OnlyBodies, ty::TyCtxt};
 
 pub struct CoenobitaCallbacks {
@@ -42,6 +41,7 @@ impl Callbacks for CoenobitaCallbacks {
     }
 }
 
+#[allow(unused)]
 struct CoenobitaVisitor<'cnbt, 'tcx> {
     crate_name: &'cnbt str,
     tcx: TyCtxt<'tcx>,
@@ -50,6 +50,7 @@ struct CoenobitaVisitor<'cnbt, 'tcx> {
 }
 
 impl<'c, 'tcx> CoenobitaVisitor<'c, 'tcx> {
+    #[allow(unused)]
     pub fn new(crate_name: &'c str, crate_type: &'c str, tcx: TyCtxt<'tcx>) -> Self {
         CoenobitaVisitor {
             crate_name,
@@ -69,7 +70,7 @@ impl<'c, 'tcx> Visitor<'tcx> for CoenobitaVisitor<'c, 'tcx> {
 
     fn visit_item(&mut self, item: &'tcx Item<'tcx>) -> Self::Result {
         // Check integrity
-        let _ = self.ichecker.check_item(item);
+        // let _ = self.ichecker.check_item(item);
 
         // Check provenance
         let _ = self.pchecker.check_item(item);
