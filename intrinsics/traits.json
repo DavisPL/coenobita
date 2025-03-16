@@ -1,0 +1,8 @@
+[
+    {
+        "name": "AsRef",
+        "args": ["Path"],
+        "allowed": ["Path", "PathBuf"],
+        "denied": []
+    }
+]

@@ -31,9 +31,19 @@
 //     };
 // }
 
-use std::fs;
+use std::{fs, path::Path};
+
+struct Boo;
+
+fn bar<B: AsRef<str>>(some: B) -> B {
+    some
+}
 
 fn bazinga() {
     let p = "hello.txt";
+    let path = Path::new(p);
+
     fs::read(p);
+
+    bar("dude");
 }

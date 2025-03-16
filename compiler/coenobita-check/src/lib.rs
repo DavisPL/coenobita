@@ -16,7 +16,9 @@ extern crate rustc_trait_selection;
 
 use std::collections::HashMap;
 use std::fs;
+use std::path::Path;
 
+use clippy_utils::ty::{implements_trait, implements_trait_with_env_from_iter};
 use coenobita_ast::TyAST;
 use coenobita_middle::property::Property;
 use coenobita_middle::ty::{Ty, TyKind};
@@ -33,23 +35,36 @@ use rustc_hir::{
     Arm, Block, BodyId, Closure, Expr, ExprField, ExprKind, FnSig, HirId, Impl, ImplItem, ImplItemKind, Item,
     ItemKind, LangItem, LetExpr, LetStmt, MatchSource, PatField, PatKind, QPath, Stmt, StmtKind,
 };
-use rustc_middle::ty::{self, FieldDef, TyCtxt};
+
+use rustc_middle::ty::{self, FieldDef, GenericArg, TyCtxt, TypingEnv};
+use rustc_span::sym::allow;
 use rustc_span::symbol::Ident;
-use rustc_span::{ErrorGuaranteed, Span, Symbol};
+use rustc_span::{sym, ErrorGuaranteed, Span, Symbol};
 
 use log::{debug, warn};
 use serde::de::DeserializeOwned;
+use serde::{Deserialize, Serialize};
 
 mod expectation;
 mod shared;
 
 pub type Result<T = ()> = std::result::Result<T, ErrorGuaranteed>;
 
+#[derive(Serialize, Deserialize)]
+pub struct TraitData {
+    name: String,
+    args: Vec<String>,
+    allowed: Vec<String>,
+    denied: Vec<String>,
+}
+
 pub trait Check<'tcx, P: Property + Parse> {
     // ======== GETTERS ======== //
 
     /// Return a shared reference to the intrinsic annotations.
-    fn get_intrinsics(&self) -> &HashMap<String, Ty<P>>;
+    fn get_type_intrinsics(&self) -> &HashMap<String, Ty<P>>;
+
+    fn get_trait_intrinsics(&self) -> &Vec<TraitData>;
 
     /// Return a shared reference to the attribute we are seeking.
     fn get_attr(&self) -> &[Symbol];
@@ -585,7 +600,7 @@ pub trait Check<'tcx, P: Property + Parse> {
             Res::Local(hir_id) => self.local_ty(hir_id),
             Res::Def(def_kind, def_id) => {
                 let canonical_path = self.get_tcx().def_path_str(def_id);
-                let intrinsics = self.get_intrinsics();
+                let intrinsics = self.get_type_intrinsics();
 
                 if intrinsics.contains_key(&canonical_path) {
                     return Ok(intrinsics[&canonical_path].clone());
@@ -695,12 +710,10 @@ pub trait Check<'tcx, P: Property + Parse> {
 
     /// Checks the type of a call expression.
     fn check_expr_call(&mut self, fun: &Expr, args: &[Expr], span: Span) -> Result<Ty<P>> {
-        // === GRAB FUNCTION NAMES === //
+        // === GRAB FUNCTION NAME === //
 
         let owner_id = fun.hir_id.owner;
         let owner_def_kind = self.get_tcx().def_kind(owner_id);
-
-        debug!("Fun: {:#?}", fun);
 
         if owner_def_kind.is_fn_like() {
             let local_def_id = owner_id.to_def_id().as_local().unwrap();
@@ -712,37 +725,56 @@ pub trait Check<'tcx, P: Property + Parse> {
                     match def_kind {
                         DefKind::Fn => {
                             let name = self.get_tcx().def_path_str(def_id);
-                            debug!("Checking call to {name}");
+                            debug!("Checking call to {name}...");
 
                             let fn_sig = self.get_tcx_mut().fn_sig(def_id).skip_binder();
 
-                            for arg_ty in fn_sig.inputs().iter() {
-                                // Do something here
+                            for (expected_ty, actual_expr) in fn_sig.inputs().iter().zip(args) {
+                                let expected_ty = expected_ty.skip_binder();
+                                let actual_ty = typeck_results.expr_ty(actual_expr);
+
+                                if let ty::Param(_) = expected_ty.kind() {
+                                    for trait_data in self.get_trait_intrinsics() {
+                                        let implements = impls_trait(
+                                            expected_ty,
+                                            &trait_data.name,
+                                            &trait_data.args,
+                                            self.get_tcx(),
+                                            def_id,
+                                        );
+
+                                        let allowed_tys: Vec<ty::Ty<'_>> = trait_data
+                                            .allowed
+                                            .iter()
+                                            .map(|name| match self.get_tcx().get_diagnostic_item(sym::Path) {
+                                                Some(def_id) => self.get_tcx().type_of(def_id).skip_binder(),
+                                                None => panic!(),
+                                            })
+                                            .collect();
+
+                                        if implements && !allowed_tys.contains(&actual_ty.peel_refs()) {
+                                            let msg =
+                                                format!("must be one of: {}", trait_data.allowed.join(", "));
+                                            return Err(self
+                                                .get_tcx_mut()
+                                                .dcx()
+                                                .span_err(actual_expr.span, msg));
+                                        }
+                                    }
+                                }
                             }
-
-                            debug!("FnSig: {:#?}", fn_sig);
-
-                            // for arg_ty in fn_sig.inputs().iter() {
-
-                            //     arg_ty.
-
-                            //     let impl_asref = has_asref_path_bound(arg_ty.skip_binder(), self.get_tcx());
-                            //     debug!("Impl asref<path>? {impl_asref}");
-                            // }
                         }
 
                         DefKind::Ctor(ctor_of, ctor_kind) => {
                             let name = self.get_tcx().def_path_str(def_id);
-                            debug!("Checking constructor of {name}")
                         }
 
                         _ => {}
                     }
                 }
-            } else {
-                debug!("The kind is {:?}", fun.kind)
             }
         }
+
         // === GRAB FUNCTION NAMES === //
 
         let fty = self.check_expr(fun, &Expectation::NoExpectation, false)?;
@@ -941,8 +973,6 @@ pub trait Check<'tcx, P: Property + Parse> {
 
     /// Checks the type of a struct expression.
     fn check_expr_struct(&mut self, hir_id: HirId, qpath: &QPath, fields: &[ExprField]) -> Result<Ty<P>> {
-        debug!("{:?}", hir_id);
-
         let ty = match qpath {
             QPath::LangItem(item, _) => match item {
                 LangItem::Range => {
@@ -1172,7 +1202,9 @@ pub struct Checker<'tcx, P: Property> {
 
     context: Vec<Ty<P>>,
 
-    intrinsics: HashMap<String, Ty<P>>,
+    type_intrinsics: HashMap<String, Ty<P>>,
+
+    trait_intrinsics: Vec<TraitData>,
 }
 
 impl<'tcx, P: Property + DeserializeOwned> Checker<'tcx, P> {
@@ -1181,7 +1213,16 @@ impl<'tcx, P: Property + DeserializeOwned> Checker<'tcx, P> {
         let path = P::intrinsics_path().with_extension("json");
         let map = fs::read_to_string(&path).unwrap();
 
-        let intrinsics: HashMap<String, Ty<P>> = serde_json::from_str(&map).unwrap();
+        let type_intrinsics: HashMap<String, Ty<P>> = serde_json::from_str(&map).unwrap();
+
+        // Collect all trait intrinsics
+        let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../..")
+            .join("intrinsics/traits")
+            .with_extension("json");
+        let map = fs::read_to_string(&path).unwrap();
+
+        let trait_intrinsics: Vec<TraitData> = serde_json::from_str(&map).unwrap();
 
         Self {
             crate_name: crate_name.clone(),
@@ -1190,14 +1231,19 @@ impl<'tcx, P: Property + DeserializeOwned> Checker<'tcx, P> {
             items: HashMap::new(),
             locals: HashMap::new(),
             context: vec![Ty::new(P::bottom(crate_name), TyKind::Infer)],
-            intrinsics,
+            type_intrinsics,
+            trait_intrinsics,
         }
     }
 }
 
 impl<'tcx, P: Property + Parse + DeserializeOwned> Check<'tcx, P> for Checker<'tcx, P> {
-    fn get_intrinsics(&self) -> &HashMap<String, Ty<P>> {
-        &self.intrinsics
+    fn get_type_intrinsics(&self) -> &HashMap<String, Ty<P>> {
+        &self.type_intrinsics
+    }
+
+    fn get_trait_intrinsics(&self) -> &Vec<TraitData> {
+        &self.trait_intrinsics
     }
 
     fn get_attr(&self) -> &[Symbol] {
@@ -1253,4 +1299,30 @@ impl<'tcx, P: Property + Parse + DeserializeOwned> Check<'tcx, P> for Checker<'t
     fn ty_top(&self) -> Ty<P> {
         Ty::new(P::top(), TyKind::Infer)
     }
+}
+
+fn impls_trait<'a, 'tcx, T: IntoIterator<Item = &'a String>>(
+    ty: &ty::Ty<'tcx>,
+    trait_name: &str,
+    arg_ty_names: T,
+    tcx: &TyCtxt<'tcx>,
+    parent_did: DefId,
+) -> bool {
+    let trait_symbol = Symbol::intern(trait_name);
+    let trait_did = tcx
+        .get_diagnostic_item(trait_symbol)
+        .expect(&format!("Trait `{trait_name}` is not a diagnostic item"));
+
+    let arg_tys = arg_ty_names.into_iter().map(|name| {
+        let ty_symbol = Symbol::intern(&name);
+        let ty = match tcx.get_diagnostic_item(ty_symbol) {
+            Some(did) => tcx.type_of(did).skip_binder(),
+            None => panic!("Type `{trait_name}` is not a diagnostic item"),
+        };
+        GenericArg::from(ty)
+    });
+
+    let typing_env = TypingEnv::post_analysis(*tcx, parent_did);
+
+    implements_trait_with_env_from_iter(*tcx, typing_env, *ty, trait_did, None, arg_tys)
 }

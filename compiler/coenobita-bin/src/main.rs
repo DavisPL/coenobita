@@ -52,19 +52,6 @@ fn main() {
     args.push("-Zcrate-attr=feature(register_tool)".to_string());
     args.push("-Zcrate-attr=register_tool(cnbt)".to_string());
 
-    // if crate_name != "std" {
-    //     // if is_release {
-    //     //     debug!("Linking release standard lib");
-    //     //     args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/release/libstd.rlib".to_string());
-    //     // } else {
-    //     //     debug!("Linking debug standard lib");
-    //     //     args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/debug/libstd.rlib".to_string());
-    //     // }
-
-    //     debug!("linking release std lib");
-    //     // args.push("--extern=std=/Users/georgeberdovskiy/Desktop/UCD/Research/PLDI25/coenobita/library/std/target/release/libstd.rlib".to_string());
-    // }
-
     // Create callbacks and run the compiler
     let mut callbacks = CoenobitaCallbacks::new(crate_name, crate_type);
     run_compiler(&args, &mut callbacks);
