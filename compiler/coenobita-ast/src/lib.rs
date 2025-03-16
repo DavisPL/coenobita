@@ -56,6 +56,7 @@ impl<P: Property> Into<TyKind<P>> for TyKindAST<P> {
     fn into(self) -> TyKind<P> {
         match self {
             Self::Fn(args, ret) => TyKind::Fn(
+                None,
                 args.into_iter().map(|t| t.into()).collect(),
                 Box::new(ret.inner.into()),
             ),

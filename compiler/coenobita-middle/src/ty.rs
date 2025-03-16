@@ -28,7 +28,7 @@ impl<'a, P: Property> Ty<P> {
         let default_ty = Ty::new(property.clone(), TyKind::Infer);
 
         let args = vec![default_ty.clone(); n];
-        let kind = TyKind::Fn(args, Box::new(default_ty));
+        let kind = TyKind::Fn(None, args, Box::new(default_ty));
 
         Ty { property, kind }
     }
@@ -54,8 +54,8 @@ impl<'a, P: Property> Ty<P> {
                 }
             }
             (TyKind::Array(t1), TyKind::Array(t2)) => t1.satisfies(&t2),
-            (TyKind::Fn(as1, r1), TyKind::Fn(as2, r2)) => {
-                // Subtyping is contravariant for argument types
+            (TyKind::Fn(_, as1, r1), TyKind::Fn(_, as2, r2)) => {
+                // TODO: Subtyping should be contravariant for argument types!
                 if as1.len() != as2.len() {
                     return false;
                 } else {
@@ -128,7 +128,7 @@ impl<P: Property> Display for Ty<P> {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum TyKind<P: Property> {
     Opaque,
-    Fn(Vec<Ty<P>>, Box<Ty<P>>),
+    Fn(Option<Box<Ty<P>>>, Vec<Ty<P>>, Box<Ty<P>>),
     Tuple(Vec<Ty<P>>),
     Array(Box<Ty<P>>),
     Adt(HashMap<String, Ty<P>>),
@@ -138,10 +138,11 @@ pub enum TyKind<P: Property> {
 impl<P: Property> Display for TyKind<P> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Fn(arg_tys, ret_ty) => {
+            Self::Fn(tup_ty, arg_tys, ret_ty) => {
                 let args = arg_tys.iter().map(|ty| ty.to_string()).sorted().join(",");
+                let tup_ty = tup_ty.clone().map_or(String::from(""), |ty| ty.to_string());
 
-                write!(f, " fn({}) -> {}", args, ret_ty)
+                write!(f, " fn {tup_ty}({args}) -> {}", ret_ty)
             }
 
             Self::Tuple(item_tys) => {

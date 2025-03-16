@@ -113,11 +113,7 @@ pub trait Check<'tcx, P: Property + Parse> {
         let intrinsics = self.get_type_intrinsics();
 
         if intrinsics.contains_key(&canonical_path) {
-            let ty = intrinsics[&canonical_path].clone();
-            debug!("intr ty of {canonical_path}:{:#?}", ty);
-            return ty;
-        } else {
-            debug!("couldnt find {canonical_path} in intrinsics: {:#?}", intrinsics);
+            return intrinsics[&canonical_path].clone();
         }
 
         if let Some(ty) = self.get_items().get(&def_id) {
@@ -358,7 +354,7 @@ pub trait Check<'tcx, P: Property + Parse> {
             Some(attr) => {
                 if let Ok(ty) = self.parse_attr(attr) {
                     match ty.inner.kind() {
-                        TyKind::Fn(ref arg_tys, _) => {
+                        TyKind::Fn(_, ref arg_tys, _) => {
                             // Make sure the number of arguments matches
                             let actual = arg_tys.len();
 
@@ -389,7 +385,7 @@ pub trait Check<'tcx, P: Property + Parse> {
 
         let ty_kind = self.fn_ty(def_id).kind;
 
-        let TyKind::Fn(args, expected) = ty_kind else {
+        let TyKind::Fn(_, args, expected) = ty_kind else {
             panic!()
         };
 
@@ -726,7 +722,14 @@ pub trait Check<'tcx, P: Property + Parse> {
         let fty = self.check_expr(fun, &Expectation::NoExpectation, false)?;
 
         let ty = match fty.clone().kind() {
-            TyKind::Fn(arg_tys, ret_ty) => {
+            TyKind::Fn(tup_ty, arg_tys, ret_ty) => {
+                if let Some(tty) = tup_ty {
+                    if !self.ty_bottom().satisfies(&tty) {
+                        let msg = format!("cannot call from \"{}\"", self.get_crate_name_owned());
+                        return Err(self.get_tcx_mut().dcx().span_err(fun.span, msg));
+                    }
+                }
+
                 if args.len() != arg_tys.len() {
                     warn!("arg ct doesnt match up");
                 }
@@ -779,12 +782,19 @@ pub trait Check<'tcx, P: Property + Parse> {
 
                 let fty = self.fn_ty(def_id);
                 // KEEP: I can use this to generate intrinsic annotations
-                // let s = serde_json::to_string(&fty).unwrap();
-
-                debug!("METHOD TYPE: {:#?}", fty);
+                let s = serde_json::to_string(&fty).unwrap();
+                debug!("{}", s);
 
                 match fty.kind() {
-                    TyKind::Fn(arg_tys, ret_ty) => {
+                    TyKind::Fn(tup_ty, arg_tys, ret_ty) => {
+                        if let Some(tty) = tup_ty {
+                            if !self.ty_bottom().satisfies(&tty) {
+                                // TODO: Use the correct span
+                                let msg = format!("cannot call from \"{}\"", self.get_crate_name_owned());
+                                return Err(self.get_tcx_mut().dcx().span_err(receiver.span, msg));
+                            }
+                        }
+
                         // We subtract one to account for the receiver
                         if args.len() != arg_tys.len() - 1 {
                             warn!("arg ct doesnt match up");
@@ -1002,9 +1012,10 @@ pub trait Check<'tcx, P: Property + Parse> {
     /// Checks the type of a closure expression.
     fn check_expr_closure(&mut self, closure: &Closure, expectation: &Expectation<P>) -> Result<Ty<P>> {
         match expectation {
+            // TODO: Account for the argument tuple type
             Expectation::ExpectHasType(Ty {
                 property,
-                kind: TyKind::Fn(args, ret),
+                kind: TyKind::Fn(_, args, ret),
             }) => {
                 // First, make sure the number of parameters is correct
                 let count = closure.fn_decl.inputs.iter().count();
@@ -1031,9 +1042,10 @@ pub trait Check<'tcx, P: Property + Parse> {
                 // Finally, return the expected type
                 Ok(Ty {
                     property: property.clone(),
-                    kind: TyKind::Fn(args.to_vec(), Box::new(ret)),
+                    kind: TyKind::Fn(None, args.to_vec(), Box::new(ret)),
                 })
             }
+
             _ => {
                 // Either there is no expectation or the expectation isn't a function
                 let count = closure.fn_decl.inputs.iter().count();
@@ -1051,7 +1063,7 @@ pub trait Check<'tcx, P: Property + Parse> {
                 let ret = self.check_expr(&body.value, &Expectation::NoExpectation, false)?;
 
                 let mut ty = self.ty_bottom();
-                ty.kind = TyKind::Fn(args, Box::new(ret));
+                ty.kind = TyKind::Fn(None, args, Box::new(ret));
 
                 Ok(ty)
             }
@@ -1219,10 +1231,7 @@ impl<'tcx, P: Property + DeserializeOwned> Checker<'tcx, P> {
         let path = P::intrinsics_path().with_extension("json");
         let map = fs::read_to_string(&path).unwrap();
 
-        debug!("getitng type intrs from {:?}", path);
         let type_intrinsics: HashMap<String, Ty<P>> = serde_json::from_str(&map).unwrap();
-
-        debug!("intrs are... {:#?}", type_intrinsics);
 
         // Collect all trait intrinsics
         let path = Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -1233,9 +1242,7 @@ impl<'tcx, P: Property + DeserializeOwned> Checker<'tcx, P> {
 
         let trait_intrinsics: Vec<TraitData> = serde_json::from_str(&map).unwrap();
 
-        debug!("intrs are... {:#?}", type_intrinsics);
-
-        let res = Self {
+        Self {
             crate_name: crate_name.clone(),
             attr: P::attr(),
             tcx,
@@ -1244,11 +1251,7 @@ impl<'tcx, P: Property + DeserializeOwned> Checker<'tcx, P> {
             context: vec![Ty::new(P::bottom(crate_name), TyKind::Infer)],
             type_intrinsics,
             trait_intrinsics,
-        };
-
-        debug!("intrs are... {:#?}", res.type_intrinsics);
-
-        res
+        }
     }
 }
 
