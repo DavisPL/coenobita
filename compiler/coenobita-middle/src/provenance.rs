@@ -85,6 +85,8 @@ impl Property for ProvenancePair {
         Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("../..")
             .join("intrinsics")
+            .join("annotations")
             .join("provenance")
+            .with_extension("json")
     }
 }

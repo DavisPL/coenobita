@@ -542,8 +542,8 @@ pub trait Check<'tcx, P: Property + Parse> {
             ExprKind::Cast(expr, _) => self.check_expr(expr, expectation, is_lvalue)?,
             ExprKind::Repeat(expr, _) => self.check_expr(expr, expectation, is_lvalue)?,
             ExprKind::Yield(expr, _) => self.check_expr(expr, expectation, is_lvalue)?,
-            ExprKind::AddrOf(_, _, expr) => self.check_expr(expr, expectation, is_lvalue)?,
-            ExprKind::Index(expr, _, _) => self.check_expr(expr, expectation, is_lvalue)?,
+            ExprKind::AddrOf(_, _, expr) => self.check_expr(expr, &Expectation::NoExpectation, is_lvalue)?,
+            ExprKind::Index(expr, _, _) => self.check_expr(expr, &Expectation::NoExpectation, is_lvalue)?,
 
             ExprKind::Assign(dest, expr, _) => self.check_expr_assign(dest, expr)?,
             ExprKind::AssignOp(_, dest, expr) => self.check_expr_assign(dest, expr)?,
@@ -551,7 +551,7 @@ pub trait Check<'tcx, P: Property + Parse> {
             ExprKind::Block(block, _) => self.check_expr_block(block, expectation)?,
             ExprKind::Loop(block, _, _, _) => self.check_expr_block(block, expectation)?,
 
-            ExprKind::Path(qpath) => self.check_expr_path(expr.hir_id, &qpath, expectation)?,
+            ExprKind::Path(qpath) => return self.check_expr_path(expr.hir_id, &qpath, expectation),
             ExprKind::Call(func, args) => self.check_expr_call(func, args, expr.span)?,
             ExprKind::Let(let_expr) => self.check_expr_let(let_expr, expectation)?,
             ExprKind::Binary(_, lhs, rhs) => self.check_expr_binary(lhs, rhs, expectation)?,
@@ -699,7 +699,7 @@ pub trait Check<'tcx, P: Property + Parse> {
             }
         };
 
-        expectation.check(*self.get_tcx_mut(), ty, qpath.span())
+        expectation.check(*self.get_tcx_mut(), self.influence(ty), qpath.span())
     }
 
     /// Checks the type of a call expression.
@@ -726,7 +726,7 @@ pub trait Check<'tcx, P: Property + Parse> {
                 if let Some(tty) = tup_ty {
                     if !self.ty_bottom().satisfies(&tty) {
                         let msg = format!("cannot call from \"{}\"", self.get_crate_name_owned());
-                        return Err(self.get_tcx_mut().dcx().span_err(fun.span, msg));
+                        self.get_tcx_mut().dcx().span_err(fun.span, msg);
                     }
                 }
 
@@ -782,8 +782,8 @@ pub trait Check<'tcx, P: Property + Parse> {
 
                 let fty = self.fn_ty(def_id);
                 // KEEP: I can use this to generate intrinsic annotations
-                let s = serde_json::to_string(&fty).unwrap();
-                debug!("{}", s);
+                // let s = serde_json::to_string(&fty).unwrap();
+                // debug!("{}", s);
 
                 match fty.kind() {
                     TyKind::Fn(tup_ty, arg_tys, ret_ty) => {
@@ -791,7 +791,7 @@ pub trait Check<'tcx, P: Property + Parse> {
                             if !self.ty_bottom().satisfies(&tty) {
                                 // TODO: Use the correct span
                                 let msg = format!("cannot call from \"{}\"", self.get_crate_name_owned());
-                                return Err(self.get_tcx_mut().dcx().span_err(receiver.span, msg));
+                                self.get_tcx_mut().dcx().span_err(receiver.span, msg);
                             }
                         }
 
@@ -1022,10 +1022,9 @@ pub trait Check<'tcx, P: Property + Parse> {
 
                 if count != args.len() {
                     let msg = format!("expected {} parameter(s), found {count}", args.len());
-                    return Err(self
-                        .get_tcx_mut()
+                    self.get_tcx_mut()
                         .dcx()
-                        .span_err(closure.fn_arg_span.unwrap(), msg));
+                        .span_err(closure.fn_arg_span.unwrap(), msg);
                 }
 
                 // Then, type check the body
@@ -1076,7 +1075,8 @@ pub trait Check<'tcx, P: Property + Parse> {
             TyKind::Adt(field_map) => {
                 if !field_map.contains_key(&field.to_string()) {
                     let msg = format!("unknown field '{}'", field.name);
-                    Err(self.get_tcx_mut().dcx().span_err(field.span, msg))
+                    self.get_tcx_mut().dcx().span_err(field.span, msg);
+                    Ok(self.ty_top())
                 } else {
                     Ok(field_map[&field.to_string()].clone())
                 }
@@ -1087,7 +1087,8 @@ pub trait Check<'tcx, P: Property + Parse> {
 
                 if index >= fields.len() {
                     let msg = format!("unknown field '{}'", field.name);
-                    Err(self.get_tcx_mut().dcx().span_err(field.span, msg))
+                    self.get_tcx_mut().dcx().span_err(field.span, msg);
+                    Ok(self.ty_top())
                 } else {
                     Ok(fields[index].clone())
                 }
@@ -1151,9 +1152,6 @@ pub trait Check<'tcx, P: Property + Parse> {
     ) -> Result {
         match def_kind {
             DefKind::Fn | DefKind::AssocFn => {
-                let name = self.get_tcx().def_path_str(def_id);
-                debug!("Checking call to {name}...");
-
                 let fn_sig = self.get_tcx_mut().fn_sig(def_id).skip_binder();
 
                 for (expected_ty, actual_expr) in fn_sig.inputs().iter().zip(args) {
@@ -1228,7 +1226,7 @@ pub struct Checker<'tcx, P: Property> {
 impl<'tcx, P: Property + DeserializeOwned> Checker<'tcx, P> {
     pub fn new(crate_name: String, tcx: TyCtxt<'tcx>) -> Self {
         // Collect intrinsic annotations for this property
-        let path = P::intrinsics_path().with_extension("json");
+        let path = P::intrinsics_path();
         let map = fs::read_to_string(&path).unwrap();
 
         let type_intrinsics: HashMap<String, Ty<P>> = serde_json::from_str(&map).unwrap();
@@ -1236,8 +1234,11 @@ impl<'tcx, P: Property + DeserializeOwned> Checker<'tcx, P> {
         // Collect all trait intrinsics
         let path = Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("../..")
-            .join("intrinsics/traits")
+            .join("intrinsics")
+            .join("ad-hoc")
+            .join("traits")
             .with_extension("json");
+
         let map = fs::read_to_string(&path).unwrap();
 
         let trait_intrinsics: Vec<TraitData> = serde_json::from_str(&map).unwrap();

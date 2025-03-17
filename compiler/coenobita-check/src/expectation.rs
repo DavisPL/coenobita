@@ -3,6 +3,7 @@ use rustc_middle::ty::TyCtxt;
 use rustc_span::Span;
 
 use crate::shared::Result;
+use log::debug;
 
 /// Bidirectional type checking requires us to propagate the type
 /// we expect an expression to have as we move along.
@@ -25,7 +26,8 @@ impl<P: Property> Expectation<P> {
                     Ok(expected.clone())
                 } else {
                     let msg = format!("expected {expected}, found {actual}");
-                    Err(tcx.dcx().span_err(span, msg))
+                    tcx.dcx().span_err(span, msg);
+                    Ok(expected.clone())
                 }
             }
         }

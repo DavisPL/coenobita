@@ -83,6 +83,8 @@ impl Property for FlowPair {
         Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("../..")
             .join("intrinsics")
+            .join("annotations")
             .join("integrity")
+            .with_extension("json")
     }
 }
