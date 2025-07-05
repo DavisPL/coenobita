@@ -13,7 +13,7 @@ use coenobita_middle::{
     flow::FlowPair,
     origin::OriginSet,
     provenance::{self, ProvenancePair},
-    ty::{Ty, TyKind},
+    ty::{Type, TypeForm},
 };
 use serde::{Deserialize, Serialize};
 
@@ -59,8 +59,8 @@ macro_rules! map {
 
 #[derive(Debug, Serialize, Deserialize)]
 struct TyData {
-    provenance: Ty<ProvenancePair>,
-    integrity: Ty<FlowPair>,
+    provenance: Type<ProvenancePair>,
+    integrity: Type<FlowPair>,
 }
 
 fn main() {
@@ -70,11 +70,11 @@ fn main() {
     let any = OriginSet::Universal;
     let root = OriginSet::Specific(set!["root".to_owned()]);
 
-    let ty_kind_provenance = TyKind::Adt(map![
-        "0".to_string() => Ty::new(ProvenancePair::new(any.clone(), root.clone()), TyKind::Opaque)
+    let ty_kind_provenance = TypeForm::Adt(map![
+        "0".to_string() => Type::new(ProvenancePair::new(any.clone(), root.clone()), TypeForm::Opaque)
     ]);
 
-    let provenance = Ty::new(ProvenancePair::new(any.clone(), any.clone()), ty_kind_provenance);
+    let provenance = Type::new(ProvenancePair::new(any.clone(), any.clone()), ty_kind_provenance);
 
     struct_map.insert("coenobita::Capability", provenance);
 
@@ -100,7 +100,7 @@ fn main() {
     // Now let's get it back
     let map_str = fs::read_to_string(path).unwrap();
 
-    let map: HashMap<String, Ty<ProvenancePair>> = serde_json::from_str(&map_str).unwrap();
+    let map: HashMap<String, Type<ProvenancePair>> = serde_json::from_str(&map_str).unwrap();
 
     println!("Reading the information back:");
     println!("{:#?}", map);

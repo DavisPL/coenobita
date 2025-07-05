@@ -21,7 +21,9 @@ use std::path::Path;
 use clippy_utils::ty::implements_trait_with_env_from_iter;
 use coenobita_ast::TyAST;
 use coenobita_middle::property::Property;
-use coenobita_middle::ty::{Ty, TyKind};
+use coenobita_middle::set::{SetAtom, SetCmpd};
+use coenobita_middle::ty::{Integrity, Type, TypeForm};
+use itertools::Itertools;
 use rustc_abi::{VariantIdx, FIRST_VARIANT};
 
 use coenobita_parse::{create_parser, create_psess, parse::Parse};
@@ -57,11 +59,11 @@ pub struct TraitData {
     denied: Vec<String>,
 }
 
-pub trait Check<'tcx, P: Property + Parse> {
+pub trait Check<'tcx> {
     // ======== GETTERS ======== //
 
     /// Return a shared reference to the intrinsic annotations.
-    fn get_type_intrinsics(&self) -> &HashMap<String, Ty<P>>;
+    fn get_type_intrinsics(&self) -> &HashMap<String, Type>;
 
     fn get_trait_intrinsics(&self) -> &Vec<TraitData>;
 
@@ -75,40 +77,72 @@ pub trait Check<'tcx, P: Property + Parse> {
     fn get_tcx_mut(&mut self) -> &mut TyCtxt<'tcx>;
 
     /// Return a shared reference to the item map.
-    fn get_items(&self) -> &HashMap<DefId, Ty<P>>;
+    fn get_items(&self) -> &HashMap<DefId, Type>;
 
     /// Return a mutable reference to the item map.
-    fn get_items_mut(&mut self) -> &mut HashMap<DefId, Ty<P>>;
+    fn get_items_mut(&mut self) -> &mut HashMap<DefId, Type>;
 
     /// Return a shared reference to the local map.
-    fn get_locals(&self) -> &HashMap<HirId, Ty<P>>;
+    fn get_locals(&self) -> &HashMap<HirId, Type>;
 
     /// Return a mutable reference to the local map.
-    fn get_locals_mut(&mut self) -> &mut HashMap<HirId, Ty<P>>;
+    fn get_locals_mut(&mut self) -> &mut HashMap<HirId, Type>;
 
     fn get_crate_name_owned(&self) -> String;
 
     // ======== CONTEXT ======== //
 
     /// Enter the scope influenced by type `ty`.
-    fn enter_scope(&mut self, ty: &Ty<P>);
+    fn enter_scope(&mut self, ty: &Type);
 
     /// Exit the last entered (innermost) scope.
     fn exit_scope(&mut self);
 
-    /// Influence the provided type given the current context.
-    fn influence(&self, ty: Ty<P>) -> Ty<P>;
+    fn create(&self) -> Type {
+        self.bottom()
+    }
+
+    fn compose(&self, ty: Type) -> Type;
+
+    fn extract(&self, child: &Type, parent: &Type) -> Type {
+        parent.influence(child)
+    }
+
+    fn adapt(&self, ty: Type) -> Type {
+        self.bottom().influence(&ty)
+    }
 
     /// Return the ⊥ type in this context.
-    fn ty_bottom(&self) -> Ty<P>;
+    fn bottom(&self) -> Type;
 
     /// Return the ⊤ type in this context.
-    fn ty_top(&self) -> Ty<P>;
+    fn ty_top(&self) -> Type;
+
+    fn constraints(&self, set: &SetAtom) -> Option<Vec<SetAtom>>;
+
+    /// Check whether origin set `actual` is a subset of origin set `expected`.
+    fn satisfies(&self, actual: &SetAtom, expected: &SetAtom) -> bool {
+        // Reflects the rule F-REFL
+        if actual == expected {
+            return true;
+        }
+
+        if let Some(bounds) = self.constraints(actual) {
+            // Reflects the rule T-TRANS
+            for bound in bounds {
+                if self.satisfies(&bound, expected) {
+                    return true;
+                }
+            }
+        }
+
+        false
+    }
 
     // ======== TYPES ======== //
 
     /// Given the `DefId` of a function, return its type.
-    fn fn_ty(&mut self, def_id: DefId) -> Ty<P> {
+    fn fn_ty(&mut self, def_id: DefId) -> Type {
         let canonical_path = self.get_tcx().def_path_str(def_id);
         let intrinsics = self.get_type_intrinsics();
 
@@ -126,7 +160,7 @@ pub trait Check<'tcx, P: Property + Parse> {
     }
 
     /// Given the parent and variant `DefId`s of an ADT (as well as its index), return its type.
-    fn adt_ty(&mut self, def_id_parent: DefId, def_id_variant: DefId, index: VariantIdx) -> Ty<P> {
+    fn adt_ty(&mut self, def_id_parent: DefId, def_id_variant: DefId, index: VariantIdx) -> Type {
         if let Some(ty) = self.get_items().get(&def_id_variant) {
             return ty.clone();
         }
@@ -146,12 +180,12 @@ pub trait Check<'tcx, P: Property + Parse> {
     }
 
     /// Fetch the type of a local identifier given its `HirId`
-    fn local_ty(&mut self, hir_id: HirId) -> Ty<P> {
+    fn local_ty(&mut self, hir_id: HirId) -> Type {
         match self.get_locals().get(&hir_id) {
             Some(ty) => ty.clone(),
             None => {
                 warn!("Silently failed to get type of local variable");
-                self.ty_bottom()
+                self.bottom()
             }
         }
     }
@@ -161,15 +195,15 @@ pub trait Check<'tcx, P: Property + Parse> {
     /// Recursively process a struct pattern, registering all identifiers with the locals map.
     fn process_pattern_struct(&mut self, hir_id: HirId, qpath: &QPath, fields: &[PatField]) {
         match self.check_expr_path(hir_id, qpath, &Expectation::NoExpectation) {
-            Ok(ty) => match ty.kind() {
-                TyKind::Adt(map) => {
+            Ok(ty) => match ty.form() {
+                TypeForm::Adt(map) => {
                     for field in fields {
-                        let ty = self.influence(map[&field.ident.to_string()].clone());
+                        let ty = self.extract(&map[&field.ident.to_string()], &ty);
                         self.process_pattern(field.pat.kind, ty, field.pat.hir_id);
                     }
                 }
 
-                TyKind::Opaque | TyKind::Infer => {
+                TypeForm::Opaque | TypeForm::Infer => {
                     for field in fields {
                         let ty = self.ty_top();
                         self.process_pattern(field.pat.kind, ty, field.pat.hir_id);
@@ -185,7 +219,7 @@ pub trait Check<'tcx, P: Property + Parse> {
         }
     }
 
-    fn process_pattern(&mut self, pat_kind: PatKind, ty: Ty<P>, hir_id: HirId) {
+    fn process_pattern(&mut self, pat_kind: PatKind, ty: Type, hir_id: HirId) {
         self.enter_scope(&ty);
 
         match pat_kind {
@@ -217,8 +251,8 @@ pub trait Check<'tcx, P: Property + Parse> {
                 self.process_pattern_struct(hir_id, &qpath, &fields);
             }
 
-            PatKind::Tuple(pats, _) => match ty.kind {
-                TyKind::Tuple(elements) => {
+            PatKind::Tuple(pats, _) => match ty.form {
+                TypeForm::Tuple(elements) => {
                     for (pat, ty) in pats.iter().zip(elements) {
                         self.process_pattern(pat.kind, ty, pat.hir_id);
                     }
@@ -275,7 +309,7 @@ pub trait Check<'tcx, P: Property + Parse> {
             .iter()
             .count();
 
-        let mut default = self.influence(Ty::ty_fn(expected));
+        let mut default = self.influence(Type::type_fn(expected));
 
         match self.get_tcx().get_attrs_by_path(def_id, &self.get_attr()).next() {
             Some(attr) => {
@@ -344,7 +378,7 @@ pub trait Check<'tcx, P: Property + Parse> {
         let def_id = body_id.hir_id.owner.to_def_id();
         let expected = signature.decl.inputs.iter().count();
 
-        let mut default = self.influence(Ty::ty_fn(expected));
+        let mut default = self.influence(Type::type_fn(expected));
 
         match self
             .get_tcx_mut()
@@ -353,8 +387,8 @@ pub trait Check<'tcx, P: Property + Parse> {
         {
             Some(attr) => {
                 if let Ok(ty) = self.parse_attr(attr) {
-                    match ty.inner.kind() {
-                        TyKind::Fn(_, ref arg_tys, _) => {
+                    match ty.inner.form() {
+                        TypeForm::Fn(_, ref arg_tys, _) => {
                             // Make sure the number of arguments matches
                             let actual = arg_tys.len();
 
@@ -383,9 +417,9 @@ pub trait Check<'tcx, P: Property + Parse> {
 
         self.get_items_mut().insert(def_id, default);
 
-        let ty_kind = self.fn_ty(def_id).kind;
+        let ty_kind = self.fn_ty(def_id).form;
 
-        let TyKind::Fn(_, args, expected) = ty_kind else {
+        let TypeForm::Fn(_, args, expected) = ty_kind else {
             panic!()
         };
 
@@ -398,7 +432,7 @@ pub trait Check<'tcx, P: Property + Parse> {
         let expr = body.value;
         let actual = self.check_expr(&body.value, &Expectation::ExpectHasType(*expected.clone()), false)?;
 
-        if !actual.satisfies(&expected) {
+        if !self.satisfies(&actual.integrity.0, &expected.integrity.0) {
             let msg = format!("Expected {expected}, found {actual}");
             self.get_tcx_mut().dcx().span_err(expr.span, msg);
         }
@@ -439,14 +473,14 @@ pub trait Check<'tcx, P: Property + Parse> {
                 let mut map = HashMap::new();
 
                 if let Ok(ty) = self.parse_attr(attr) {
-                    match ty.inner.kind() {
-                        TyKind::Adt(elements) => {
+                    match ty.inner.form() {
+                        TypeForm::Adt(elements) => {
                             for (name, ty) in elements {
                                 map.insert(name, self.influence(ty.clone().into()));
                             }
                         }
 
-                        TyKind::Tuple(ref elements) => {
+                        TypeForm::Tuple(ref elements) => {
                             let len = elements.len();
                             for (i, ty) in (0..len).zip(elements) {
                                 map.insert(i.to_string(), ty.clone().into());
@@ -487,8 +521,8 @@ pub trait Check<'tcx, P: Property + Parse> {
         };
 
         // Since this type is a struct definition, its flow pair will never be used and is only here for consistency
-        let mut ty = self.ty_bottom();
-        ty.kind = TyKind::Adt(fields);
+        let mut ty = self.bottom();
+        ty.form = TypeForm::Adt(fields);
 
         self.get_items_mut().insert(def_id, ty);
 
@@ -501,7 +535,7 @@ pub trait Check<'tcx, P: Property + Parse> {
         for attr in self.get_tcx_mut().hir().attrs(local.hir_id) {
             if attr.path_matches(&self.get_attr()) {
                 if let Ok(ty) = self.parse_attr(attr) {
-                    let expected: Ty<P> = ty.into();
+                    let expected: Type = ty.into();
                     self.process_pattern(local.pat.kind, expected.clone(), local.pat.hir_id);
 
                     if let Some(expr) = local.init {
@@ -530,11 +564,19 @@ pub trait Check<'tcx, P: Property + Parse> {
     // ======== EXPRESSIONS ======== //
 
     /// Serves as the type checking entrypoint for all expressions.
-    fn check_expr(&mut self, expr: &Expr, expectation: &Expectation<P>, is_lvalue: bool) -> Result<Ty<P>> {
+    fn check_expr(&mut self, expr: &Expr, expectation: &Expectation, is_lvalue: bool) -> Result<Type> {
         let ty = match expr.kind {
-            ExprKind::Lit(_) => self.ty_bottom(),
-            ExprKind::Break(_, _) => self.ty_bottom(),
-            ExprKind::Continue(_) => self.ty_bottom(),
+            ExprKind::ConstBlock(_) => todo!(),
+            ExprKind::Become(_) => todo!(),
+            ExprKind::Type(_, _) => todo!(),
+            ExprKind::InlineAsm(_) => todo!(),
+            ExprKind::OffsetOf(_, _) => todo!(),
+            ExprKind::UnsafeBinderCast(_, _, _) => todo!(),
+            ExprKind::Err(_) => todo!(),
+
+            ExprKind::Lit(_) => self.bottom(),
+            ExprKind::Break(_, _) => self.bottom(),
+            ExprKind::Continue(_) => self.bottom(),
 
             // TODO: Think about the typing rules for `Unary`, `AddrOf`, and `Index`
             ExprKind::Unary(_, expr) => self.check_expr(expr, expectation, is_lvalue)?,
@@ -588,12 +630,7 @@ pub trait Check<'tcx, P: Property + Parse> {
     }
 
     /// Checks the type of a path expression.
-    fn check_expr_path(
-        &mut self,
-        hir_id: HirId,
-        qpath: &QPath,
-        expectation: &Expectation<P>,
-    ) -> Result<Ty<P>> {
+    fn check_expr_path(&mut self, hir_id: HirId, qpath: &QPath, expectation: &Expectation) -> Result<Type> {
         let local_def_id = hir_id.owner.to_def_id().as_local().unwrap();
 
         let res = self.get_tcx_mut().typeck(local_def_id).qpath_res(qpath, hir_id);
@@ -657,14 +694,14 @@ pub trait Check<'tcx, P: Property + Parse> {
                     },
 
                     // TODO: Implement actual logic
-                    DefKind::Static { .. } => self.ty_bottom(),
+                    DefKind::Static { .. } => self.bottom(),
 
                     // TODO: Implement actual logic
-                    DefKind::AssocConst | DefKind::Const | DefKind::ConstParam => self.ty_bottom(),
+                    DefKind::AssocConst | DefKind::Const | DefKind::ConstParam => self.bottom(),
 
                     DefKind::Union => {
                         warn!("Silently skipping union usage");
-                        self.ty_bottom()
+                        self.bottom()
                     }
 
                     DefKind::TyAlias => {
@@ -703,7 +740,7 @@ pub trait Check<'tcx, P: Property + Parse> {
     }
 
     /// Checks the type of a call expression.
-    fn check_expr_call(&mut self, fun: &Expr, args: &[Expr], _span: Span) -> Result<Ty<P>> {
+    fn check_expr_call(&mut self, fun: &Expr, args: &[Expr], _span: Span) -> Result<Type> {
         let owner_id = fun.hir_id.owner;
         let owner_def_kind = self.get_tcx().def_kind(owner_id);
 
@@ -721,15 +758,8 @@ pub trait Check<'tcx, P: Property + Parse> {
 
         let fty = self.check_expr(fun, &Expectation::NoExpectation, false)?;
 
-        let ty = match fty.clone().kind() {
-            TyKind::Fn(tup_ty, arg_tys, ret_ty) => {
-                if let Some(tty) = tup_ty {
-                    if !self.ty_bottom().satisfies(&tty) {
-                        let msg = format!("cannot call from \"{}\"", self.get_crate_name_owned());
-                        self.get_tcx_mut().dcx().span_err(fun.span, msg);
-                    }
-                }
-
+        let ty = match fty.clone().form() {
+            TypeForm::Fn(_, arg_tys, ret_ty) => {
                 if args.len() != arg_tys.len() {
                     warn!("arg ct doesnt match up");
                 }
@@ -742,7 +772,7 @@ pub trait Check<'tcx, P: Property + Parse> {
                 *ret_ty
             }
 
-            TyKind::Adt(elements) => {
+            TypeForm::Adt(elements) => {
                 for (i, arg) in args.iter().enumerate() {
                     let ty = elements[&i.to_string()].clone();
                     let expectation = Expectation::ExpectHasType(ty);
@@ -758,7 +788,11 @@ pub trait Check<'tcx, P: Property + Parse> {
             }
         };
 
-        Ok(ty.merge(fty))
+        Ok(self.compose(vec![ty, fty]))
+    }
+
+    fn join(&self, types: Vec<Type>) -> Type {
+        todo!()
     }
 
     /// Checks the type of a method call.
@@ -768,7 +802,7 @@ pub trait Check<'tcx, P: Property + Parse> {
         receiver: &Expr,
         args: &[Expr],
         _span: Span,
-    ) -> Result<Ty<P>> {
+    ) -> Result<Type> {
         let typeck_results = self.get_tcx_mut().typeck(hir_id.owner.def_id);
         let (def_kind, def_id) = typeck_results.type_dependent_def(hir_id).unwrap();
 
@@ -778,23 +812,15 @@ pub trait Check<'tcx, P: Property + Parse> {
                 let mut args_ = vec![receiver.clone()];
                 args_.extend_from_slice(args);
 
-                self.check_intrinsic_constraints(def_id, def_kind, args, typeck_results)?;
+                self.check_intrinsic_constraints(def_id, def_kind, &args_, typeck_results)?;
 
                 let fty = self.fn_ty(def_id);
                 // KEEP: I can use this to generate intrinsic annotations
                 // let s = serde_json::to_string(&fty).unwrap();
                 // debug!("{}", s);
 
-                match fty.kind() {
-                    TyKind::Fn(tup_ty, arg_tys, ret_ty) => {
-                        if let Some(tty) = tup_ty {
-                            if !self.ty_bottom().satisfies(&tty) {
-                                // TODO: Use the correct span
-                                let msg = format!("cannot call from \"{}\"", self.get_crate_name_owned());
-                                self.get_tcx_mut().dcx().span_err(receiver.span, msg);
-                            }
-                        }
-
+                match fty.form() {
+                    TypeForm::Fn(_, arg_tys, ret_ty) => {
                         // We subtract one to account for the receiver
                         if args.len() != arg_tys.len() - 1 {
                             warn!("arg ct doesnt match up");
@@ -823,8 +849,8 @@ pub trait Check<'tcx, P: Property + Parse> {
         guard: &Expr,
         then_expr: &Expr,
         else_expr: Option<&Expr>,
-        expectation: &Expectation<P>,
-    ) -> Result<Ty<P>> {
+        expectation: &Expectation,
+    ) -> Result<Type> {
         let ity = self.check_expr(guard, &Expectation::NoExpectation, false)?;
 
         self.enter_scope(&ity);
@@ -832,7 +858,8 @@ pub trait Check<'tcx, P: Property + Parse> {
         let mut rty = self.check_expr(then_expr, expectation, false)?;
 
         if let Some(else_expr) = else_expr {
-            rty = rty.merge(self.check_expr(else_expr, expectation, false)?);
+            let to_be_joined = self.check_expr(else_expr, expectation, false)?;
+            rty = self.join(vec![rty, to_be_joined])
         }
 
         self.exit_scope();
@@ -845,8 +872,8 @@ pub trait Check<'tcx, P: Property + Parse> {
         guard: &Expr,
         arms: &[Arm],
         source: MatchSource,
-        expectation: &Expectation<P>,
-    ) -> Result<Ty<P>> {
+        expectation: &Expectation,
+    ) -> Result<Type> {
         let ity = match source {
             MatchSource::ForLoopDesugar => {
                 // The guard expression is a function call, and we want the argument
@@ -862,11 +889,12 @@ pub trait Check<'tcx, P: Property + Parse> {
 
         self.enter_scope(&ity);
 
-        let mut result = self.ty_bottom();
+        let mut result = self.bottom();
 
         for arm in arms {
             self.process_pattern(arm.pat.kind, ity.clone(), arm.pat.hir_id);
-            result = result.merge(self.check_expr(arm.body, expectation, false)?)
+            let to_be_joined = self.check_expr(arm.body, expectation, false)?;
+            result = self.join(vec![result, to_be_joined]);
         }
 
         self.exit_scope();
@@ -874,7 +902,7 @@ pub trait Check<'tcx, P: Property + Parse> {
     }
 
     /// Checks the type of a `let` expression. These typically appear as the guards of `if` expressions.
-    fn check_expr_let(&mut self, let_expr: &LetExpr, expectation: &Expectation<P>) -> Result<Ty<P>> {
+    fn check_expr_let(&mut self, let_expr: &LetExpr, expectation: &Expectation) -> Result<Type> {
         let ty = self.check_expr(let_expr.init, expectation, false)?;
 
         self.process_pattern(let_expr.pat.kind, ty.clone(), let_expr.pat.hir_id);
@@ -883,16 +911,16 @@ pub trait Check<'tcx, P: Property + Parse> {
     }
 
     /// Checks the type of a binary expression.
-    fn check_expr_binary(&mut self, lhs: &Expr, rhs: &Expr, expectation: &Expectation<P>) -> Result<Ty<P>> {
+    fn check_expr_binary(&mut self, lhs: &Expr, rhs: &Expr, expectation: &Expectation) -> Result<Type> {
         let lty = self.check_expr(lhs, expectation, false)?;
         let rty = self.check_expr(rhs, expectation, false)?;
-        let ty = lty.merge(rty);
+        let ty = self.join(vec![lty, rty]);
 
         Ok(ty)
     }
 
     /// Checks the type of a block.
-    fn check_expr_block(&mut self, block: &Block, expectation: &Expectation<P>) -> Result<Ty<P>> {
+    fn check_expr_block(&mut self, block: &Block, expectation: &Expectation) -> Result<Type> {
         // The number of statements in this block;
         let len = block.stmts.len();
 
@@ -915,12 +943,12 @@ pub trait Check<'tcx, P: Property + Parse> {
                 self.check_stmt(&block.stmts.last().unwrap(), expectation)
             }
 
-            _ => Ok(self.ty_bottom()),
+            _ => Ok(self.bottom()),
         }
     }
 
     /// Checks the type of an assignment expression.
-    fn check_expr_assign(&mut self, dest: &Expr, expr: &Expr) -> Result<Ty<P>> {
+    fn check_expr_assign(&mut self, dest: &Expr, expr: &Expr) -> Result<Type> {
         let expected = self.check_expr(dest, &Expectation::NoExpectation, true)?;
 
         let expectation = &Expectation::ExpectHasType(expected.clone());
@@ -928,16 +956,16 @@ pub trait Check<'tcx, P: Property + Parse> {
     }
 
     /// Checks the type of a struct expression.
-    fn check_expr_struct(&mut self, hir_id: HirId, qpath: &QPath, fields: &[ExprField]) -> Result<Ty<P>> {
+    fn check_expr_struct(&mut self, hir_id: HirId, qpath: &QPath, fields: &[ExprField]) -> Result<Type> {
         let ty = match qpath {
             QPath::LangItem(item, _) => match item {
                 LangItem::Range => {
                     // NOTE: We handle ranges in a special manner for the time being
-                    let mut result = self.ty_bottom();
+                    let mut result = self.bottom();
 
                     for field in fields {
-                        result =
-                            result.merge(self.check_expr(field.expr, &Expectation::NoExpectation, false)?);
+                        let pending = self.check_expr(field.expr, &Expectation::NoExpectation, false)?;
+                        result = self.join(vec![result, pending]);
                     }
 
                     result
@@ -945,15 +973,15 @@ pub trait Check<'tcx, P: Property + Parse> {
 
                 _ => {
                     warn!("Language item silently ignored");
-                    self.ty_bottom()
+                    self.bottom()
                 }
             },
 
             _ => self.check_expr_path(hir_id, qpath, &Expectation::NoExpectation)?,
         };
 
-        match ty.kind() {
-            TyKind::Adt(tys) => {
+        match ty.form() {
+            TypeForm::Adt(tys) => {
                 for field in fields {
                     let ty = tys[&field.ident.to_string()].clone();
                     let expectation = Expectation::ExpectHasType(ty);
@@ -961,7 +989,7 @@ pub trait Check<'tcx, P: Property + Parse> {
                 }
             }
 
-            TyKind::Opaque | TyKind::Infer => {
+            TypeForm::Opaque | TypeForm::Infer => {
                 for field in fields {
                     self.check_expr(field.expr, &Expectation::NoExpectation, false)?;
                 }
@@ -974,22 +1002,23 @@ pub trait Check<'tcx, P: Property + Parse> {
     }
 
     /// Checks the type of an array expression.
-    fn check_expr_array(&mut self, exprs: &[Expr]) -> Result<Ty<P>> {
-        let mut result = self.ty_bottom();
-        let mut item = self.ty_bottom();
+    fn check_expr_array(&mut self, exprs: &[Expr]) -> Result<Type> {
+        let mut result = self.bottom();
+        let mut item = self.bottom();
 
         for expr in exprs {
-            item = item.merge(self.check_expr(expr, &Expectation::NoExpectation, false)?);
+            let pending = self.check_expr(expr, &Expectation::NoExpectation, false)?;
+            item = self.join(vec![item, pending]);
         }
 
-        result.kind = TyKind::Array(Box::new(item));
+        result.form = TypeForm::Array(Box::new(item));
 
         Ok(result)
     }
 
     /// Checks the type of a tuple expression.
-    fn check_expr_tup(&mut self, exprs: &[Expr]) -> Result<Ty<P>> {
-        let mut result = self.ty_bottom();
+    fn check_expr_tup(&mut self, exprs: &[Expr]) -> Result<Type> {
+        let mut result = self.bottom();
 
         let mut items = vec![];
 
@@ -997,25 +1026,25 @@ pub trait Check<'tcx, P: Property + Parse> {
             items.push(self.check_expr(expr, &Expectation::NoExpectation, false)?);
         }
 
-        result.kind = TyKind::Tuple(items);
+        result.form = TypeForm::Tuple(items);
         Ok(result)
     }
 
     /// Checks the type of a return expression.
-    fn check_expr_ret(&mut self, expr: Option<&Expr>, expectation: &Expectation<P>) -> Result<Ty<P>> {
+    fn check_expr_ret(&mut self, expr: Option<&Expr>, expectation: &Expectation) -> Result<Type> {
         match expr {
             Some(expr) => Ok(self.check_expr(expr, expectation, false)?),
-            None => Ok(self.ty_bottom()),
+            None => Ok(self.bottom()),
         }
     }
 
     /// Checks the type of a closure expression.
-    fn check_expr_closure(&mut self, closure: &Closure, expectation: &Expectation<P>) -> Result<Ty<P>> {
+    fn check_expr_closure(&mut self, closure: &Closure, expectation: &Expectation) -> Result<Type> {
         match expectation {
             // TODO: Account for the argument tuple type
-            Expectation::ExpectHasType(Ty {
-                property,
-                kind: TyKind::Fn(_, args, ret),
+            Expectation::ExpectHasType(Type {
+                integrity,
+                form: TypeForm::Fn(_, args, ret),
             }) => {
                 // First, make sure the number of parameters is correct
                 let count = closure.fn_decl.inputs.iter().count();
@@ -1039,9 +1068,9 @@ pub trait Check<'tcx, P: Property + Parse> {
                 let ret = self.check_expr(&body.value, &expectation, false)?;
 
                 // Finally, return the expected type
-                Ok(Ty {
-                    property: property.clone(),
-                    kind: TyKind::Fn(None, args.to_vec(), Box::new(ret)),
+                Ok(Type {
+                    integrity: integrity.clone(),
+                    form: TypeForm::Fn(vec![], args.to_vec(), Box::new(ret)),
                 })
             }
 
@@ -1049,7 +1078,7 @@ pub trait Check<'tcx, P: Property + Parse> {
                 // Either there is no expectation or the expectation isn't a function
                 let count = closure.fn_decl.inputs.iter().count();
 
-                let args: Vec<Ty<P>> = (0..count).map(|_| self.ty_bottom()).collect();
+                let args: Vec<Type> = (0..count).map(|_| self.bottom()).collect();
 
                 // Then, type check the body
                 let body = self.get_tcx_mut().hir_body(closure.body);
@@ -1061,8 +1090,8 @@ pub trait Check<'tcx, P: Property + Parse> {
 
                 let ret = self.check_expr(&body.value, &Expectation::NoExpectation, false)?;
 
-                let mut ty = self.ty_bottom();
-                ty.kind = TyKind::Fn(None, args, Box::new(ret));
+                let mut ty = self.bottom();
+                ty.form = TypeForm::Fn(vec![], args, Box::new(ret));
 
                 Ok(ty)
             }
@@ -1070,9 +1099,9 @@ pub trait Check<'tcx, P: Property + Parse> {
     }
 
     /// Checks the type of a projection.
-    fn check_expr_field(&mut self, object: &Expr, field: Ident) -> Result<Ty<P>> {
-        match self.check_expr(object, &Expectation::NoExpectation, false)?.kind {
-            TyKind::Adt(field_map) => {
+    fn check_expr_field(&mut self, object: &Expr, field: Ident) -> Result<Type> {
+        match self.check_expr(object, &Expectation::NoExpectation, false)?.form {
+            TypeForm::Adt(field_map) => {
                 if !field_map.contains_key(&field.to_string()) {
                     let msg = format!("unknown field '{}'", field.name);
                     self.get_tcx_mut().dcx().span_err(field.span, msg);
@@ -1082,7 +1111,7 @@ pub trait Check<'tcx, P: Property + Parse> {
                 }
             }
 
-            TyKind::Tuple(fields) => {
+            TypeForm::Tuple(fields) => {
                 let index = field.name.as_str().parse::<usize>().unwrap();
 
                 if index >= fields.len() {
@@ -1094,7 +1123,7 @@ pub trait Check<'tcx, P: Property + Parse> {
                 }
             }
 
-            TyKind::Opaque | TyKind::Infer => {
+            TypeForm::Opaque | TypeForm::Infer => {
                 // For now, any field access with an unknown receiver will be universal
                 // However, in the future, I should refine my type checking to avoid this
                 Ok(self.ty_top())
@@ -1105,26 +1134,26 @@ pub trait Check<'tcx, P: Property + Parse> {
     }
 
     /// Checks the type of a statement.
-    fn check_stmt(&mut self, stmt: &Stmt, expectation: &Expectation<P>) -> Result<Ty<P>> {
+    fn check_stmt(&mut self, stmt: &Stmt, expectation: &Expectation) -> Result<Type> {
         // TODO: Think more about what type should be returned by a statement
         match stmt.kind {
             StmtKind::Let(local) => {
                 self.check_let_stmt(local)?;
-                Ok(self.ty_bottom())
+                Ok(self.bottom())
             }
             StmtKind::Expr(expr) => self.check_expr(expr, expectation, false),
             StmtKind::Semi(expr) => self.check_expr(expr, expectation, false),
             StmtKind::Item(item_id) => {
                 let item = self.get_tcx_mut().hir_item(item_id);
                 self.check_item(item)?;
-                Ok(self.ty_bottom())
+                Ok(self.bottom())
             }
         }
     }
 
     // ======== ATTRIBUTE PARSING ======== //
 
-    fn parse_attr(&self, attr: &Attribute) -> Result<TyAST<P>> {
+    fn parse_attr(&self, attr: &Attribute) -> Result<TyAST> {
         let AttrKind::Normal(normal) = &attr.kind else {
             unreachable!()
         };
@@ -1153,6 +1182,17 @@ pub trait Check<'tcx, P: Property + Parse> {
         match def_kind {
             DefKind::Fn | DefKind::AssocFn => {
                 let fn_sig = self.get_tcx_mut().fn_sig(def_id).skip_binder();
+                let name = self.get_tcx().def_path_str(def_id);
+
+                debug!("Checking intrinsic constraints for {name}...");
+                debug!(
+                    "Expected types: {}",
+                    fn_sig.inputs().iter().map(|t| t.skip_binder()).join(",")
+                );
+                debug!(
+                    "Actual types: {}",
+                    args.iter().map(|t| typeck_results.expr_ty(t)).join(",")
+                );
 
                 for (expected_ty, actual_expr) in fn_sig.inputs().iter().zip(args) {
                     let expected_ty = expected_ty.skip_binder();
@@ -1168,6 +1208,8 @@ pub trait Check<'tcx, P: Property + Parse> {
                                 def_id,
                             );
 
+                            debug!("does {:?} impl {}? {implements}", expected_ty, trait_data.name);
+
                             let allowed_tys: Vec<ty::Ty<'_>> = trait_data
                                 .allowed
                                 .iter()
@@ -1181,6 +1223,12 @@ pub trait Check<'tcx, P: Property + Parse> {
                                 .collect();
 
                             if implements && !allowed_tys.contains(&actual_ty.peel_refs()) {
+                                debug!(
+                                    "The type {:?} must be one of: {}",
+                                    actual_ty,
+                                    trait_data.allowed.join(", ")
+                                );
+
                                 let msg = format!("must be one of: {}", trait_data.allowed.join(", "));
                                 return Err(self.get_tcx_mut().dcx().span_err(actual_expr.span, msg));
                             }
@@ -1200,7 +1248,7 @@ pub trait Check<'tcx, P: Property + Parse> {
     }
 }
 
-pub struct Checker<'tcx, P: Property> {
+pub struct Checker<'tcx> {
     /// Contains the name of the crate we're checking.
     crate_name: String,
 
@@ -1211,25 +1259,31 @@ pub struct Checker<'tcx, P: Property> {
     tcx: TyCtxt<'tcx>,
 
     /// Maps item `DefId`s to their properties.
-    items: HashMap<DefId, Ty<P>>,
+    items: HashMap<DefId, Type>,
 
     /// Maps local `HirId`s to their properties.
-    locals: HashMap<HirId, Ty<P>>,
+    locals: HashMap<HirId, Type>,
 
-    context: Vec<Ty<P>>,
+    context: Vec<Type>,
 
-    pub type_intrinsics: HashMap<String, Ty<P>>,
+    pub type_intrinsics: HashMap<String, Type>,
 
     trait_intrinsics: Vec<TraitData>,
 }
 
-impl<'tcx, P: Property + DeserializeOwned> Checker<'tcx, P> {
+impl<'tcx> Checker<'tcx> {
     pub fn new(crate_name: String, tcx: TyCtxt<'tcx>) -> Self {
         // Collect intrinsic annotations for this property
-        let path = P::intrinsics_path();
+        let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../..")
+            .join("intrinsics")
+            .join("annotations")
+            .join("integrity")
+            .with_extension("json");
+
         let map = fs::read_to_string(&path).unwrap();
 
-        let type_intrinsics: HashMap<String, Ty<P>> = serde_json::from_str(&map).unwrap();
+        let type_intrinsics: HashMap<String, Type> = HashMap::new(); // serde_json::from_str(&map).unwrap();
 
         // Collect all trait intrinsics
         let path = Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -1241,27 +1295,27 @@ impl<'tcx, P: Property + DeserializeOwned> Checker<'tcx, P> {
 
         let map = fs::read_to_string(&path).unwrap();
 
-        let trait_intrinsics: Vec<TraitData> = serde_json::from_str(&map).unwrap();
+        let trait_intrinsics: Vec<TraitData> = vec![]; // serde_json::from_str(&map).unwrap();
 
         Self {
             crate_name: crate_name.clone(),
-            attr: P::attr(),
+            attr: vec![Symbol::intern("cnbt"), Symbol::intern("ty")],
             tcx,
             items: HashMap::new(),
             locals: HashMap::new(),
-            context: vec![Ty::new(P::bottom(crate_name), TyKind::Infer)],
+            context: vec![Type::new(Integrity::bottom(), TypeForm::Infer)],
             type_intrinsics,
             trait_intrinsics,
         }
     }
 }
 
-impl<'tcx, P: Property + Parse + DeserializeOwned> Check<'tcx, P> for Checker<'tcx, P> {
+impl<'tcx> Check<'tcx> for Checker<'tcx> {
     fn get_crate_name_owned(&self) -> String {
         self.crate_name.clone()
     }
 
-    fn get_type_intrinsics(&self) -> &HashMap<String, Ty<P>> {
+    fn get_type_intrinsics(&self) -> &HashMap<String, Type> {
         &self.type_intrinsics
     }
 
@@ -1281,23 +1335,23 @@ impl<'tcx, P: Property + Parse + DeserializeOwned> Check<'tcx, P> for Checker<'t
         &mut self.tcx
     }
 
-    fn get_items(&self) -> &HashMap<DefId, Ty<P>> {
+    fn get_items(&self) -> &HashMap<DefId, Type> {
         &self.items
     }
 
-    fn get_items_mut(&mut self) -> &mut HashMap<DefId, Ty<P>> {
+    fn get_items_mut(&mut self) -> &mut HashMap<DefId, Type> {
         &mut self.items
     }
 
-    fn get_locals(&self) -> &HashMap<HirId, Ty<P>> {
+    fn get_locals(&self) -> &HashMap<HirId, Type> {
         &self.locals
     }
 
-    fn get_locals_mut(&mut self) -> &mut HashMap<HirId, Ty<P>> {
+    fn get_locals_mut(&mut self) -> &mut HashMap<HirId, Type> {
         &mut self.locals
     }
 
-    fn enter_scope(&mut self, ty: &Ty<P>) {
+    fn enter_scope(&mut self, ty: &Type) {
         self.context.push(ty.clone())
     }
 
@@ -1305,7 +1359,11 @@ impl<'tcx, P: Property + Parse + DeserializeOwned> Check<'tcx, P> for Checker<'t
         self.context.pop();
     }
 
-    fn influence(&self, ty: Ty<P>) -> Ty<P> {
+    fn constraints(&self, set: &SetAtom) -> Option<Vec<SetAtom>> {
+        todo!()
+    }
+
+    fn create(&self) -> Type {
         let mut result = ty;
 
         for infl in self.context.iter().rev() {
@@ -1315,12 +1373,12 @@ impl<'tcx, P: Property + Parse + DeserializeOwned> Check<'tcx, P> for Checker<'t
         result
     }
 
-    fn ty_bottom(&self) -> Ty<P> {
-        self.influence(Ty::new(P::bottom(self.crate_name.clone()), TyKind::Infer))
+    fn bottom(&self) -> Type {
+        self.influence(Type::new(Integrity::bottom(), TypeForm::Infer))
     }
 
-    fn ty_top(&self) -> Ty<P> {
-        Ty::new(P::top(), TyKind::Infer)
+    fn ty_top(&self) -> Type {
+        Type::new(Integrity::top(), TypeForm::Infer)
     }
 }
 

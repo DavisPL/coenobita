@@ -53,7 +53,7 @@ impl Property for FlowPair {
         let implicit = self.implicit().union(other.implicit());
 
         Self {
-            explicit: self.explicit().clone(),
+            explicit: other.explicit,
             implicit,
         }
     }
@@ -76,7 +76,7 @@ impl Property for FlowPair {
     }
 
     fn attr() -> Vec<Symbol> {
-        vec![Symbol::intern("cnbt"), Symbol::intern("flow")]
+        vec![Symbol::intern("cnbt"), Symbol::intern("integrity")]
     }
 
     fn intrinsics_path() -> std::path::PathBuf {

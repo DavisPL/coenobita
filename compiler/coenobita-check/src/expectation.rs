@@ -1,4 +1,4 @@
-use coenobita_middle::{property::Property, ty::Ty};
+use coenobita_middle::{property::Property, ty::Type};
 use rustc_middle::ty::TyCtxt;
 use rustc_span::Span;
 
@@ -8,28 +8,18 @@ use log::debug;
 /// Bidirectional type checking requires us to propagate the type
 /// we expect an expression to have as we move along.
 #[derive(Debug, Clone)]
-pub enum Expectation<P: Property> {
+pub enum Expectation {
     /// We don't know what type this expression should have.
     NoExpectation,
 
     /// This expression should satisfy the given type.
-    ExpectHasType(Ty<P>),
+    ExpectHasType(Type),
 }
 
-impl<P: Property> Expectation<P> {
+impl Expectation {
     /// Checks whether the provided type `actual` matches the expectation.
-    pub fn check(&self, tcx: TyCtxt, actual: Ty<P>, span: Span) -> Result<Ty<P>> {
-        match self {
-            Self::NoExpectation => Ok(actual),
-            Self::ExpectHasType(expected) => {
-                if actual.satisfies(expected) {
-                    Ok(expected.clone())
-                } else {
-                    let msg = format!("expected {expected}, found {actual}");
-                    tcx.dcx().span_err(span, msg);
-                    Ok(expected.clone())
-                }
-            }
-        }
+    pub fn check(&self, tcx: TyCtxt, actual: Type, span: Span) -> Result<Type> {
+        //
+        todo!()
     }
 }

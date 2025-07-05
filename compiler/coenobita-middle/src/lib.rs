@@ -6,6 +6,8 @@ pub mod origin;
 pub mod property;
 pub mod provenance;
 
+pub mod set;
+
 pub mod ty;
 
 pub mod map;

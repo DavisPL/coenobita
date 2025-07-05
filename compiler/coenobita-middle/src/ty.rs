@@ -1,148 +1,112 @@
-use std::{collections::HashMap, fmt::Display};
+use std::{collections::{HashMap, HashSet}, fmt::Display};
 
-use crate::flow::FlowPair;
-use crate::origin::OriginSet;
-use crate::property::Property;
 use itertools::Itertools;
-
 use serde::{Deserialize, Serialize};
 
+use crate::set::{Set, SetBind, SetUnion};
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Ty<P: Property> {
-    pub property: P,
+pub struct Integrity(pub Set, pub Set, pub Set);
 
-    pub kind: TyKind<P>,
-}
+impl Integrity {
+    pub fn influence(&self, other: &Integrity) -> Self {
+        let mut influenced = self.clone();
+        let influencers = SetUnion::new(vec![self.influencers(), other.influencers()]);
 
-impl<'a, P: Property> Ty<P> {
-    pub fn new(property: P, kind: TyKind<P>) -> Self {
-        Ty { property, kind }
+        influenced.2 = Set::Union(influencers);
+        influenced
     }
 
-    pub fn kind(&self) -> TyKind<P> {
-        self.kind.clone()
-    }
-
-    pub fn ty_fn(n: usize) -> Self {
-        let property = P::default();
-        let default_ty = Ty::new(property.clone(), TyKind::Infer);
-
-        let args = vec![default_ty.clone(); n];
-        let kind = TyKind::Fn(None, args, Box::new(default_ty));
-
-        Ty { property, kind }
-    }
-
-    pub fn satisfies(&self, other: &Ty<P>) -> bool {
-        let s = self.property.satisfies(&other.property);
-
-        s && match (self.kind(), other.kind()) {
-            // TODO: `Abs` should really be `Infer`
-            (_, TyKind::Opaque) => true,
-            (_, TyKind::Infer) => true,
-            (TyKind::Adt(f1), TyKind::Adt(f2)) => {
-                if f1.len() != f2.len() {
-                    false
-                } else {
-                    for (field, ty) in f1 {
-                        if !f2.contains_key(&field) || !ty.satisfies(&f2[&field]) {
-                            return false;
-                        }
-                    }
-
-                    true
-                }
-            }
-            (TyKind::Array(t1), TyKind::Array(t2)) => t1.satisfies(&t2),
-            (TyKind::Fn(_, as1, r1), TyKind::Fn(_, as2, r2)) => {
-                // TODO: Subtyping should be contravariant for argument types!
-                if as1.len() != as2.len() {
-                    return false;
-                } else {
-                    for (a1, a2) in as1.iter().zip(as2) {
-                        if !a1.satisfies(&a2) {
-                            return false;
-                        }
-                    }
-                }
-
-                r1.satisfies(&r2)
-            }
-            (TyKind::Tuple(items1), TyKind::Tuple(items2)) => {
-                for (i1, i2) in items1.iter().zip(items2) {
-                    if !i1.satisfies(&i2) {
-                        return false;
-                    }
-                }
-
-                true
-            }
-            _ => false,
-        }
-    }
-
-    pub fn merge(&self, other: Self) -> Self {
-        let property = self.property.merge(other.property);
-        Self {
-            property,
-            kind: self.kind(),
-        }
-    }
-
-    pub fn influence(&self, mut other: Self) -> Self {
-        other.property = self.property.influence(other.property);
-        other
+    pub fn influencers(&self) -> &Set {
+        &self.2
     }
 }
 
-impl Ty<FlowPair> {
-    pub fn with_explicit(mut self, explicit: OriginSet) -> Self {
-        self.property.explicit = explicit;
-        self
+impl Integrity {
+    pub fn top() -> Self {
+        let top = Set::Concrete(None);
+        Self(top.clone(), top.clone(), top)
     }
 
-    pub fn ty_adt(n: usize) -> Ty<FlowPair> {
-        let default_flow_pair = FlowPair::new(OriginSet::Universal, OriginSet::Universal);
-        let default_ty = Ty::new(default_flow_pair.clone(), TyKind::Infer);
-
-        let args = vec![default_ty.clone(); n]; // Create `n` copies of `default_ty`
-        let mut map = HashMap::new();
-
-        for (i, arg) in (0..n).zip(args) {
-            map.insert(i.to_string(), arg);
-        }
-
-        Ty {
-            property: default_flow_pair,
-            kind: TyKind::Adt(map),
-        }
+    pub fn bottom() -> Self {
+        let bottom = Set::Concrete(Some(HashSet::new()));
+        Self(bottom.clone(), bottom.clone(), bottom)
     }
 }
 
-impl<P: Property> Display for Ty<P> {
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Type {
+    pub integrity: Integrity,
+    pub form: TypeForm,
+}
+
+impl Type {
+    pub fn new(integrity: Integrity, form: TypeForm) -> Self {
+        Self { integrity, form }
+    }
+
+    pub fn influence(&self, other: &Type) -> Self {
+        let mut influenced = other.clone();
+        influenced.integrity = self.integrity.influence(&other.integrity);
+        influenced
+    }
+
+    pub fn form(&self) -> TypeForm {
+        self.form.clone()
+    }
+
+    pub fn type_fn(n: usize) -> Self {
+        let integrity = Integrity::top();
+        let default = Type::new(integrity.clone(), TypeForm::Infer);
+
+        let args = vec![default.clone(); n];
+        let form = TypeForm::Fn(vec![], args, Box::new(default));
+
+        Type { integrity, form }
+    }
+
+    pub fn ty_adt(n: usize) -> Type {
+        // let default_flow_pair = FlowPair::new(OriginSet::Universal, OriginSet::Universal);
+        // let default_ty = Type::new(default_flow_pair.clone(), TypeForm::Infer);
+
+        // let args = vec![default_ty.clone(); n]; // Create `n` copies of `default_ty`
+        // let mut map = HashMap::new();
+
+        // for (i, arg) in (0..n).zip(args) {
+        //     map.insert(i.to_string(), arg);
+        // }
+
+        // Type {
+        //     property: default_flow_pair,
+        //     form: TypeForm::Adt(map),
+        // }
+        todo!()
+    }
+}
+
+impl Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}{}", self.property, self.kind)
+        write!(f, "{}{:?}", self.form, self.integrity)
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub enum TyKind<P: Property> {
+pub enum TypeForm {
     Opaque,
-    Fn(Option<Box<Ty<P>>>, Vec<Ty<P>>, Box<Ty<P>>),
-    Tuple(Vec<Ty<P>>),
-    Array(Box<Ty<P>>),
-    Adt(HashMap<String, Ty<P>>),
+    Fn(Vec<SetBind>, Vec<Type>, Box<Type>),
+    Tuple(Vec<Type>),
+    Array(Box<Type>),
+    Adt(HashMap<String, Type>),
     Infer,
 }
 
-impl<P: Property> Display for TyKind<P> {
+impl Display for TypeForm {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Fn(tup_ty, arg_tys, ret_ty) => {
+            Self::Fn(_, arg_tys, ret_ty) => {
                 let args = arg_tys.iter().map(|ty| ty.to_string()).sorted().join(",");
-                let tup_ty = tup_ty.clone().map_or(String::from(""), |ty| ty.to_string());
 
-                write!(f, " fn {tup_ty}({args}) -> {}", ret_ty)
+                write!(f, " fn ({args}) -> {}", ret_ty)
             }
 
             Self::Tuple(item_tys) => {
