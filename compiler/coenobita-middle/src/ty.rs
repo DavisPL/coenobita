@@ -1,6 +1,10 @@
-use std::{collections::{HashMap, HashSet}, fmt::Display};
+use std::{
+    collections::{HashMap, HashSet},
+    fmt::Display,
+};
 
 use itertools::Itertools;
+use log::debug;
 use serde::{Deserialize, Serialize};
 
 use crate::set::{Set, SetBind, SetUnion};
@@ -10,8 +14,17 @@ pub struct Integrity(pub Set, pub Set, pub Set);
 
 impl Integrity {
     pub fn influence(&self, other: &Integrity) -> Self {
-        let mut influenced = self.clone();
+        let mut influenced = other.clone();
+
+        // debug!(
+        //     "influencers will be {:?} U {:?}",
+        //     self.influencers(),
+        //     other.influencers()
+        // );
+
         let influencers = SetUnion::new(vec![self.influencers(), other.influencers()]);
+
+        // debug!("influencers are now {:?}", influencers);
 
         influenced.2 = Set::Union(influencers);
         influenced
@@ -28,9 +41,18 @@ impl Integrity {
         Self(top.clone(), top.clone(), top)
     }
 
-    pub fn bottom() -> Self {
-        let bottom = Set::Concrete(Some(HashSet::new()));
+    pub fn bottom(origin: String) -> Self {
+        let mut origins = HashSet::new();
+        origins.insert(origin);
+
+        let bottom = Set::Concrete(Some(origins));
         Self(bottom.clone(), bottom.clone(), bottom)
+    }
+}
+
+impl Display for Integrity {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({},{},{})", self.0, self.1, self.2)
     }
 }
 
@@ -86,7 +108,7 @@ impl Type {
 
 impl Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}{:?}", self.form, self.integrity)
+        write!(f, "{}{}", self.form, self.integrity)
     }
 }
 

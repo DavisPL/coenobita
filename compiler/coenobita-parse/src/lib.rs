@@ -15,7 +15,7 @@ use std::io;
 use std::sync::Arc;
 
 use coenobita_middle::property::Property;
-use coenobita_middle::set::Set;
+use coenobita_middle::set::{Set, SetBind, SetUnion};
 use coenobita_middle::ty::{Integrity, Type};
 use parse::{CoenobitaParser, Parse};
 use rustc_ast::token::TokenKind::{CloseDelim, Ident, OpenDelim};
@@ -56,34 +56,50 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
     pub fn parse_ty(&mut self) -> PResult<'cnbt, TyAST> {
         let start = self.start();
 
+        let form = self.parse_ty_kind()?;
+        let integrity = self.parse_integrity()?;
+
         Ok(TyAST {
-            inner: Type::new(self.parse_integrity()?, self.parse_ty_kind()?.into()),
+            inner: Type::new(integrity, form.into()),
             span: self.end(start),
         })
     }
 
-    pub fn parse_integrity(&self) -> PResult<'cnbt, Integrity> {
-        todo!()
+    pub fn parse_integrity(&mut self) -> PResult<'cnbt, Integrity> {
+        self.parser.expect(OPEN_PAREN)?;
+
+        let authors = self.parse_set()?;
+
+        self.parser.expect(COMMA)?;
+
+        let contributors = self.parse_set()?;
+
+        self.parser.expect(COMMA)?;
+
+        let influencers = self.parse_set()?;
+
+        self.parser.expect(CLOSE_PAREN)?;
+
+        Ok(Integrity(authors, contributors, influencers))
     }
 
     pub fn parse_ty_kind(&mut self) -> PResult<'cnbt, TypeFormAST> {
         if self.parser.eat_keyword(KW_FN) {
             // We are parsing a function type
-            let mut set_variables = vec![];
+            let mut set_bindings = vec![];
 
             if self.parser.eat(OPEN_BRACKET) {
                 // The function takes set parameters
                 while !self.parser.eat(CLOSE_BRACKET) {
-                    let variable = self.parser.parse_ident()?.to_string();
+                    let left = self.parser.parse_ident()?.to_string();
 
-                    if self.eat_subset() {
-                        debug!("Ate subset");
-                        let right = self.parse_set_compound()?;
-
-                        set_variables.push(format!("{variable} ⊆ {:?}", right));
+                    let right = if self.eat_subset() {
+                        self.parse_set()?
                     } else {
-                        set_variables.push(variable);
-                    }
+                        Set::Concrete(None)
+                    };
+
+                    set_bindings.push(SetBind::new(left, right));
 
                     if self.parser.token != CloseDelim(Delimiter::Bracket) {
                         self.parser.expect(COMMA)?;
@@ -91,7 +107,7 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
                 }
             }
 
-            debug!("Function takes set variables {:?}", set_variables);
+            debug!("Function takes set variables {:?}", set_bindings);
 
             self.parser.expect(OPEN_PAREN)?;
 
@@ -107,7 +123,7 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
             self.parser.expect(CLOSE_PAREN)?;
             self.parser.expect(RARROW)?;
 
-            Ok(TypeFormAST::Fn(vec![], args, Box::new(self.parse_ty()?)))
+            Ok(TypeFormAST::Fn(set_bindings, args, Box::new(self.parse_ty()?)))
         } else if self.parser.eat_keyword(KW_STRUCT) {
             // We are parsing a struct type
             if self.parser.token.kind == OpenDelim(Delimiter::Brace) {
@@ -163,12 +179,13 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
             self.parser.expect(CLOSE_BRACKET)?;
             Ok(TypeFormAST::Array(Box::new(element)))
         } else {
+            let ident = self.parser.parse_ident()?;
             Ok(TypeFormAST::Opaque)
         }
     }
 
     pub fn parse_set(&mut self) -> PResult<'cnbt, Set> {
-        let result = if self.parser.eat(OPEN_BRACE) {
+        let left = if self.parser.eat(OPEN_BRACE) {
             let first_origin = self.parser.parse_ident()?.to_string();
 
             if first_origin == "*" {
@@ -190,21 +207,13 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
             Set::Variable(self.parser.parse_ident()?.to_string())
         };
 
-        return Ok(result);
-    }
-
-    pub fn parse_set_compound(&mut self) -> PResult<'cnbt, SetCmpd> {
-        let left = self.parse_set()?;
-
         if self.eat_union() {
-            let right = self.parse_set_compound()?;
-
-            debug!("> right is {:?}", right);
-
-            return Ok(SetCmpd::Union(Box::new(SetCmpd::Atomic(left)), Box::new(right)));
+            let right = self.parse_set()?;
+            let un = SetUnion::new(vec![&left, &right]);
+            return Ok(Set::Union(un));
         }
 
-        return Ok(SetCmpd::Atomic(left));
+        Ok(left)
     }
 
     pub fn eat_subset(&mut self) -> bool {

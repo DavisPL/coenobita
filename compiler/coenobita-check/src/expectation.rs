@@ -19,7 +19,7 @@ pub enum Expectation {
 impl Expectation {
     /// Checks whether the provided type `actual` matches the expectation.
     pub fn check(&self, tcx: TyCtxt, actual: Type, span: Span) -> Result<Type> {
-        //
-        todo!()
+        // TODO: Implement
+        Ok(actual)
     }
 }
