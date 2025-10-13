@@ -9,17 +9,18 @@ extern crate rustc_parse;
 extern crate rustc_session;
 extern crate rustc_span;
 
-use std::collections::HashSet;
+use std::collections::{BTreeSet, HashSet};
 use std::fmt::Debug;
 use std::io;
 use std::sync::Arc;
 
 use coenobita_middle::property::Property;
-use coenobita_middle::set::{Set, SetBind, SetUnion};
-use coenobita_middle::ty::{Integrity, Type};
+use coenobita_middle::set::Set;
+use std::collections::HashMap;
+// use coenobita_middle::ty::{Integrity, Type};
 use parse::{CoenobitaParser, Parse};
 use rustc_ast::token::TokenKind::{CloseDelim, Ident, OpenDelim};
-use rustc_ast::token::{Delimiter, TokenKind};
+use rustc_ast::token::{Delimiter, Token, TokenKind};
 use rustc_ast::tokenstream::TokenStream;
 
 use rustc_data_structures::sync;
@@ -39,7 +40,7 @@ use rustc_session::parse::ParseSess;
 use rustc_span::source_map::SourceMap;
 use rustc_span::{BytePos, Span};
 
-use coenobita_ast::{TyAST, TypeFormAST};
+// use coenobita_ast::{TyAST, TypeFormAST};
 
 use log::debug;
 
@@ -48,183 +49,123 @@ pub(crate) mod token;
 
 use token::*;
 
+use crate::parse::VarSpan;
+
+pub struct Take {
+    pub left: VarSpan,
+    pub bound: Set,
+    pub right: HashMap<String, Span>
+}
+
+pub struct Pass {
+    pub left: (String, Span),
+    pub set: Set,
+    pub right: HashMap<String, Span>
+}
+
 impl<'cnbt> CoenobitaParser<'cnbt> {
     pub fn new(parser: Parser<'cnbt>) -> Self {
-        CoenobitaParser { parser }
+        CoenobitaParser { parser, variables: HashMap::new() }
     }
 
-    pub fn parse_ty(&mut self) -> PResult<'cnbt, TyAST> {
-        let start = self.start();
+    pub fn parse_take(&mut self) -> PResult<'cnbt, Take> {
+        let var = self.parser.parse_ident()?;
+        self.parse_subset()?;
+        let bound = self.parse_set()?;
 
-        let form = self.parse_ty_kind()?;
-        let integrity = self.parse_integrity()?;
-
-        Ok(TyAST {
-            inner: Type::new(integrity, form.into()),
-            span: self.end(start),
+        Ok(Take {
+            left: (var.to_string(), var.span),
+            bound,
+            right: self.variables.clone()
         })
     }
 
-    pub fn parse_integrity(&mut self) -> PResult<'cnbt, Integrity> {
-        self.parser.expect(OPEN_PAREN)?;
+    pub fn parse_pass(&mut self) -> PResult<'cnbt, Pass> {
+        debug!("Parsing pass; token is {:?}", self.parser.token.kind);
 
-        let authors = self.parse_set()?;
+        let left = if self.parser.token.kind == TokenKind::RArrow {
+            let span = self.parser.token.span;
 
-        self.parser.expect(COMMA)?;
-
-        let contributors = self.parse_set()?;
-
-        self.parser.expect(COMMA)?;
-
-        let influencers = self.parse_set()?;
-
-        self.parser.expect(CLOSE_PAREN)?;
-
-        Ok(Integrity(authors, contributors, influencers))
-    }
-
-    pub fn parse_ty_kind(&mut self) -> PResult<'cnbt, TypeFormAST> {
-        if self.parser.eat_keyword(KW_FN) {
-            // We are parsing a function type
-            let mut set_bindings = vec![];
-
-            if self.parser.eat(OPEN_BRACKET) {
-                // The function takes set parameters
-                while !self.parser.eat(CLOSE_BRACKET) {
-                    let left = self.parser.parse_ident()?.to_string();
-
-                    let right = if self.eat_subset() {
-                        self.parse_set()?
-                    } else {
-                        Set::Concrete(None)
-                    };
-
-                    set_bindings.push(SetBind::new(left, right));
-
-                    if self.parser.token != CloseDelim(Delimiter::Bracket) {
-                        self.parser.expect(COMMA)?;
-                    }
-                }
-            }
-
-            debug!("Function takes set variables {:?}", set_bindings);
-
-            self.parser.expect(OPEN_PAREN)?;
-
-            let mut args = vec![];
-            while self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                args.push(self.parse_ty()?);
-
-                if self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                    self.parser.expect(COMMA)?;
-                }
-            }
-
-            self.parser.expect(CLOSE_PAREN)?;
-            self.parser.expect(RARROW)?;
-
-            Ok(TypeFormAST::Fn(set_bindings, args, Box::new(self.parse_ty()?)))
-        } else if self.parser.eat_keyword(KW_STRUCT) {
-            // We are parsing a struct type
-            if self.parser.token.kind == OpenDelim(Delimiter::Brace) {
-                // We are parsing a `{ ... }` struct
-                self.parser.expect(OPEN_BRACE)?;
-
-                let mut fields = vec![];
-                while self.parser.token != CloseDelim(Delimiter::Brace) {
-                    let ident = self.parser.parse_ident()?;
-                    self.parser.expect(COLON)?;
-
-                    fields.push((ident, self.parse_ty()?));
-
-                    if self.parser.token != CloseDelim(Delimiter::Brace) {
-                        self.parser.expect(COMMA)?;
-                    }
-                }
-
-                self.parser.expect(CLOSE_BRACE)?;
-                Ok(TypeFormAST::Struct(fields))
-            } else {
-                // We are parsing a `( ... )` struct
-                self.parser.expect(OPEN_PAREN)?;
-
-                let mut elements = vec![];
-                while self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                    elements.push(self.parse_ty()?);
-
-                    if self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                        self.parser.expect(COMMA)?;
-                    }
-                }
-
-                self.parser.expect(CLOSE_PAREN)?;
-                Ok(TypeFormAST::StructTuple(elements))
-            }
-        } else if self.parser.eat(OPEN_PAREN) {
-            // We are parsing a tuple type
-            let mut elements = vec![];
-            while self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                elements.push(self.parse_ty()?);
-
-                if self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                    self.parser.expect(COMMA)?;
-                }
-            }
-
-            self.parser.expect(CLOSE_PAREN)?;
-            Ok(TypeFormAST::Tuple(elements))
-        } else if self.parser.eat(OPEN_BRACKET) {
-            // We are parsing an array type
-            let element = self.parse_ty()?;
-            self.parser.expect(CLOSE_BRACKET)?;
-            Ok(TypeFormAST::Array(Box::new(element)))
+            self.parser.bump();
+            (String::from("->"), span)
         } else {
             let ident = self.parser.parse_ident()?;
-            Ok(TypeFormAST::Opaque)
-        }
+            (ident.to_string(), ident.span)
+        };
+
+        let set = self.parse_set()?;
+
+        Ok(Pass {
+            left,
+            set,
+            right: self.variables.clone()
+        })
     }
 
     pub fn parse_set(&mut self) -> PResult<'cnbt, Set> {
         let left = if self.parser.eat(OPEN_BRACE) {
-            let first_origin = self.parser.parse_ident()?.to_string();
+            let mut origins = BTreeSet::new();
 
-            if first_origin == "*" {
-                Set::Concrete(None)
-            } else {
-                let mut origins = HashSet::new();
-                origins.insert(first_origin);
+            if let Ok(ident) = self.parser.parse_ident() {
+                origins.insert(ident.to_string());
+            }
 
-                while !self.parser.eat(CLOSE_BRACE) {
-                    self.parser.expect(COMMA)?;
+            while !self.parser.eat(CLOSE_BRACE) {
+                self.parser.expect(COMMA)?;
 
-                    let next_origin = self.parser.parse_ident()?.to_string();
-                    origins.insert(next_origin);
+                if self.parser.eat(CLOSE_BRACE) {
+                    break;
                 }
 
-                Set::Concrete(Some(origins))
+                let next_origin = self.parser.parse_ident()?.to_string();
+                origins.insert(next_origin);
+            }
+
+            if origins.contains("*") {
+                Set::Universe
+            } else {
+                Set::Concrete(origins)
             }
         } else {
-            Set::Variable(self.parser.parse_ident()?.to_string())
+            let ident = self.parser.parse_ident()?;
+
+            if !self.variables.contains_key(&ident.to_string()) {
+                self.variables.insert(ident.to_string(), ident.span.clone());
+            }
+ 
+            Set::Variable(ident.to_string())
         };
 
         if self.eat_union() {
             let right = self.parse_set()?;
-            let un = SetUnion::new(vec![&left, &right]);
-            return Ok(Set::Union(un));
+            return Ok(left.union(right));
         }
 
         Ok(left)
     }
 
-    pub fn eat_subset(&mut self) -> bool {
+    pub fn parse_subset(&mut self) -> PResult<'cnbt, ()> {
+        // Check for "sub" identifier
         if let TokenKind::Ident(sym, _) = self.parser.token.kind {
             if sym.to_string() == "sub" {
                 self.parser.bump();
-                return self.parser.eat(EQUAL);
+            } else {
+                return Err(self.parser.dcx().struct_span_err(
+                    self.parser.token.span,
+                    format!("expected `sub`, found `{}`", sym)
+                ));
             }
+        } else {
+            return Err(self.parser.dcx().struct_span_err(
+                self.parser.token.span,
+                format!("expected `sub`, found `{:?}`", self.parser.token.kind)
+            ));
         }
 
-        false
+        // Expect the `=` token
+        self.parser.expect(EQUAL)?;
+
+        Ok(())
     }
 
     pub fn eat_union(&mut self) -> bool {
@@ -236,14 +177,6 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
         }
 
         false
-    }
-
-    fn start(&mut self) -> BytePos {
-        self.parser.token.span.lo()
-    }
-
-    fn end(&self, start: BytePos) -> Span {
-        self.parser.prev_token.span.with_lo(start)
     }
 }
 

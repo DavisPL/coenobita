@@ -20,36 +20,53 @@ macro_rules! set {
     };
 }
 
-struct SetCtx {
-	bindings: HashMap<String, Set>
+pub struct SetCtx {
+	bindings: Vec<HashMap<String, Set>>
 }
 
 impl SetCtx {
-    fn new() -> Self {
+    pub fn new() -> Self {
         SetCtx {
-			bindings: HashMap::new()
+			bindings: Vec::new()
 		}
     }
 
-    fn bound(&self, var: &str) -> Option<&Set> {
-        self.bindings.get(var)
+    pub fn get(&self, var: &str) -> Option<&Set> {
+        self.bindings.iter()
+            .rev()
+            .find_map(|cx| cx.get(var))
     }
 
-	fn bind(&mut self, var: String, set: Set) {
-		self.bindings.insert(var, set);
+	pub fn set(&mut self, var: String, set: Set) {
+        match self.bindings.last_mut() {
+            Some(cx) => cx.insert(var, set),
+            None => None // TODO: We should probably return an error or panic
+        };
 	}
+
+    pub fn enter(&mut self) {
+        self.bindings.push(HashMap::new());
+    }
+
+    pub fn exit(&mut self) {
+        self.bindings.pop();
+    }
 }
 
 #[derive(Clone, Ord, Eq, PartialEq, Hash, PartialOrd)]
-enum Set {
+pub enum Set {
     Variable(String),
     Concrete(BTreeSet<String>),
     Union(BTreeSet<Set>),
+    Universe
 }
 
 impl Set {
-    fn subset(&self, ctx: &SetCtx, other: &Set) -> bool {
+    pub fn subset(&self, ctx: &SetCtx, other: &Set) -> bool {
         match (self, other) {
+            (_, Set::Universe) => true,
+            (Set::Universe, _) => false,
+
             (Set::Concrete(s1), Set::Concrete(s2)) => s1.is_subset(s2),
 
             // We can never determine whether a concrete set is a subset of a variable because variables do not have lower bounds
@@ -75,7 +92,7 @@ impl Set {
 			(Set::Variable(_), Set::Union(s1)) if s1.contains(self) => true,
 
             // In all other cases, we try to determine whether the variable's upper bound is a subset of 'other'
-            (Set::Variable(v), w2) => match ctx.bound(v) {
+            (Set::Variable(v), w2) => match ctx.get(v) {
                 Some(w1) => w1.subset(ctx, w2),
                 None => false,
             },
@@ -94,8 +111,10 @@ impl Set {
         }
     }
 
-    fn union(self, other: Set) -> Set {
+    pub fn union(self, other: Set) -> Set {
         match (self, other) {
+            (_, Set::Universe) | (Set::Universe, _) => Set::Universe,
+
             // {a,b} ∪ {b,c}
             (Set::Concrete(s1), Set::Concrete(s2)) => {
                 Set::Concrete(s1.union(&s2).cloned().collect())
@@ -173,6 +192,7 @@ impl Set {
 impl Display for Set {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Set::Universe => write!(f, "{{*}}"),
             Set::Concrete(e) => {
                 if e.is_empty() {
                     write!(f, "∅")
@@ -188,5 +208,11 @@ impl Display for Set {
 
             Set::Variable(v) => write!(f, "{v}"),
         }
+    }
+}
+
+impl std::fmt::Debug for Set {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self, f)
     }
 }

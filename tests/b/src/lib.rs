@@ -1,12 +1,23 @@
-#[cnbt::ty(fn[A sub= {a,b}, B sub= {c}, C sub= A U B](i32 ({b},{b},C)) -> i32 ({b},{b},{a,b,c,d}) ({a},{a},{a}))]
-pub fn foo(x: i32) -> i32 {
-    
-    #[cnbt::ty(fn(i32 ({b},{b},C U {b})) -> i32 ({b},{b},{a,b,c,d}) ({a},{a},{a}))]
-    fn bar(y: i32) -> i32 {
-        y
+#[coenobita::take(A sub= {a,b,c} U {b})]
+#[coenobita::take(B sub= {c} U A)]
+
+#[coenobita::pass(x A)]
+#[coenobita::pass(x {a})]
+#[coenobita::pass(x {a})]
+
+#[coenobita::pass(y B)]
+#[coenobita::pass(y {b})]
+#[coenobita::pass(y {b})]
+
+#[coenobita::pass(-> {b} U A)]
+#[coenobita::pass(-> {a,b,c})]
+#[coenobita::pass(-> {a,b,c})]
+pub fn foo(x: Vec<i32>, y: Vec<i64>) -> i32 {
+    fn baz(z: i32) {
+        
     }
 
-    bar(x)
+    5
 }
 
 // #[cnbt::ty(fn[A]() -> i32 ({b},{b},{a,b,c,d}) ({a},{a},{a}))]
