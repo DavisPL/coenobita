@@ -17,6 +17,7 @@ pub enum TypeKind {
     Opaque,
     Fn(Vec<Type>, Box<Type>),
     Rec(HashMap<String, Type>),
+    Array(Box<Type>),
     Tuple(Vec<Type>)
 }
 

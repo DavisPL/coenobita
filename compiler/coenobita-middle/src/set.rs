@@ -132,6 +132,8 @@ impl Set {
                     }
                 }
 
+                s2.insert(Set::Concrete(e1));
+
                 Set::Union(s2)
             }
 

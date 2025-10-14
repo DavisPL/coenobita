@@ -90,7 +90,9 @@ pub struct Checker<'tcx> {
 
     vctx: Ctx<HirId, Type>,
 
-    icx: InfCtx
+    icx: InfCtx,
+
+    crate_name: String
 }
 
 impl<'tcx> Checker<'tcx> {
@@ -108,7 +110,9 @@ impl<'tcx> Checker<'tcx> {
 
             vctx: Ctx::new(),
 
-            icx: InfCtx::new(crate_name)
+            icx: InfCtx::new(crate_name.clone()),
+
+            crate_name
         }
 	}
 
@@ -122,8 +126,6 @@ impl<'tcx> Checker<'tcx> {
         // Collect all set variables introduced by this function
 		for attr in self.tcx.get_attrs_by_path(def_id, &self.take_attr) {
             let take = self.parse_attr_take(attr)?;
-
-            debug!("Introducing {} ⊆ {}", take.left.0, take.bound);
 
             // Make sure this variable hasn't been introduced yet
             if let Some(bound) = self.scx.get(&take.left.0) {
@@ -144,8 +146,6 @@ impl<'tcx> Checker<'tcx> {
 
             let type_constr = self.get_constr_for_ty(&param_ty);
 
-            debug!("- {:#?} : {param_ty}", param.pat.simple_ident());
-
             self.process_pattern(param.pat.kind, type_constr, param.pat.hir_id);
         }
 
@@ -157,8 +157,6 @@ impl<'tcx> Checker<'tcx> {
         // Collect all set applications
 		for attr in self.tcx.get_attrs_by_path(def_id, &self.pass_attr) {
             let Pass { left, set, right } = self.parse_attr_pass(attr)?;
-
-            debug!("PASS {} {}", left.0, set);
 
             // Make sure all variables on the right exist
             self.ensure_variables_exist(&set, &right)?;
@@ -190,24 +188,7 @@ impl<'tcx> Checker<'tcx> {
             }
         }
 
-        let expr = body.value;
-        let actual = self.check_expr(&body.value, Some(&ret_ty), false)?;
-
-        debug!("Expect return type of... {:?}", ret_ty);
-        debug!("Found return type of... {:?}", actual);
-
-        if !actual.satisfies(&self.scx, &ret_ty) {
-            debug!("Type err found");
-        }
-
-        // debug!("Params...");
-        // for param in body.params {
-        //     let param_ty = self.tcx.typeck(local_def_id).node_type(param.hir_id);
-
-            
-            
-        //     debug!("- {:#?} : {param_ty}", param.pat.simple_ident());
-        // }
+        self.check_expr(&body.value, Some(&ret_ty), false)?;
 
         // Exit this scope
         self.scx.exit();
@@ -231,13 +212,26 @@ impl<'tcx> Checker<'tcx> {
         println!("======");
     }
 
+    // ======== TYPES ======== //
+
+    /// Given the `DefId` of a function, return its type.
+    fn fn_ty(&mut self, def_id: DefId) -> Type {
+        todo!()
+    }
+
     fn top_type(&self) -> Type {
         Type::opaque()
     }
 
     fn bottom_type(&self) -> Type {
         // TODO: This type should be influenced by the current influence context and have only the origin in its sets
-        Type::opaque()
+        let mut ty = Type::opaque();
+
+        let set = Set::Concrete(BTreeSet::from([self.crate_name.clone()]));
+
+        ty.intrinsic = [set.clone(), set.clone(), set];
+
+        self.icx.influence(ty)
     }
 
     fn set_type_constr(&mut self, def_id: DefId, ty: Type) {
@@ -325,8 +319,6 @@ impl<'tcx> Checker<'tcx> {
 	pub fn check_item(&mut self, item: &Item) -> Result {
 		let def_id = item.owner_id.to_def_id();
 
-		debug!("Getting attributes for item {:?}", def_id);
-
         match item.kind {
             ItemKind::Fn { sig, body, .. } => self.check_item_fn(&sig, body),
             ItemKind::Struct(var_data, _) => {
@@ -394,8 +386,6 @@ impl<'tcx> Checker<'tcx> {
 		for attr in self.tcx.get_attrs_by_path(def_id, &self.take_attr) {
             let take = self.parse_attr_take(attr)?;
 
-            debug!("Introducing {} ⊆ {}", take.left.0, take.bound);
-
             // Make sure this variable hasn't been introduced yet
             if let Some(bound) = self.scx.get(&take.left.0) {
                 return Err(self.tcx.dcx().span_err(take.left.1, format!("Variable has already been introduced with upper bound {bound}")))
@@ -445,26 +435,66 @@ impl<'tcx> Checker<'tcx> {
 
     /// Serves as the type checking entrypoint for all expressions.
     fn check_expr(&mut self, expr: &Expr, expectation: Option<&Type>, is_lvalue: bool) -> Result<Type> {
-        debug!("expr is {:#?}", expr);
-
         let ty = match expr.kind {
-            ExprKind::Path(qpath) => return self.check_expr_path(expr.hir_id, &qpath, expectation),
+            ExprKind::ConstBlock(_) => todo!(),
+            ExprKind::Become(_) => todo!(),
+            ExprKind::Type(_, _) => todo!(),
+            ExprKind::InlineAsm(_) => todo!(),
+            ExprKind::OffsetOf(_, _) => todo!(),
+            ExprKind::UnsafeBinderCast(_, _, _) => todo!(),
+            ExprKind::Err(_) => todo!(),
+
+            ExprKind::Lit(_) => self.bottom_type(),
+            ExprKind::Break(_, _) => self.bottom_type(),
+            ExprKind::Continue(_) => self.bottom_type(),
+
+            // TODO: Think about the typing rules for `Unary`, `AddrOf`, and `Index`
+            ExprKind::Unary(_, expr) => self.check_expr(expr, expectation, is_lvalue)?,
+            ExprKind::DropTemps(expr) => self.check_expr(expr, expectation, is_lvalue)?,
+            ExprKind::Cast(expr, _) => self.check_expr(expr, expectation, is_lvalue)?,
+            ExprKind::Repeat(expr, _) => self.check_expr(expr, expectation, is_lvalue)?,
+            ExprKind::Yield(expr, _) => self.check_expr(expr, expectation, is_lvalue)?,
+            ExprKind::AddrOf(_, _, expr) => self.check_expr(expr, None, is_lvalue)?,
+            ExprKind::Index(expr, _, _) => self.check_expr(expr, None, is_lvalue)?,
+
+            ExprKind::Assign(dest, expr, _) => self.check_expr_assign(dest, expr)?,
+            ExprKind::AssignOp(_, dest, expr) => self.check_expr_assign(dest, expr)?,
 
             ExprKind::Block(block, _) => self.check_expr_block(block, expectation)?,
-            _ => Type::opaque()
+            ExprKind::Loop(block, _, _, _) => self.check_expr_block(block, expectation)?,
+
+            ExprKind::Path(qpath) => return self.check_expr_path(expr.hir_id, &qpath, expectation),
+            ExprKind::Call(func, args) => self.check_expr_call(func, args, expr.span)?,
+            ExprKind::Let(let_expr) => self.check_expr_let(let_expr, expectation)?,
+            ExprKind::Binary(_, lhs, rhs) => self.check_expr_binary(lhs, rhs, expectation)?,
+            ExprKind::Array(exprs) => self.check_expr_array(exprs)?,
+            ExprKind::Tup(exprs) => self.check_expr_tup(exprs)?,
+            ExprKind::Ret(expr) => self.check_expr_ret(expr, expectation)?,
+            ExprKind::Closure(closure) => self.check_expr_closure(closure, expectation)?,
+
+            // TODO: Think about the typing rules for projection
+            ExprKind::Field(obj, ident) => self.check_expr_field(obj, ident)?,
+
+            ExprKind::MethodCall(_, receiver, args, _) => {
+                self.check_method_call(expr.hir_id, receiver, args, expr.span)?
+            }
+            ExprKind::If(guard, then_expr, else_expr) => {
+                self.check_expr_if(guard, then_expr, else_expr, expectation)?
+            }
+            ExprKind::Match(guard, arms, source) => {
+                self.check_expr_match(guard, arms, source, expectation)?
+            }
+            ExprKind::Struct(qpath, fields, _) => self.check_expr_struct(expr.hir_id, qpath, fields)?,
         };
 
-        let actual = if is_lvalue { ty } else { /* influence */ ty };
-
-        debug!("Expected - {:?}", expectation);
-        debug!("Actual - {:?}", actual);
+        let actual = if is_lvalue { ty } else { self.icx.influence(ty) };
         
         match expectation {
             Some(expected) => {
                 if actual.satisfies(&self.scx, expected) {
                     Ok(actual)
                 } else {
-                    let msg = format!("expected '{}' but found '{}'", actual, expected);
+                    let msg = format!("expected '{}' but found '{}'", expected, actual);
                     Err(self.tcx.dcx().span_err(expr.span, msg))
                 }
             }
@@ -475,6 +505,8 @@ impl<'tcx> Checker<'tcx> {
 
     /// Checks the type of a block.
     fn check_expr_block(&mut self, block: &Block, expectation: Option<&Type>) -> Result<Type> {
+        debug!("Checking block expression with expected type {:?}", expectation);
+
         // The number of statements in this block;
         let len = block.stmts.len();
 
@@ -499,8 +531,6 @@ impl<'tcx> Checker<'tcx> {
 
             _ => {
                 let b = Type::opaque();
-                debug!("block has no stmts, so type is bottom: {:?}", b);
-
                 Ok(b)
             }
         }
@@ -508,6 +538,8 @@ impl<'tcx> Checker<'tcx> {
 
     /// Checks the type of a path expression.
     fn check_expr_path(&mut self, hir_id: HirId, qpath: &QPath, expectation: Option<&Type>) -> Result<Type> {
+        debug!("Checking path expression with expectation {:?}", expectation);
+
         let local_def_id = hir_id.owner.to_def_id().as_local().unwrap();
 
         let res = self.tcx.typeck(local_def_id).qpath_res(qpath, hir_id);
@@ -523,17 +555,354 @@ impl<'tcx> Checker<'tcx> {
 
         let actual = ty;
 
+        debug!("Actual is {actual}, expected is {:?}", expectation);
+
         match expectation {
             Some(ty) => {
                 if actual.satisfies(&self.scx, ty) {
+                    debug!("Expectation satisfied");
                     Ok(actual)
                 } else {
+                    debug!("Expectation NOT satisfied");
                     let msg = format!("expected {} found {}", ty, actual);
                     Err(self.tcx.dcx().span_err(qpath.span(), msg))
                 }
             }
 
             None => Ok(actual),
+        }
+    }
+
+    /// Checks the type of a call expression.
+    fn check_expr_call(&mut self, fun: &Expr, args: &[Expr], _span: Span) -> Result<Type> {
+        let owner_id = fun.hir_id.owner;
+        let owner_def_kind = self.tcx.def_kind(owner_id);
+
+        if owner_def_kind.is_fn_like() {
+            let local_def_id = owner_id.to_def_id().as_local().unwrap();
+
+            if let ExprKind::Path(qpath) = fun.kind {
+                let typeck_results = self.tcx.typeck(local_def_id);
+
+                if let Res::Def(def_kind, def_id) = typeck_results.qpath_res(&qpath, fun.hir_id) {
+                    // TODO: Check intrinsic constraints
+                    // self.check_intrinsic_constraints(def_id, def_kind, args, typeck_results)?;
+                }
+            }
+        }
+
+        let fty = self.check_expr(fun, None, false)?;
+
+        let mut ty = match fty.clone().kind {
+            TypeKind::Fn(arg_tys, ret_ty) => {
+                if args.len() != arg_tys.len() {
+                    warn!("arg ct doesnt match up");
+                }
+
+                for (ty, expr) in arg_tys.into_iter().zip(args) {
+                    self.check_expr(expr, Some(&ty), false)?;
+                }
+
+                *ret_ty
+            }
+
+            TypeKind::Rec(elements) => {
+                for (i, arg) in args.iter().enumerate() {
+                    let ty = elements[&i.to_string()].clone();
+                    self.check_expr(arg, Some(&ty), false)?;
+                }
+
+                fty.clone()
+            }
+
+            _ => {
+                warn!("Cannot tell if expression is a function - {:?}", fun);
+                fty.clone()
+            }
+        };
+
+        ty = self.extract(&ty, &fty);
+
+        Ok(ty)
+    }
+
+    fn join(&self, types: Vec<Type>) -> Type {
+        // TODO: Fail if type kinds are incompatible
+        let mut it = types.iter();
+
+        let mut res = it.next().unwrap().clone();
+
+        while let Some(ty) = it.next() {
+            res.intrinsic[0] = res.intrinsic[0].clone().union(ty.intrinsic[0].clone());
+            res.intrinsic[1] = res.intrinsic[1].clone().union(ty.intrinsic[1].clone());
+            res.intrinsic[2] = res.intrinsic[2].clone().union(ty.intrinsic[2].clone());
+        }
+
+        res
+    }
+
+    /// Checks the type of a method call.
+    fn check_method_call(
+        &mut self,
+        hir_id: HirId,
+        receiver: &Expr,
+        args: &[Expr],
+        _span: Span,
+    ) -> Result<Type> {
+        let typeck_results = self.tcx.typeck(hir_id.owner.def_id);
+        let (def_kind, def_id) = typeck_results.type_dependent_def(hir_id).unwrap();
+
+        match def_kind {
+            DefKind::AssocFn => {
+                // let args = vec![receiver];
+                let mut args_ = vec![receiver.clone()];
+                args_.extend_from_slice(args);
+
+                // TODO: Check intrinsic constraints
+                // self.check_intrinsic_constraints(def_id, def_kind, &args_, typeck_results)?;
+
+                let fty = self.fn_ty(def_id);
+                // KEEP: I can use this to generate intrinsic annotations
+                // let s = serde_json::to_string(&fty).unwrap();
+                // debug!("{}", s);
+
+                match fty.kind {
+                    TypeKind::Fn(arg_tys, ret_ty) => {
+                        // We subtract one to account for the receiver
+                        if args.len() != arg_tys.len() - 1 {
+                            warn!("arg ct doesnt match up");
+                        }
+
+                        let args = std::iter::once(receiver).chain(args.iter());
+                        for (ty, expr) in arg_tys.into_iter().zip(args) {
+                            self.check_expr(expr, Some(&ty), false)?;
+                        }
+
+                        Ok(*ret_ty)
+                    }
+
+                    _ => todo!(),
+                }
+            }
+
+            _ => todo!(),
+        }
+    }
+
+    /// Checks the type of an `if` expression.
+    fn check_expr_if(
+        &mut self,
+        guard: &Expr,
+        then_expr: &Expr,
+        else_expr: Option<&Expr>,
+        expectation: Option<&Type>,
+    ) -> Result<Type> {
+        let ity = self.check_expr(guard, None, false)?;
+
+        debug!("Guard type is {ity}");
+
+        self.icx.enter(&ity.intrinsic[2]);
+
+        let mut rty = self.check_expr(then_expr, expectation, false)?;
+
+        if let Some(else_expr) = else_expr {
+            let to_be_joined = self.check_expr(else_expr, expectation, false)?;
+            rty = self.join(vec![rty, to_be_joined])
+        }
+
+        self.icx.exit();
+        Ok(rty)
+    }
+
+    /// Checks the type of a `match` expression.
+    fn check_expr_match(
+        &mut self,
+        guard: &Expr,
+        arms: &[Arm],
+        source: MatchSource,
+        expectation: Option<&Type>,
+    ) -> Result<Type> {
+        let ity = match source {
+            MatchSource::ForLoopDesugar => {
+                // The guard expression is a function call, and we want the argument
+                let ExprKind::Call(_, args) = guard.kind else {
+                    unreachable!()
+                };
+
+                self.check_expr(&args[0], None, false)?
+            }
+
+            _ => self.check_expr(guard, None, false)?,
+        };
+
+        self.icx.enter(&ity.intrinsic[2]);
+
+        let mut result = self.bottom_type();
+
+        for arm in arms {
+            self.process_pattern(arm.pat.kind, ity.clone(), arm.pat.hir_id);
+            let to_be_joined = self.check_expr(arm.body, expectation, false)?;
+            result = self.join(vec![result, to_be_joined]);
+        }
+
+        self.icx.exit();
+        Ok(result)
+    }
+
+    /// Checks the type of a `let` expression. These typically appear as the guards of `if` expressions.
+    fn check_expr_let(&mut self, let_expr: &LetExpr, expectation: Option<&Type>) -> Result<Type> {
+        let ty = self.check_expr(let_expr.init, expectation, false)?;
+
+        self.process_pattern(let_expr.pat.kind, ty.clone(), let_expr.pat.hir_id);
+
+        Ok(ty)
+    }
+
+    /// Checks the type of a binary expression.
+    fn check_expr_binary(&mut self, lhs: &Expr, rhs: &Expr, expectation: Option<&Type>) -> Result<Type> {
+        let lty = self.check_expr(lhs, expectation, false)?;
+        let rty = self.check_expr(rhs, expectation, false)?;
+        let ty = self.join(vec![lty, rty]);
+
+        Ok(ty)
+    }
+
+    /// Checks the type of an assignment expression.
+    fn check_expr_assign(&mut self, dest: &Expr, expr: &Expr) -> Result<Type> {
+        debug!("CHECKING LEFT OF ASSIGN");
+
+        let expected = self.check_expr(dest, None, true)?;
+
+        debug!("CHECKING RIGHT OF ASSIGN");
+
+        debug!("Checking assignment expr; destination type is {expected}");
+
+        let ty = self.check_expr(expr, Some(&expected), false)?;
+
+        debug!("Assigning {ty} to {expected}");
+
+        Ok(ty)
+    }
+
+    /// Checks the type of a struct expression.
+    fn check_expr_struct(&mut self, hir_id: HirId, qpath: &QPath, fields: &[ExprField]) -> Result<Type> {
+        let ty = match qpath {
+            QPath::LangItem(item, _) => match item {
+                LangItem::Range => {
+                    // NOTE: We handle ranges in a special manner for the time being
+                    let mut result = self.bottom_type();
+
+                    for field in fields {
+                        let pending = self.check_expr(field.expr, None, false)?;
+                        result = self.join(vec![result, pending]);
+                    }
+
+                    result
+                }
+
+                _ => {
+                    warn!("Language item silently ignored");
+                    self.bottom_type()
+                }
+            },
+
+            _ => self.check_expr_path(hir_id, qpath, None)?,
+        };
+
+        match &ty.kind {
+            TypeKind::Rec(tys) => {
+                for field in fields {
+                    let ty = tys[&field.ident.to_string()].clone();
+                    self.check_expr(field.expr, Some(&ty), false)?;
+                }
+            }
+
+            TypeKind::Opaque => {
+                for field in fields {
+                    self.check_expr(field.expr, None, false)?;
+                }
+            }
+
+            _ => todo!(),
+        }
+
+        Ok(ty)
+    }
+
+    /// Checks the type of an array expression.
+    fn check_expr_array(&mut self, exprs: &[Expr]) -> Result<Type> {
+        let mut result = self.bottom_type();
+        let mut item = self.bottom_type();
+
+        for expr in exprs {
+            let pending = self.check_expr(expr, None, false)?;
+            item = self.join(vec![item, pending]);
+        }
+
+        result.kind = TypeKind::Array(Box::new(item));
+
+        Ok(result)
+    }
+
+    /// Checks the type of a tuple expression.
+    fn check_expr_tup(&mut self, exprs: &[Expr]) -> Result<Type> {
+        let mut result = self.bottom_type();
+
+        let mut items = vec![];
+
+        for expr in exprs {
+            items.push(self.check_expr(expr, None, false)?);
+        }
+
+        result.kind = TypeKind::Tuple(items);
+        Ok(result)
+    }
+
+    /// Checks the type of a return expression.
+    fn check_expr_ret(&mut self, expr: Option<&Expr>, expectation: Option<&Type>) -> Result<Type> {
+        match expr {
+            Some(expr) => Ok(self.check_expr(expr, expectation, false)?),
+            None => Ok(self.bottom_type()),
+        }
+    }
+
+    /// Checks the type of a closure expression.
+    fn check_expr_closure(&mut self, closure: &Closure, expectation: Option<&Type>) -> Result<Type> {
+        todo!()
+    }
+
+    /// Checks the type of a projection.
+    fn check_expr_field(&mut self, object: &Expr, field: Ident) -> Result<Type> {
+        match self.check_expr(object, None, false)?.kind {
+            TypeKind::Rec(field_map) => {
+                if !field_map.contains_key(&field.to_string()) {
+                    let msg = format!("unknown field '{}'", field.name);
+                    self.tcx.dcx().span_err(field.span, msg);
+                    Ok(self.top_type())
+                } else {
+                    Ok(field_map[&field.to_string()].clone())
+                }
+            }
+
+            TypeKind::Tuple(fields) => {
+                let index = field.name.as_str().parse::<usize>().unwrap();
+
+                if index >= fields.len() {
+                    let msg = format!("unknown field '{}'", field.name);
+                    self.tcx.dcx().span_err(field.span, msg);
+                    Ok(self.top_type())
+                } else {
+                    Ok(fields[index].clone())
+                }
+            }
+
+            TypeKind::Opaque => {
+                // For now, any field access with an unknown receiver will be universal
+                // However, in the future, I should refine my type checking to avoid this
+                Ok(self.top_type())
+            }
+
+            _ => todo!(),
         }
     }
 
@@ -558,31 +927,29 @@ impl<'tcx> Checker<'tcx> {
     fn check_let_stmt(&mut self, local: &LetStmt) -> Result {
         let mut processed = false;
 
+        // TODO: We need to use a type constructor that matches the left type
+        let mut ty = self.top_type();
+
         for attr in self.tcx.hir().attrs(local.hir_id) {
             if attr.path_matches(&self.pass_attr) {
                 let Pass { left, set, right } = self.parse_attr_pass(attr)?;
 
                 self.ensure_variables_exist(&set, &right)?;
 
-                if let Some(expr) = local.init {
-                    let ty = self.check_expr(expr, None, false)?;
-                    self.process_pattern(local.pat.kind, ty, local.pat.hir_id);
-
-                } else {
-                    self.process_pattern(local.pat.kind, self.top_type(), local.pat.hir_id);
+                if let Err(e) = ty.pass(&self.scx, set.clone()) {
+                    match e {
+                        PassError::BoundMismatch(bound) => return Err(self.tcx.dcx().span_err(left.1, format!("Provided set {set} is not a subset of {bound}"))),
+                        PassError::Unexpected => return Err(self.tcx.dcx().span_err(left.1, format!("No more set applications are expected")))
+                    }
                 }
-
-                processed = true;
             }
         }
 
-        if !processed {
-            // There was no tag, so we cannot make any assumptions about the intended type
-            if let Some(expr) = local.init {
-                self.check_expr(expr, None, false)?;
-            }
-
-            self.process_pattern(local.pat.kind, self.icx.influence(self.top_type()), local.pat.hir_id);
+        if let Some(expr) = local.init {
+            self.check_expr(expr, Some(&ty), false)?;
+            self.process_pattern(local.pat.kind, ty, local.pat.hir_id);
+        } else {
+            self.process_pattern(local.pat.kind, self.top_type(), local.pat.hir_id);
         }
 
         Ok(())
@@ -641,8 +1008,11 @@ impl<'tcx> Checker<'tcx> {
         self.icx.enter(&ty.intrinsic[2]);
 
         match pat_kind {
-            PatKind::Binding(_, hir_id, _, _) => {
+            PatKind::Binding(_, hir_id, ident, _) => {
                 // TODO: Figure out the HirId <-> String mapping
+                self.str_to_hir.insert(ident.to_string(), hir_id);
+                self.hir_to_ty.insert(hir_id, ty.clone());
+
                 self.vctx.set(hir_id, ty.clone());
             }
 

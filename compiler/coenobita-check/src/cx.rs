@@ -2,6 +2,7 @@ use std::collections::BTreeSet;
 
 use coenobita_middle::set::{Set, SetCtx};
 use coenobita_middle::ty::Type;
+use log::debug;
 
 pub struct InfCtx {
     scopes: Vec<Set>
@@ -23,8 +24,14 @@ impl InfCtx {
     }
 
     pub fn influence(&self, mut ty: Type) -> Type {
-        let parent = self.scopes.last().unwrap();
-        ty.intrinsic[2] = ty.intrinsic[2].clone().union(parent.clone());
+        debug!("Influencing type {ty}; current icx is {:?}", self.scopes);
+
+        for set in &self.scopes {
+            debug!("- Unioning {} with {}", ty.intrinsic[2], set);
+            ty.intrinsic[2] = ty.intrinsic[2].clone().union(set.clone());
+            debug!("- Type is now {ty}");
+        }
+
         ty
     }
 }
