@@ -20,7 +20,7 @@ use std::collections::HashMap;
 // use coenobita_middle::ty::{Integrity, Type};
 use parse::{CoenobitaParser, Parse};
 use rustc_ast::token::TokenKind::{CloseDelim, Ident, OpenDelim};
-use rustc_ast::token::{Delimiter, Token, TokenKind};
+use rustc_ast::token::{Delimiter, LitKind, Token, TokenKind};
 use rustc_ast::tokenstream::TokenStream;
 
 use rustc_data_structures::sync;
@@ -54,18 +54,27 @@ use crate::parse::VarSpan;
 pub struct Take {
     pub left: VarSpan,
     pub bound: Set,
-    pub right: HashMap<String, Span>
+    pub right: HashMap<String, Span>,
+}
+
+pub enum PassTarget {
+    Infer,
+    Return,
+    Argument(usize),
 }
 
 pub struct Pass {
-    pub left: (String, Span),
+    pub left: (PassTarget, Span),
     pub set: Set,
-    pub right: HashMap<String, Span>
+    pub right: HashMap<String, Span>,
 }
 
 impl<'cnbt> CoenobitaParser<'cnbt> {
     pub fn new(parser: Parser<'cnbt>) -> Self {
-        CoenobitaParser { parser, variables: HashMap::new() }
+        CoenobitaParser {
+            parser,
+            variables: HashMap::new(),
+        }
     }
 
     pub fn parse_take(&mut self) -> PResult<'cnbt, Take> {
@@ -76,29 +85,67 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
         Ok(Take {
             left: (var.to_string(), var.span),
             bound,
-            right: self.variables.clone()
+            right: self.variables.clone(),
         })
     }
 
     pub fn parse_pass(&mut self) -> PResult<'cnbt, Pass> {
-        debug!("Parsing pass; token is {:?}", self.parser.token.kind);
+        let span = self.parser.token.span;
 
-        let left = if self.parser.token.kind == TokenKind::RArrow {
-            let span = self.parser.token.span;
+        let target = match self.parser.token.kind {
+            TokenKind::RArrow => {
+                self.parser.bump();
+                PassTarget::Return
+            }
 
-            self.parser.bump();
-            (String::from("->"), span)
-        } else {
-            let ident = self.parser.parse_ident()?;
-            (ident.to_string(), ident.span)
+            TokenKind::Literal(lit) => match lit.kind {
+                LitKind::Integer => {
+                    let index: usize = lit.symbol.to_string().parse().map_err(|e| {
+                        self.parser
+                            .dcx()
+                            .struct_span_err(self.parser.token.span, format!("invalid index {}", lit.symbol))
+                    })?;
+
+                    self.parser.bump();
+
+                    PassTarget::Argument(index)
+                }
+
+                _ => {
+                    return Err(self.parser.dcx().struct_span_err(
+                        self.parser.token.span,
+                        format!("expected nonzero integer, found {}", lit.symbol),
+                    ))
+                }
+            },
+
+            TokenKind::Ident(symbol, _) => {
+                if symbol.as_str() == "_" {
+                    self.parser.bump();
+
+                    PassTarget::Infer
+                } else {
+                    return Err(self
+                        .parser
+                        .dcx()
+                        .struct_span_err(self.parser.token.span, format!("expected '_', found {}", symbol)));
+                }
+            }
+
+            _ => {
+                return Err(self
+                    .parser
+                    .dcx()
+                    .struct_span_err(self.parser.token.span, format!("invalid pass target")))
+            }
         };
 
         let set = self.parse_set()?;
 
         Ok(Pass {
-            left,
+            left: (target, span),
             set,
-            right: self.variables.clone()
+            right: self.variables.clone(),
         })
     }
 
@@ -132,7 +179,7 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
             if !self.variables.contains_key(&ident.to_string()) {
                 self.variables.insert(ident.to_string(), ident.span.clone());
             }
- 
+
             Set::Variable(ident.to_string())
         };
 
@@ -150,15 +197,15 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
             if sym.to_string() == "sub" {
                 self.parser.bump();
             } else {
-                return Err(self.parser.dcx().struct_span_err(
-                    self.parser.token.span,
-                    format!("expected `sub`, found `{}`", sym)
-                ));
+                return Err(self
+                    .parser
+                    .dcx()
+                    .struct_span_err(self.parser.token.span, format!("expected `sub`, found `{}`", sym)));
             }
         } else {
             return Err(self.parser.dcx().struct_span_err(
                 self.parser.token.span,
-                format!("expected `sub`, found `{:?}`", self.parser.token.kind)
+                format!("expected `sub`, found `{:?}`", self.parser.token.kind),
             ));
         }
 

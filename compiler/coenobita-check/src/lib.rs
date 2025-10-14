@@ -3,12 +3,14 @@
 mod cx;
 
 use coenobita_middle::ty::{PassError, Type, TypeKind};
+use coenobita_parse::PassTarget;
+use rustc_abi::{VariantIdx, FIRST_VARIANT};
 
 use std::collections::{BTreeSet, HashMap, VecDeque};
 use std::fmt::Display;
 
-use std::hash::Hash;
 use std::cmp::Eq;
+use std::hash::Hash;
 
 use itertools::Itertools;
 use rustc_middle::ty::{Ty, TyCtxt, TyKind};
@@ -30,11 +32,13 @@ extern crate rustc_span;
 extern crate rustc_target;
 extern crate rustc_trait_selection;
 
-use rustc_middle::ty::{self, FieldDef, GenericArg, TypeckResults, TypingEnv};
 use rustc_hir::def::{CtorOf, DefKind, Res};
 use rustc_hir::{
-    def_id::DefId, Arm, AttrArgs, AttrKind, Attribute, Block, BodyId, Closure, Expr, ExprField, ExprKind, FnSig, HirId, Impl, ImplItem, ImplItemKind, Item, ItemKind, LangItem, LetExpr, LetStmt, MatchSource, PatField, PatKind, QPath, Stmt, StmtKind
+    def_id::DefId, Arm, AttrArgs, AttrKind, Attribute, Block, BodyId, Closure, Expr, ExprField, ExprKind,
+    FnSig, HirId, Impl, ImplItem, ImplItemKind, Item, ItemKind, LangItem, LetExpr, LetStmt, MatchSource,
+    PatField, PatKind, QPath, Stmt, StmtKind,
 };
+use rustc_middle::ty::{self, FieldDef, GenericArg, TypeckResults, TypingEnv};
 
 use log::{debug, warn};
 
@@ -46,7 +50,7 @@ use coenobita_parse::{create_parser, create_psess, parse::Parse, Pass, Take};
 use crate::cx::InfCtx;
 
 struct Ctx<K, V> {
-    scopes: Vec<HashMap<K, V>>
+    scopes: Vec<HashMap<K, V>>,
 }
 
 impl<K: Hash + Eq, V> Ctx<K, V> {
@@ -63,22 +67,20 @@ impl<K: Hash + Eq, V> Ctx<K, V> {
     }
 
     pub fn get(&self, k: &K) -> Option<&V> {
-        self.scopes.iter()
-            .rev()
-            .find_map(|cx| cx.get(k))
+        self.scopes.iter().rev().find_map(|cx| cx.get(k))
     }
 
     pub fn set(&mut self, k: K, v: V) {
         match self.scopes.last_mut() {
             Some(cx) => cx.insert(k, v),
-            None => None
+            None => None,
         };
-	}
+    }
 }
 
 pub struct Checker<'tcx> {
-	tcx: TyCtxt<'tcx>,
-	take_attr: Vec<Symbol>,
+    tcx: TyCtxt<'tcx>,
+    take_attr: Vec<Symbol>,
     pass_attr: Vec<Symbol>,
 
     scx: SetCtx,
@@ -86,18 +88,19 @@ pub struct Checker<'tcx> {
     str_to_hir: HashMap<String, HirId>,
     hir_to_ty: HashMap<HirId, Type>,
 
-    ty_constructors: HashMap<DefId, Type>,
+    items: HashMap<DefId, Type>,
 
     vctx: Ctx<HirId, Type>,
 
     icx: InfCtx,
 
-    crate_name: String
+    crate_name: String,
+    // items: HashMap<DefId, Type>,
 }
 
 impl<'tcx> Checker<'tcx> {
-	pub fn new(crate_name: String, tcx: TyCtxt<'tcx>) -> Self {
-		Checker {
+    pub fn new(crate_name: String, tcx: TyCtxt<'tcx>) -> Self {
+        Checker {
             tcx,
             take_attr: vec![Symbol::intern("coenobita"), Symbol::intern("take")],
             pass_attr: vec![Symbol::intern("coenobita"), Symbol::intern("pass")],
@@ -106,17 +109,17 @@ impl<'tcx> Checker<'tcx> {
             str_to_hir: HashMap::new(),
             hir_to_ty: HashMap::new(),
 
-            ty_constructors: HashMap::new(),
+            items: HashMap::new(),
 
             vctx: Ctx::new(),
 
             icx: InfCtx::new(crate_name.clone()),
 
-            crate_name
+            crate_name,
         }
-	}
+    }
 
-    fn check_item_fn(&mut self, sig: &FnSig, body_id: BodyId) -> Result {
+    fn check_item_fn(&mut self, _: &FnSig, body_id: BodyId) -> Result {
         let def_id = body_id.hir_id.owner.to_def_id();
         let local_def_id = def_id.as_local().unwrap();
 
@@ -124,71 +127,51 @@ impl<'tcx> Checker<'tcx> {
         self.scx.enter();
 
         // Collect all set variables introduced by this function
-		for attr in self.tcx.get_attrs_by_path(def_id, &self.take_attr) {
-            let take = self.parse_attr_take(attr)?;
+        for attr in self.tcx.get_attrs_by_path(def_id, &self.take_attr) {
+            let Take { right, bound, left } = self.parse_attr_take(attr)?;
 
             // Make sure this variable hasn't been introduced yet
-            if let Some(bound) = self.scx.get(&take.left.0) {
-                return Err(self.tcx.dcx().span_err(take.left.1, format!("Variable has already been introduced with upper bound {bound}")))
+            if let Some(bound) = self.scx.get(&left.0) {
+                return Err(self.tcx.dcx().span_err(
+                    left.1,
+                    format!("variable already introduced with upper bound {bound}"),
+                ));
             }
 
             // Make sure all variables in the bound exist
-            self.ensure_variables_exist(&take.bound, &take.right)?;
-            
+            self.ensure_variables_exist(&bound, &right)?;
+
             // Add upper bound to set variable context
-            self.scx.set(take.left.0, take.bound);            
-		}
+            self.scx.set(left.0, bound);
+        }
+
+        let mut params = Vec::new();
 
         let body = self.tcx.hir_body(body_id);
 
         for param in body.params {
-            let param_ty = self.tcx.typeck(local_def_id).node_type(param.hir_id);
+            let raw = self.tcx.typeck(local_def_id).node_type(param.hir_id);
+            let ty = self.get_constr_for_ty(&raw);
 
-            let type_constr = self.get_constr_for_ty(&param_ty);
+            params.push(ty.clone());
 
-            self.process_pattern(param.pat.kind, type_constr, param.pat.hir_id);
+            self.process_pattern(param.pat.kind, ty, param.pat.hir_id);
         }
 
-        self.display_str_to_hir();
-        self.display_hir_to_ty();
-        
-        let mut ret_ty = self.top_type();
+        let mut rty = self.top_type();
 
         // Collect all set applications
-		for attr in self.tcx.get_attrs_by_path(def_id, &self.pass_attr) {
-            let Pass { left, set, right } = self.parse_attr_pass(attr)?;
+        for attr in self.tcx.get_attrs_by_path(def_id, &self.pass_attr) {
+            let pass = self.parse_pass(attr)?;
 
-            // Make sure all variables on the right exist
-            self.ensure_variables_exist(&set, &right)?;
-
-            if left.0 == "->" {
-                if let Err(e) = ret_ty.pass(&self.scx, set.clone()) {
-                    match e {
-                        PassError::BoundMismatch(bound) => return Err(self.tcx.dcx().span_err(left.1, format!("Provided set {set} is not a subset of {bound}"))),
-                        PassError::Unexpected => return Err(self.tcx.dcx().span_err(left.1, format!("No more set applications are expected")))
-                    }
-                }
-
-                continue;
-            }
-
-            match self.str_to_hir.get(&left.0) {
-                Some(hir_id) => {
-                    let ty = self.hir_to_ty.get_mut(hir_id).unwrap();
-
-                    if let Err(e) = ty.pass(&self.scx, set.clone()) {
-                        match e {
-                            PassError::BoundMismatch(bound) => return Err(self.tcx.dcx().span_err(left.1, format!("Provided set {set} is not a subset of {bound}"))),
-                            PassError::Unexpected => return Err(self.tcx.dcx().span_err(left.1, format!("No more set applications are expected")))
-                        }
-                    }
-                },
-
-                None => return Err(self.tcx.dcx().span_err(left.1, format!("Identifier does not exist")))
+            match pass.left.0 {
+                PassTarget::Argument(index) => self.pass(&mut params[index], pass)?,
+                PassTarget::Return => self.pass(&mut rty, pass)?,
+                PassTarget::Infer => warn!("Set pass with inferred target has no effect on function items")
             }
         }
 
-        self.check_expr(&body.value, Some(&ret_ty), false)?;
+        self.check_expr(&body.value, Some(&rty), false)?;
 
         // Exit this scope
         self.scx.exit();
@@ -196,27 +179,31 @@ impl<'tcx> Checker<'tcx> {
         Ok(())
     }
 
-    fn display_str_to_hir(&self) {
-        println!("======");
-        for (str, hir) in &self.str_to_hir {
-            println!("{} ↦ {}", str, hir);
-        }
-        println!("======");
-    }
-
-    fn display_hir_to_ty(&self) {
-        println!("======");
-        for (hir_id, ty) in &self.hir_to_ty {
-            println!("{} ↦ {:?}", hir_id, ty);
-        }
-        println!("======");
-    }
-
     // ======== TYPES ======== //
 
     /// Given the `DefId` of a function, return its type.
     fn fn_ty(&mut self, def_id: DefId) -> Type {
         todo!()
+    }
+
+    /// Given the parent and variant `DefId`s of an ADT (as well as its index), return its type.
+    fn adt_ty(&mut self, def_id_parent: DefId, def_id_variant: DefId, index: VariantIdx) -> Type {
+        if let Some(ty) = self.get_type_constr(def_id_variant) {
+            return ty.clone();
+        }
+
+        // We haven't processed the definition of this function yet
+        let field_defs = &self
+            .tcx
+            .adt_def(def_id_parent)
+            .variants()
+            .get(index)
+            .unwrap()
+            .fields
+            .raw;
+
+        let _ = self.check_item_struct(def_id_variant, field_defs);
+        self.get_type_constr(def_id_variant).unwrap().clone()
     }
 
     fn top_type(&self) -> Type {
@@ -235,14 +222,11 @@ impl<'tcx> Checker<'tcx> {
     }
 
     fn set_type_constr(&mut self, def_id: DefId, ty: Type) {
-        self.ty_constructors.insert(def_id, ty);
+        self.items.insert(def_id, ty);
     }
 
-    fn get_type_constr(&mut self, def_id: DefId) -> Type {
-        match self.ty_constructors.get(&def_id) {
-            Some(ty) => ty.clone(),
-            None => self.top_type()
-        }
+    fn get_type_constr(&mut self, def_id: DefId) -> Option<&Type> {
+        self.items.get(&def_id)
     }
 
     fn get_constr_for_ty(&mut self, ty: &Ty<'tcx>) -> Type {
@@ -253,7 +237,10 @@ impl<'tcx> Checker<'tcx> {
                 let type_def_id = adt_def.did();
                 println!("ADT DefId: {:?}", type_def_id);
 
-                return self.get_type_constr(type_def_id);
+                return self
+                    .get_type_constr(type_def_id)
+                    .unwrap_or(&Type::opaque())
+                    .clone();
             }
             TyKind::Int(int_ty) => {
                 // i8, i16, i32, i64, i128, isize
@@ -297,11 +284,14 @@ impl<'tcx> Checker<'tcx> {
         match set {
             Set::Variable(v) => {
                 if self.scx.get(&v).is_none() {
-                    return Err(self.tcx.dcx().span_err(spans[v], format!("variable {v} has not been introduced")))
+                    return Err(self
+                        .tcx
+                        .dcx()
+                        .span_err(spans[v], format!("variable {v} has not been introduced")));
                 }
 
                 Ok(())
-            },
+            }
 
             Set::Concrete(_) => Ok(()),
             Set::Universe => Ok(()),
@@ -312,12 +302,12 @@ impl<'tcx> Checker<'tcx> {
                 }
 
                 Ok(())
-            },
+            }
         }
     }
 
-	pub fn check_item(&mut self, item: &Item) -> Result {
-		let def_id = item.owner_id.to_def_id();
+    pub fn check_item(&mut self, item: &Item) -> Result {
+        let def_id = item.owner_id.to_def_id();
 
         match item.kind {
             ItemKind::Fn { sig, body, .. } => self.check_item_fn(&sig, body),
@@ -337,96 +327,53 @@ impl<'tcx> Checker<'tcx> {
                 self.check_item_struct(def_id, &fields)
             }
 
-            _ => Ok(())
+            _ => Ok(()),
         }
-	}
+    }
+
+    fn pass(&self, ty: &mut Type, pass: Pass) -> Result {
+        let Pass { left, set, right } = pass;
+        let span = left.1;
+
+        self.ensure_variables_exist(&set, &right)?;
+
+        if let Err(e) = ty.pass(&self.scx, set.clone()) {
+            match e {
+                PassError::BoundMismatch(bound) => {
+                    return Err(self
+                        .tcx
+                        .dcx()
+                        .span_err(span, format!("Provided set {set} is not a subset of {bound}")))
+                },
+
+                PassError::Unexpected => {
+                    return Err(self
+                        .tcx
+                        .dcx()
+                        .span_err(span, format!("No more set applications are expected")))
+                }
+            }
+        }
+
+        Ok(())
+    }
 
     fn check_item_struct(&mut self, def_id: DefId, field_defs: &[FieldDef]) -> Result {
-        let struct_name = self.tcx.item_name(def_id);
-
-        // Get type parameters (generics)
-        let generics = self.tcx.generics_of(def_id);
-
-        let mut vars = Vec::new();
-        
-        // Iterate over type parameters
-        for param in &generics.own_params {
-            let param_name = param.name;
-            vars.push(param_name.to_string());
-
-            match param.kind {
-                ty::GenericParamDefKind::Type { .. } => {
-                    
-                    // Do something with type parameter
-                    println!("TYPE PARAM: {}", param_name);
-
-                }
-                ty::GenericParamDefKind::Lifetime => {
-                    // Handle lifetime parameters
-                    println!("LIFETIME PARAM: {}", param_name);
-                }
-                ty::GenericParamDefKind::Const { .. } => {
-                    // Handle const parameters
-                    println!("CONST: {}", param_name);
-                }
-            }
-        }
-
-        if vars.is_empty() {
-            println!("Checking {}", struct_name);
-        } else {
-            println!("Checking {}<{}>", struct_name, vars.join(", "))
-        }
-
-        // Collect all 'take' attributes
-                // Enter a new scope in the set context
-        self.scx.enter();
-
-        // Collect all set variables introduced by this function
-		for attr in self.tcx.get_attrs_by_path(def_id, &self.take_attr) {
-            let take = self.parse_attr_take(attr)?;
-
-            // Make sure this variable hasn't been introduced yet
-            if let Some(bound) = self.scx.get(&take.left.0) {
-                return Err(self.tcx.dcx().span_err(take.left.1, format!("Variable has already been introduced with upper bound {bound}")))
-            }
-
-            // Make sure all variables in the bound exist
-            self.ensure_variables_exist(&take.bound, &take.right)?;
-            
-            // Add upper bound to set variable context
-            self.scx.set(take.left.0, take.bound);            
-		}
-
-        // Collect all 'pass' attributes on every field
         let mut fields = HashMap::new();
 
+        // Collect all 'pass' attributes on every field
         for field in field_defs {
             let mut ty = Type::opaque();
 
             for attr in self.tcx.get_attrs_by_path(field.did, &self.pass_attr) {
-                let Pass { left, set, right } = self.parse_attr_pass(attr)?;
-
-                self.ensure_variables_exist(&set, &right)?;
-
-                if let Err(e) = ty.pass(&self.scx, set.clone()) {
-                    match e {
-                        PassError::BoundMismatch(bound) => return Err(self.tcx.dcx().span_err(left.1, format!("Provided set {set} is not a subset of {bound}"))),
-                        PassError::Unexpected => return Err(self.tcx.dcx().span_err(left.1, format!("No more set applications are expected")))
-                    }
-                }
+                let pass = self.parse_pass(attr)?;
+                self.pass(&mut ty, pass)?;
             }
 
             fields.insert(field.name.to_string(), ty);
         }
 
-        let ty = Type::record(fields);
-
-        println!("STRUCT: {}", ty);
-
-        self.set_type_constr(def_id, ty);
-
-        self.scx.exit();
+        self.items.insert(def_id, Type::record(fields));
 
         Ok(())
     }
@@ -488,7 +435,7 @@ impl<'tcx> Checker<'tcx> {
         };
 
         let actual = if is_lvalue { ty } else { self.icx.influence(ty) };
-        
+
         match expectation {
             Some(expected) => {
                 if actual.satisfies(&self.scx, expected) {
@@ -505,8 +452,6 @@ impl<'tcx> Checker<'tcx> {
 
     /// Checks the type of a block.
     fn check_expr_block(&mut self, block: &Block, expectation: Option<&Type>) -> Result<Type> {
-        debug!("Checking block expression with expected type {:?}", expectation);
-
         // The number of statements in this block;
         let len = block.stmts.len();
 
@@ -538,8 +483,6 @@ impl<'tcx> Checker<'tcx> {
 
     /// Checks the type of a path expression.
     fn check_expr_path(&mut self, hir_id: HirId, qpath: &QPath, expectation: Option<&Type>) -> Result<Type> {
-        debug!("Checking path expression with expectation {:?}", expectation);
-
         let local_def_id = hir_id.owner.to_def_id().as_local().unwrap();
 
         let res = self.tcx.typeck(local_def_id).qpath_res(qpath, hir_id);
@@ -548,6 +491,101 @@ impl<'tcx> Checker<'tcx> {
             // TODO: Since some locals may not have bindings, put this access in a function that returns a default value
             Res::Local(hir_id) => self.hir_to_ty[&hir_id].clone(),
 
+            Res::Def(def_kind, def_id) => {
+                match def_kind {
+                    // TODO: Check that `AssocFn` is handled properly
+                    DefKind::Fn | DefKind::AssocFn => self.fn_ty(def_id),
+
+                    DefKind::Struct => self.adt_ty(def_id, def_id, FIRST_VARIANT),
+
+                    DefKind::Variant => {
+                        // The variant DefId
+                        let id = def_id;
+
+                        // The parent DefId
+                        let def_id = self.tcx.parent(def_id);
+
+                        // The parent ADT definition
+                        let adt = self.tcx.adt_def(def_id);
+
+                        // The index of this variant in particular
+                        let idx = adt
+                            .variants()
+                            .iter()
+                            .enumerate()
+                            .find(|(_, vdef)| vdef.def_id == id)
+                            .unwrap()
+                            .0;
+
+                        self.adt_ty(def_id, id, idx.into())
+                    }
+
+                    // TODO: Test this thoroughly
+                    DefKind::Ctor(ctor_of, _) => match ctor_of {
+                        CtorOf::Struct => {
+                            let def_id = self.tcx.parent(def_id);
+
+                            self.adt_ty(def_id, def_id, FIRST_VARIANT)
+                        }
+
+                        CtorOf::Variant => {
+                            // Get the DefId of the variant
+                            let id = self.tcx.parent(def_id);
+
+                            // Get the DefId of the enum holding this variant
+                            let def_id = self.tcx.parent(id);
+                            let adt = self.tcx.adt_def(def_id);
+
+                            let idx = adt
+                                .variants()
+                                .iter()
+                                .enumerate()
+                                .find(|(_, vdef)| vdef.def_id == id)
+                                .unwrap()
+                                .0;
+
+                            self.adt_ty(def_id, id, idx.into())
+                        }
+                    },
+
+                    // TODO: Implement actual logic
+                    DefKind::Static { .. } => self.bottom_type(),
+
+                    // TODO: Implement actual logic
+                    DefKind::AssocConst | DefKind::Const | DefKind::ConstParam => self.bottom_type(),
+
+                    DefKind::Union => {
+                        warn!("Silently skipping union usage");
+                        self.bottom_type()
+                    }
+
+                    DefKind::TyAlias => {
+                        let ty = self.tcx.type_of(def_id).skip_binder();
+                        let kind = ty.kind();
+
+                        match kind {
+                            ty::TyKind::Adt(adt_def, _) => {
+                                self.adt_ty(adt_def.did(), adt_def.did(), FIRST_VARIANT)
+                            }
+                            _ => todo!(),
+                        }
+                    }
+
+                    _ => todo!(),
+                }
+            }
+
+            Res::SelfCtor(alias_to) | Res::SelfTyAlias { alias_to, .. } => {
+                match self.tcx.type_of(alias_to).skip_binder().kind() {
+                    ty::TyKind::Adt(adt_def, _) => {
+                        let did = adt_def.did();
+                        self.adt_ty(did, did, FIRST_VARIANT)
+                    }
+
+                    _ => todo!(),
+                }
+            }
+
             _ => {
                 todo!()
             }
@@ -555,15 +593,11 @@ impl<'tcx> Checker<'tcx> {
 
         let actual = ty;
 
-        debug!("Actual is {actual}, expected is {:?}", expectation);
-
         match expectation {
             Some(ty) => {
                 if actual.satisfies(&self.scx, ty) {
-                    debug!("Expectation satisfied");
                     Ok(actual)
                 } else {
-                    debug!("Expectation NOT satisfied");
                     let msg = format!("expected {} found {}", ty, actual);
                     Err(self.tcx.dcx().span_err(qpath.span(), msg))
                 }
@@ -699,8 +733,6 @@ impl<'tcx> Checker<'tcx> {
     ) -> Result<Type> {
         let ity = self.check_expr(guard, None, false)?;
 
-        debug!("Guard type is {ity}");
-
         self.icx.enter(&ity.intrinsic[2]);
 
         let mut rty = self.check_expr(then_expr, expectation, false)?;
@@ -769,17 +801,9 @@ impl<'tcx> Checker<'tcx> {
 
     /// Checks the type of an assignment expression.
     fn check_expr_assign(&mut self, dest: &Expr, expr: &Expr) -> Result<Type> {
-        debug!("CHECKING LEFT OF ASSIGN");
-
         let expected = self.check_expr(dest, None, true)?;
 
-        debug!("CHECKING RIGHT OF ASSIGN");
-
-        debug!("Checking assignment expr; destination type is {expected}");
-
         let ty = self.check_expr(expr, Some(&expected), false)?;
-
-        debug!("Assigning {ty} to {expected}");
 
         Ok(ty)
     }
@@ -932,14 +956,25 @@ impl<'tcx> Checker<'tcx> {
 
         for attr in self.tcx.hir().attrs(local.hir_id) {
             if attr.path_matches(&self.pass_attr) {
-                let Pass { left, set, right } = self.parse_attr_pass(attr)?;
+                let Pass { left, set, right } = self.parse_pass(attr)?;
 
                 self.ensure_variables_exist(&set, &right)?;
 
                 if let Err(e) = ty.pass(&self.scx, set.clone()) {
                     match e {
-                        PassError::BoundMismatch(bound) => return Err(self.tcx.dcx().span_err(left.1, format!("Provided set {set} is not a subset of {bound}"))),
-                        PassError::Unexpected => return Err(self.tcx.dcx().span_err(left.1, format!("No more set applications are expected")))
+                        PassError::BoundMismatch(bound) => {
+                            return Err(self
+                                .tcx
+                                .dcx()
+                                .span_err(left.1, format!("set {set} is not a subset of {bound}")))
+                        },
+
+                        PassError::Unexpected => {
+                            return Err(self
+                                .tcx
+                                .dcx()
+                                .span_err(left.1, format!("unexpected pass")))
+                        }
                     }
                 }
             }
@@ -973,7 +1008,7 @@ impl<'tcx> Checker<'tcx> {
         }
     }
 
-    fn parse_attr_pass(&self, attr: &Attribute) -> Result<Pass> {
+    fn parse_pass(&self, attr: &Attribute) -> Result<Pass> {
         let AttrKind::Normal(normal) = &attr.kind else {
             unreachable!()
         };
@@ -1089,10 +1124,14 @@ impl<'tcx> Checker<'tcx> {
     }
 
     fn extract(&self, child: &Type, parent: &Type) -> Type {
-        todo!()
+        let mut child = child.clone();
+
+        child.intrinsic[2] = child.intrinsic[2].clone().union(parent.intrinsic[2].clone());
+
+        child
     }
 
-        /// Recursively process a struct pattern, registering all identifiers with the locals map.
+    /// Recursively process a struct pattern, registering all identifiers with the locals map.
     fn process_pattern_struct(&mut self, hir_id: HirId, qpath: &QPath, fields: &[PatField]) {
         match self.check_expr_path(hir_id, qpath, None) {
             Ok(ty) => match &ty.kind {

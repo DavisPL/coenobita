@@ -5,7 +5,7 @@ use coenobita_middle::ty::Type;
 use log::debug;
 
 pub struct InfCtx {
-    scopes: Vec<Set>
+    scopes: Vec<Set>,
 }
 
 impl InfCtx {
@@ -24,12 +24,8 @@ impl InfCtx {
     }
 
     pub fn influence(&self, mut ty: Type) -> Type {
-        debug!("Influencing type {ty}; current icx is {:?}", self.scopes);
-
         for set in &self.scopes {
-            debug!("- Unioning {} with {}", ty.intrinsic[2], set);
             ty.intrinsic[2] = ty.intrinsic[2].clone().union(set.clone());
-            debug!("- Type is now {ty}");
         }
 
         ty

@@ -1,5 +1,8 @@
 use itertools::Itertools;
-use std::{collections::{BTreeSet, HashMap}, fmt::Display};
+use std::{
+    collections::{BTreeSet, HashMap},
+    fmt::Display,
+};
 
 #[macro_export]
 macro_rules! set {
@@ -21,28 +24,24 @@ macro_rules! set {
 }
 
 pub struct SetCtx {
-	bindings: Vec<HashMap<String, Set>>
+    bindings: Vec<HashMap<String, Set>>,
 }
 
 impl SetCtx {
     pub fn new() -> Self {
-        SetCtx {
-			bindings: Vec::new()
-		}
+        SetCtx { bindings: Vec::new() }
     }
 
     pub fn get(&self, var: &str) -> Option<&Set> {
-        self.bindings.iter()
-            .rev()
-            .find_map(|cx| cx.get(var))
+        self.bindings.iter().rev().find_map(|cx| cx.get(var))
     }
 
-	pub fn set(&mut self, var: String, set: Set) {
+    pub fn set(&mut self, var: String, set: Set) {
         match self.bindings.last_mut() {
             Some(cx) => cx.insert(var, set),
-            None => None // TODO: We should probably return an error or panic
+            None => None, // TODO: We should probably return an error or panic
         };
-	}
+    }
 
     pub fn enter(&mut self) {
         self.bindings.push(HashMap::new());
@@ -58,7 +57,7 @@ pub enum Set {
     Variable(String),
     Concrete(BTreeSet<String>),
     Union(BTreeSet<Set>),
-    Universe
+    Universe,
 }
 
 impl Set {
@@ -74,22 +73,22 @@ impl Set {
 
             // We can only prove that a concrete set is a subset of a union if it's a subset of the union's concrete component
             (Set::Concrete(e1), Set::Union(s2)) => {
-				let mut e2 = BTreeSet::new();
+                let mut e2 = BTreeSet::new();
 
-				for set in s2 {
-					if let Set::Concrete(elements) = set {
-						e2.extend(elements.clone());
-					}
-				}
+                for set in s2 {
+                    if let Set::Concrete(elements) = set {
+                        e2.extend(elements.clone());
+                    }
+                }
 
-				e1.is_subset(&e2)
-			}
+                e1.is_subset(&e2)
+            }
 
             // If we are comparing a variable to itself, we can apply REFL to conclude that the subset relation holds
             (Set::Variable(v1), Set::Variable(v2)) if v1 == v2 => true,
 
-			// If set variable `self` is an explicit member of the union, then it is definitely a subset
-			(Set::Variable(_), Set::Union(s1)) if s1.contains(self) => true,
+            // If set variable `self` is an explicit member of the union, then it is definitely a subset
+            (Set::Variable(_), Set::Union(s1)) if s1.contains(self) => true,
 
             // In all other cases, we try to determine whether the variable's upper bound is a subset of 'other'
             (Set::Variable(v), w2) => match ctx.get(v) {
@@ -116,9 +115,7 @@ impl Set {
             (_, Set::Universe) | (Set::Universe, _) => Set::Universe,
 
             // {a,b} ∪ {b,c}
-            (Set::Concrete(s1), Set::Concrete(s2)) => {
-                Set::Concrete(s1.union(&s2).cloned().collect())
-            }
+            (Set::Concrete(s1), Set::Concrete(s2)) => Set::Concrete(s1.union(&s2).cloned().collect()),
 
             // <UNION> ∪ {a,b,c} | {a,b,c} ∪ <UNION>
             (Set::Union(s1), Set::Concrete(mut e1)) | (Set::Concrete(mut e1), Set::Union(s1)) => {
@@ -174,19 +171,13 @@ impl Set {
             }
 
             // {a,b,c} ∪ X
-            (Set::Concrete(e), Set::Variable(v)) => {
-                Set::Union(set![Set::Concrete(e), Set::Variable(v)])
-            }
+            (Set::Concrete(e), Set::Variable(v)) => Set::Union(set![Set::Concrete(e), Set::Variable(v)]),
 
             // X ∪ {a,b,c}
-            (Set::Variable(v), Set::Concrete(e)) => {
-                Set::Union(set![Set::Variable(v), Set::Concrete(e)])
-            }
+            (Set::Variable(v), Set::Concrete(e)) => Set::Union(set![Set::Variable(v), Set::Concrete(e)]),
 
             // X ∪ Y
-            (Set::Variable(v1), Set::Variable(v2)) => {
-                Set::Union(set![Set::Variable(v1), Set::Variable(v2)])
-            }
+            (Set::Variable(v1), Set::Variable(v2)) => Set::Union(set![Set::Variable(v1), Set::Variable(v2)]),
         }
     }
 }
@@ -218,4 +209,3 @@ impl std::fmt::Debug for Set {
         std::fmt::Display::fmt(self, f)
     }
 }
-
