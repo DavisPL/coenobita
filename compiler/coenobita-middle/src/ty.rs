@@ -25,9 +25,28 @@ pub enum TypeKind {
 }
 
 #[derive(Clone, Debug)]
+pub struct SetVar {
+    pub ident: String,
+    pub value: Option<Set>,
+    pub bound: Set,
+}
+
+impl SetVar {
+    pub fn new(ident: String, bound: Set) -> Self {
+        Self {
+            ident,
+            value: None,
+            bound,
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
 pub struct Type {
     pub kind: TypeKind,
-    pub binder: VecDeque<(String, Set)>,
+    pub binder: Vec<SetVar>,
+    pub var_to_idx: HashMap<String, usize>,
+    pub binder_idx: usize,
     pub intrinsic: [Set; 3],
     pub intrinsic_idx: usize,
 }
@@ -43,6 +62,22 @@ impl Display for Type {
                 )
             }
 
+            TypeKind::Fn(params, rty) => {
+                let params = params.iter().join(", ");
+
+                if self.binder.len() > 0 {
+                    let set_vars = self
+                        .binder
+                        .iter()
+                        .map(|sv| format!("{} ⊆ {}", sv.ident, sv.bound))
+                        .join(", ");
+
+                    write!(f, "fn[{set_vars}]({params}) → {rty}")
+                } else {
+                    write!(f, "fn({params}) → {rty}")
+                }
+            }
+
             // TODO: Implement proper printing for every kind
             _ => write!(
                 f,
@@ -53,13 +88,53 @@ impl Display for Type {
     }
 }
 
+impl TypeKind {
+    pub fn replace(&mut self, var: &str, set: &Set) {
+        match self {
+            TypeKind::Array(ty) => {
+                ty.replace(var, set);
+            }
+
+            TypeKind::Fn(params, rty) => {
+                for param in params {
+                    param.replace(var, set);
+                }
+
+                rty.replace(var, set);
+            }
+
+            TypeKind::Rec(fields) => {
+                for ty in fields.values_mut() {
+                    ty.replace(var, set);
+                }
+            }
+
+            TypeKind::Tuple(elements) => {
+                for e in elements {
+                    e.replace(var, set);
+                }
+            }
+
+            _ => {}
+        }
+    }
+}
+
 impl Type {
     pub fn opaque() -> Self {
         Self {
             kind: TypeKind::Opaque,
-            binder: VecDeque::from([]),
+            binder: vec![],
+            binder_idx: 0,
+            var_to_idx: HashMap::new(),
             intrinsic: [Set::Universe, Set::Universe, Set::Universe],
             intrinsic_idx: 0,
+        }
+    }
+
+    pub fn replace(&mut self, var: &str, set: &Set) {
+        for i in 0..3 {
+            self.intrinsic[i] = self.intrinsic[i].replace(var, set)
         }
     }
 
@@ -68,7 +143,9 @@ impl Type {
 
         Self {
             kind: TypeKind::Fn(args, Box::new(Type::opaque())),
-            binder: VecDeque::from([]),
+            binder: vec![],
+            binder_idx: 0,
+            var_to_idx: HashMap::new(),
             intrinsic: [Set::Universe, Set::Universe, Set::Universe],
             intrinsic_idx: 0,
         }
@@ -77,7 +154,9 @@ impl Type {
     pub fn record(fields: HashMap<String, Type>) -> Self {
         Self {
             kind: TypeKind::Rec(fields),
-            binder: VecDeque::from([]),
+            binder: vec![],
+            binder_idx: 0,
+            var_to_idx: HashMap::new(),
             intrinsic: [Set::Universe, Set::Universe, Set::Universe],
             intrinsic_idx: 0,
         }
@@ -114,26 +193,27 @@ impl Type {
     /// Replace variable `var` with `val` in every type this one contains, recursively, as long as `val` satisfies the bound on the outermost binder
     /// Return error if variable passed when binder is empty
     pub fn pass(&mut self, scx: &SetCtx, val: Set) -> std::result::Result<(), PassError> {
-        match self.binder.pop_front() {
-            Some((var, bound)) => {
-                if !val.subset(scx, &bound) {
-                    return Err(PassError::BoundMismatch(bound.clone()));
-                }
+        if self.binder_idx < self.binder.len() {
+            let slot = self.binder[self.binder_idx].clone();
 
-                // TODO: Recursively replace set variables with the value we've been given
-
-                Ok(())
+            if !val.subset(scx, &slot.bound) {
+                return Err(PassError::BoundMismatch(slot.bound.clone()));
             }
 
-            None => {
-                if self.intrinsic_idx == 3 {
-                    return Err(PassError::Unexpected);
-                }
+            self.binder[self.binder_idx].value = Some(val.clone());
+            self.binder_idx += 1;
 
-                self.intrinsic[self.intrinsic_idx] = val;
-                self.intrinsic_idx += 1;
-                Ok(())
-            }
+            self.kind.replace(&slot.ident, &val);
+
+            return Ok(());
         }
+
+        if self.intrinsic_idx == 3 {
+            return Err(PassError::Unexpected);
+        }
+
+        self.intrinsic[self.intrinsic_idx] = val;
+        self.intrinsic_idx += 1;
+        Ok(())
     }
 }

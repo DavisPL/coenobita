@@ -2,7 +2,7 @@
 
 mod cx;
 
-use coenobita_middle::ty::{PassError, Type, TypeKind};
+use coenobita_middle::ty::{PassError, SetVar, Type, TypeKind};
 use coenobita_parse::PassTarget;
 use rustc_abi::{VariantIdx, FIRST_VARIANT};
 
@@ -119,12 +119,29 @@ impl<'tcx> Checker<'tcx> {
         }
     }
 
+    // ======== NONLOCAL ITEMS ======== //
+
+    fn check_item_fn_nonlocal(&mut self, def_id: DefId) -> Result {
+        let n = self.tcx.fn_sig(def_id).skip_binder().inputs().iter().count();
+
+        let default = self.icx.influence(Type::fun(n));
+
+        // TODO: Collect attributes
+
+        self.items.insert(def_id, default);
+
+        Ok(())
+    }
+
     fn check_item_fn(&mut self, _: &FnSig, body_id: BodyId) -> Result {
         let def_id = body_id.hir_id.owner.to_def_id();
         let local_def_id = def_id.as_local().unwrap();
 
         // Enter a new scope in the set context
         self.scx.enter();
+
+        let mut binder = Vec::new();
+        let mut var_to_idx = HashMap::new();
 
         // Collect all set variables introduced by this function
         for attr in self.tcx.get_attrs_by_path(def_id, &self.take_attr) {
@@ -142,7 +159,11 @@ impl<'tcx> Checker<'tcx> {
             self.ensure_variables_exist(&bound, &right)?;
 
             // Add upper bound to set variable context
-            self.scx.set(left.0, bound);
+            self.scx.set(left.0.clone(), bound.clone());
+
+            // Add set variable to binder
+            binder.push(SetVar::new(left.0.clone(), bound));
+            var_to_idx.insert(left.0, binder.len() - 1);
         }
 
         let mut params = Vec::new();
@@ -167,11 +188,26 @@ impl<'tcx> Checker<'tcx> {
             match pass.left.0 {
                 PassTarget::Argument(index) => self.pass(&mut params[index], pass)?,
                 PassTarget::Return => self.pass(&mut rty, pass)?,
-                PassTarget::Infer => warn!("Set pass with inferred target has no effect on function items")
+                PassTarget::Infer => warn!("Set pass with inferred target has no effect on function items"),
             }
         }
 
         self.check_expr(&body.value, Some(&rty), false)?;
+
+        // Build the function type from scratch
+        let kind = TypeKind::Fn(params, Box::new(rty));
+        let set = Set::Concrete(BTreeSet::from([self.crate_name.clone()]));
+
+        let ty = Type {
+            kind,
+            var_to_idx,
+            binder,
+            binder_idx: 0,
+            intrinsic: [set.clone(), set.clone(), set.clone()],
+            intrinsic_idx: 0,
+        };
+
+        self.items.insert(def_id, ty);
 
         // Exit this scope
         self.scx.exit();
@@ -183,7 +219,15 @@ impl<'tcx> Checker<'tcx> {
 
     /// Given the `DefId` of a function, return its type.
     fn fn_ty(&mut self, def_id: DefId) -> Type {
-        todo!()
+        println!("Getting type for func {:?}", def_id);
+
+        if let Some(ty) = self.items.get(&def_id) {
+            return ty.clone();
+        }
+
+        // We haven't processed the definition of this function yet
+        let _ = self.check_item_fn_nonlocal(def_id);
+        self.items.get(&def_id).unwrap().clone()
     }
 
     /// Given the parent and variant `DefId`s of an ADT (as well as its index), return its type.
@@ -344,7 +388,7 @@ impl<'tcx> Checker<'tcx> {
                         .tcx
                         .dcx()
                         .span_err(span, format!("Provided set {set} is not a subset of {bound}")))
-                },
+                }
 
                 PassError::Unexpected => {
                     return Err(self
@@ -625,7 +669,9 @@ impl<'tcx> Checker<'tcx> {
             }
         }
 
-        let fty = self.check_expr(fun, None, false)?;
+        let mut fty = self.check_expr(fun, None, false)?;
+
+        println!("Function type: {fty}");
 
         let mut ty = match fty.clone().kind {
             TypeKind::Fn(arg_tys, ret_ty) => {
@@ -633,8 +679,31 @@ impl<'tcx> Checker<'tcx> {
                     warn!("arg ct doesnt match up");
                 }
 
-                for (ty, expr) in arg_tys.into_iter().zip(args) {
-                    self.check_expr(expr, Some(&ty), false)?;
+                for (expected, expr) in arg_tys.into_iter().zip(args) {
+                    let actual = self.check_expr(expr, None, false)?;
+
+                    for i in 0..3 {
+                        if let Set::Variable(v) = expected.intrinsic[i].clone() {
+                            // This set is a variable that needs to be replaced... which one is it?
+                            let index = fty.var_to_idx[&v];
+
+                            let set_var = &fty.binder[index];
+
+                            let candidate = actual.intrinsic[i].clone();
+
+                            if !candidate.subset(&self.scx, &set_var.bound) {
+                                let msg = format!(
+                                    "argument has type {}, but {} ⊈ {} as required",
+                                    actual, candidate, set_var.bound
+                                );
+
+                                return Err(self.tcx.dcx().span_err(expr.span, msg));
+                            }
+
+                            fty.binder[index].value = Some(actual.intrinsic[i].clone());
+                            fty.replace(&v, &actual.intrinsic[i]);
+                        }
+                    }
                 }
 
                 *ret_ty
@@ -967,13 +1036,10 @@ impl<'tcx> Checker<'tcx> {
                                 .tcx
                                 .dcx()
                                 .span_err(left.1, format!("set {set} is not a subset of {bound}")))
-                        },
+                        }
 
                         PassError::Unexpected => {
-                            return Err(self
-                                .tcx
-                                .dcx()
-                                .span_err(left.1, format!("unexpected pass")))
+                            return Err(self.tcx.dcx().span_err(left.1, format!("unexpected pass")))
                         }
                     }
                 }

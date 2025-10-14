@@ -61,6 +61,16 @@ pub enum Set {
 }
 
 impl Set {
+    pub fn replace(&self, var: &str, set: &Set) -> Set {
+        match self {
+            Set::Variable(v) if v == var => set.clone(),
+            Set::Variable(_) | Set::Concrete(_) | Set::Universe => self.clone(),
+            Set::Union(s) => {
+                todo!()
+            }
+        }
+    }
+
     pub fn subset(&self, ctx: &SetCtx, other: &Set) -> bool {
         match (self, other) {
             (_, Set::Universe) => true,

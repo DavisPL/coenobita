@@ -98,7 +98,19 @@ struct Bing {
     a: i64
 }
 
+#[coenobita::take(A sub= {a,b,c})]
+#[coenobita::pass(0 A)]
+#[coenobita::pass(0 A)]
+#[coenobita::pass(0 A)]
 
-fn foo(x: i32, (y, z): (i32, i32), Bing { a }: Bing) {
+#[coenobita::pass(-> A)]
+#[coenobita::pass(-> A)]
+#[coenobita::pass(-> A)]
+fn foo(x: i32) -> i32 {
+    x
+}
 
+fn bar() {
+    #[coenobita::pass(_ {b})]
+    let f = foo(5);
 }
