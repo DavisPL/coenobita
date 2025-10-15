@@ -65,8 +65,50 @@ impl Set {
         match self {
             Set::Variable(v) if v == var => set.clone(),
             Set::Variable(_) | Set::Concrete(_) | Set::Universe => self.clone(),
-            Set::Union(s) => {
-                todo!()
+            Set::Union(s1) => {
+                match set {
+                    Set::Variable(v) => {
+                        // Copy the set 's' EXCEPT replace 'var' by 'v' if found
+                        let mut s2 = BTreeSet::new();
+
+                        for s in s1 {
+                            if let Set::Variable(v3) = s {
+                                if v3 == v {
+                                    // FOUND IT!
+                                    s2.insert(set.clone());
+                                } else {
+                                    s2.insert(s.clone());
+                                }
+                            } else {
+                                s2.insert(s.clone());
+                            }
+                        }
+
+                        Set::Union(s2)
+                    },
+
+                    Set::Concrete(elems) => {
+                        // Copy the set 's' EXCEPT if we encounter 'var', don't add it; add the concrete 'elems' instead
+                        let mut conc = BTreeSet::new();
+                        let mut s2 = BTreeSet::new();
+
+                        for s in s1 {
+                            match s {
+                                Set::Variable(v3) if v3 == var => {
+                                    conc.extend(elems.iter().cloned());
+                                },
+
+                                Set::Concrete(c) => conc.extend(c.iter().cloned()),
+                                _ => { s2.insert(s.clone()); }
+                            }
+                        }
+
+                        s2.insert(Set::Concrete(conc));
+                        Set::Union(s2)
+                    }
+
+                    _ => todo!()
+                }
             }
         }
     }

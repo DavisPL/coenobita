@@ -94,8 +94,14 @@
 //     y + x
 // }
 
+struct Zap {
+  #[coenobita::pass(_ {a})]
+    x: i64
+}
+
 struct Bing {
-    a: i64
+    #[coenobita::pass(_ {a, b})]
+    x: i64
 }
 
 #[coenobita::take(A sub= {a,b,c})]
@@ -105,12 +111,26 @@ struct Bing {
 
 #[coenobita::pass(-> A)]
 #[coenobita::pass(-> A)]
-#[coenobita::pass(-> A)]
+#[coenobita::pass(-> A U {b})]
 fn foo(x: i32) -> i32 {
     x
 }
 
-fn bar() {
-    #[coenobita::pass(_ {b})]
-    let f = foo(5);
+fn bar(zap: &mut Zap) -> Bing {
+    // ERROR: expected '{a} {*} {*}' but found '{b} {b} {b}'
+    // zap.x = 6;
+
+    #[coenobita::pass(_ {a,b,c})]
+    #[coenobita::pass(_ {a,b,c})]
+    #[coenobita::pass(_ {a,b,c})]
+    let z = 5;
+
+    #[coenobita::pass(_ {a,b,c})]
+    let f = foo(z);
+
+    let mut b = Bing { x: 5 };
+
+    b.x = 6;
+
+    b
 }

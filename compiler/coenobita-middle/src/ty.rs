@@ -57,8 +57,9 @@ impl Display for Type {
             TypeKind::Rec(fields) => {
                 write!(
                     f,
-                    "{{ {} }}",
-                    fields.iter().map(|(k, v)| format!("{k} : {v}")).join(", ")
+                    "{{ {} }} {}",
+                    fields.iter().map(|(k, v)| format!("{k} : {v}")).join(", "),
+                    self.intrinsic.iter().join(" ")
                 )
             }
 
@@ -72,17 +73,17 @@ impl Display for Type {
                         .map(|sv| format!("{} ⊆ {}", sv.ident, sv.bound))
                         .join(", ");
 
-                    write!(f, "fn[{set_vars}]({params}) → {rty}")
+                    write!(f, "fn[{set_vars}]({params}) (→ {}) {rty}", self.intrinsic.iter().join(" "))
                 } else {
-                    write!(f, "fn({params}) → {rty}")
+                    write!(f, "fn({params}) (→ {}) {rty}", self.intrinsic.iter().join(" "))
                 }
             }
 
             // TODO: Implement proper printing for every kind
             _ => write!(
                 f,
-                "{} {} {}",
-                self.intrinsic[0], self.intrinsic[1], self.intrinsic[2]
+                "{}",
+                self.intrinsic.iter().join(" ")
             ),
         }
     }
@@ -133,6 +134,10 @@ impl Type {
     }
 
     pub fn replace(&mut self, var: &str, set: &Set) {
+        println!("[TYPE] Replacing {var} for {set}...");
+
+        self.kind.replace(var, set);
+        
         for i in 0..3 {
             self.intrinsic[i] = self.intrinsic[i].replace(var, set)
         }
@@ -174,6 +179,25 @@ impl Type {
 
                 r2.satisfies(scx, &r1)
             }
+
+            (TypeKind::Rec(f1), TypeKind::Rec(f2)) => {
+                // It's NOT okay for fields in 'f2' to be absent from 'f1'
+                for (field, ty2) in f2 {
+                    match f1.get(field) {
+                        Some(ty1) => {
+                            if !ty1.satisfies(scx, ty2) {
+                                return false
+                            }
+                        }
+
+                        None => return false
+                    }
+                }
+
+                true
+            }
+
+            // TODO: Handle comparison between other types
             _ => false,
         };
 

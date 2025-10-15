@@ -5,6 +5,7 @@ mod cx;
 use coenobita_middle::ty::{PassError, SetVar, Type, TypeKind};
 use coenobita_parse::PassTarget;
 use rustc_abi::{VariantIdx, FIRST_VARIANT};
+use rustc_hir::FnRetTy;
 
 use std::collections::{BTreeSet, HashMap, VecDeque};
 use std::fmt::Display;
@@ -133,7 +134,7 @@ impl<'tcx> Checker<'tcx> {
         Ok(())
     }
 
-    fn check_item_fn(&mut self, _: &FnSig, body_id: BodyId) -> Result {
+    fn check_item_fn(&mut self, sig: &FnSig, body_id: BodyId) -> Result {
         let def_id = body_id.hir_id.owner.to_def_id();
         let local_def_id = def_id.as_local().unwrap();
 
@@ -170,16 +171,18 @@ impl<'tcx> Checker<'tcx> {
 
         let body = self.tcx.hir_body(body_id);
 
-        for param in body.params {
+        // Get the type for every parameter
+        for param in body.params.iter() {
             let raw = self.tcx.typeck(local_def_id).node_type(param.hir_id);
             let ty = self.get_constr_for_ty(&raw);
 
             params.push(ty.clone());
-
-            self.process_pattern(param.pat.kind, ty, param.pat.hir_id);
         }
 
-        let mut rty = self.top_type();
+        let fn_sig = self.tcx.fn_sig(def_id).skip_binder();
+        let return_ty = fn_sig.output();
+
+        let mut rty = self.get_constr_for_ty(&return_ty.skip_binder());
 
         // Collect all set applications
         for attr in self.tcx.get_attrs_by_path(def_id, &self.pass_attr) {
@@ -190,6 +193,11 @@ impl<'tcx> Checker<'tcx> {
                 PassTarget::Return => self.pass(&mut rty, pass)?,
                 PassTarget::Infer => warn!("Set pass with inferred target has no effect on function items"),
             }
+        }
+
+        // Now that all the parameter types have their integrity triples filled, process the patterns
+        for (i, param) in body.params.iter().enumerate() {
+            self.process_pattern(param.pat.kind, params[i].clone(), param.pat.hir_id);
         }
 
         self.check_expr(&body.value, Some(&rty), false)?;
@@ -311,6 +319,8 @@ impl<'tcx> Checker<'tcx> {
             TyKind::Ref(region, ty, mutability) => {
                 // References like &T or &mut T
                 println!("Reference to {:?}", ty);
+
+                return self.get_constr_for_ty(ty)
             }
             TyKind::Tuple(types) => {
                 // Tuples like (i32, String)
@@ -426,6 +436,8 @@ impl<'tcx> Checker<'tcx> {
 
     /// Serves as the type checking entrypoint for all expressions.
     fn check_expr(&mut self, expr: &Expr, expectation: Option<&Type>, is_lvalue: bool) -> Result<Type> {
+        debug!("Checking expr... {:?}", expr);
+
         let ty = match expr.kind {
             ExprKind::ConstBlock(_) => todo!(),
             ExprKind::Become(_) => todo!(),
@@ -702,11 +714,14 @@ impl<'tcx> Checker<'tcx> {
 
                             fty.binder[index].value = Some(actual.intrinsic[i].clone());
                             fty.replace(&v, &actual.intrinsic[i]);
+
+                            println!("Type is now {fty}");
                         }
                     }
                 }
 
-                *ret_ty
+                let TypeKind::Fn(args, rty) = fty.kind.clone() else { unreachable!() };
+                *rty
             }
 
             TypeKind::Rec(elements) => {
@@ -872,7 +887,11 @@ impl<'tcx> Checker<'tcx> {
     fn check_expr_assign(&mut self, dest: &Expr, expr: &Expr) -> Result<Type> {
         let expected = self.check_expr(dest, None, true)?;
 
+        println!("(ASSIGN) LEFT: {expected}");
+
         let ty = self.check_expr(expr, Some(&expected), false)?;
+
+        println!("(ASSIGN) RIGHT: {ty}");
 
         Ok(ty)
     }
@@ -1021,7 +1040,20 @@ impl<'tcx> Checker<'tcx> {
         let mut processed = false;
 
         // TODO: We need to use a type constructor that matches the left type
-        let mut ty = self.top_type();
+        let mut ty = if let Some(expr) = local.init {
+            self.check_expr(expr, None, false)?
+        } else {
+            self.top_type()
+        };
+
+        // if let Some(expr) = local.init {
+        //     self.check_expr(expr, Some(&ty), false)?;
+        //     self.process_pattern(local.pat.kind, ty, local.pat.hir_id);
+        // } else {
+        //     self.process_pattern(local.pat.kind, self.top_type(), local.pat.hir_id);
+        // }
+
+        let mut idx = 0;
 
         for attr in self.tcx.hir().attrs(local.hir_id) {
             if attr.path_matches(&self.pass_attr) {
@@ -1029,29 +1061,31 @@ impl<'tcx> Checker<'tcx> {
 
                 self.ensure_variables_exist(&set, &right)?;
 
-                if let Err(e) = ty.pass(&self.scx, set.clone()) {
-                    match e {
-                        PassError::BoundMismatch(bound) => {
-                            return Err(self
-                                .tcx
-                                .dcx()
-                                .span_err(left.1, format!("set {set} is not a subset of {bound}")))
-                        }
-
-                        PassError::Unexpected => {
-                            return Err(self.tcx.dcx().span_err(left.1, format!("unexpected pass")))
-                        }
-                    }
+                if idx > 2 {
+                    return Err(self.tcx.dcx().span_err(left.1, format!("unexpected pass")))
                 }
+
+                ty.intrinsic[idx] = set;
+                idx += 1;
+
+                // if let Err(e) = ty.pass(&self.scx, set.clone()) {
+                //     match e {
+                //         PassError::BoundMismatch(bound) => {
+                //             return Err(self
+                //                 .tcx
+                //                 .dcx()
+                //                 .span_err(left.1, format!("set {set} is not a subset of {bound}")))
+                //         }
+
+                //         PassError::Unexpected => {
+                //             return Err(self.tcx.dcx().span_err(left.1, format!("unexpected pass")))
+                //         }
+                //     }
+                // }
             }
         }
 
-        if let Some(expr) = local.init {
-            self.check_expr(expr, Some(&ty), false)?;
-            self.process_pattern(local.pat.kind, ty, local.pat.hir_id);
-        } else {
-            self.process_pattern(local.pat.kind, self.top_type(), local.pat.hir_id);
-        }
+        self.process_pattern(local.pat.kind, ty, local.pat.hir_id);
 
         Ok(())
     }
