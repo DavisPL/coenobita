@@ -7,7 +7,6 @@ resolver = "2"
 edition = "2021"
 
 [workspace.dependencies]
-coenobita-ast = { path = "./compiler/coenobita-ast" }
 coenobita-bin = { path = "./compiler/coenobita-bin" }
 coenobita-middle = { path = "./compiler/coenobita-middle" }
 coenobita-parse = { path = "./compiler/coenobita-parse" }

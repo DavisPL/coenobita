@@ -27,14 +27,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "coenobita-ast"
-version = "0.1.0"
-dependencies = [
- "coenobita-middle",
- "itertools 0.13.0",
-]
-
-[[package]]
 name = "coenobita-bin"
 version = "0.1.0"
 dependencies = [
@@ -49,7 +41,6 @@ name = "coenobita-check"
 version = "0.1.0"
 dependencies = [
  "clippy_utils",
- "coenobita-ast",
  "coenobita-middle",
  "coenobita-parse",
  "itertools 0.13.0",
@@ -72,7 +63,6 @@ dependencies = [
 name = "coenobita-parse"
 version = "0.1.0"
 dependencies = [
- "coenobita-ast",
  "coenobita-middle",
  "log",
 ]

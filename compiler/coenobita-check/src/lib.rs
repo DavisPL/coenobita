@@ -320,7 +320,7 @@ impl<'tcx> Checker<'tcx> {
                 // References like &T or &mut T
                 println!("Reference to {:?}", ty);
 
-                return self.get_constr_for_ty(ty)
+                return self.get_constr_for_ty(ty);
             }
             TyKind::Tuple(types) => {
                 // Tuples like (i32, String)
@@ -720,7 +720,9 @@ impl<'tcx> Checker<'tcx> {
                     }
                 }
 
-                let TypeKind::Fn(args, rty) = fty.kind.clone() else { unreachable!() };
+                let TypeKind::Fn(args, rty) = fty.kind.clone() else {
+                    unreachable!()
+                };
                 *rty
             }
 
@@ -1062,7 +1064,7 @@ impl<'tcx> Checker<'tcx> {
                 self.ensure_variables_exist(&set, &right)?;
 
                 if idx > 2 {
-                    return Err(self.tcx.dcx().span_err(left.1, format!("unexpected pass")))
+                    return Err(self.tcx.dcx().span_err(left.1, format!("unexpected pass")));
                 }
 
                 ty.intrinsic[idx] = set;

@@ -7,7 +7,6 @@ edition.workspace = true
 rustc_private = true
 
 [dependencies]
-coenobita-ast.workspace = true
 coenobita-middle.workspace = true
 coenobita-parse.workspace = true
 

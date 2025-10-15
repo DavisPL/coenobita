@@ -73,18 +73,18 @@ impl Display for Type {
                         .map(|sv| format!("{} ⊆ {}", sv.ident, sv.bound))
                         .join(", ");
 
-                    write!(f, "fn[{set_vars}]({params}) (→ {}) {rty}", self.intrinsic.iter().join(" "))
+                    write!(
+                        f,
+                        "fn[{set_vars}]({params}) (→ {}) {rty}",
+                        self.intrinsic.iter().join(" ")
+                    )
                 } else {
                     write!(f, "fn({params}) (→ {}) {rty}", self.intrinsic.iter().join(" "))
                 }
             }
 
             // TODO: Implement proper printing for every kind
-            _ => write!(
-                f,
-                "{}",
-                self.intrinsic.iter().join(" ")
-            ),
+            _ => write!(f, "{}", self.intrinsic.iter().join(" ")),
         }
     }
 }
@@ -137,7 +137,7 @@ impl Type {
         println!("[TYPE] Replacing {var} for {set}...");
 
         self.kind.replace(var, set);
-        
+
         for i in 0..3 {
             self.intrinsic[i] = self.intrinsic[i].replace(var, set)
         }
@@ -186,11 +186,11 @@ impl Type {
                     match f1.get(field) {
                         Some(ty1) => {
                             if !ty1.satisfies(scx, ty2) {
-                                return false
+                                return false;
                             }
                         }
 
-                        None => return false
+                        None => return false,
                     }
                 }
 

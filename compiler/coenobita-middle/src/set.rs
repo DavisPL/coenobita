@@ -85,7 +85,7 @@ impl Set {
                         }
 
                         Set::Union(s2)
-                    },
+                    }
 
                     Set::Concrete(elems) => {
                         // Copy the set 's' EXCEPT if we encounter 'var', don't add it; add the concrete 'elems' instead
@@ -96,10 +96,12 @@ impl Set {
                             match s {
                                 Set::Variable(v3) if v3 == var => {
                                     conc.extend(elems.iter().cloned());
-                                },
+                                }
 
                                 Set::Concrete(c) => conc.extend(c.iter().cloned()),
-                                _ => { s2.insert(s.clone()); }
+                                _ => {
+                                    s2.insert(s.clone());
+                                }
                             }
                         }
 
@@ -107,7 +109,7 @@ impl Set {
                         Set::Union(s2)
                     }
 
-                    _ => todo!()
+                    _ => todo!(),
                 }
             }
         }
