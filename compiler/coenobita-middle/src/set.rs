@@ -1,8 +1,6 @@
 use itertools::Itertools;
-use std::{
-    collections::{BTreeSet, HashMap},
-    fmt::Display,
-};
+use std::collections::{BTreeSet, HashMap};
+use std::fmt::Display;
 
 #[macro_export]
 macro_rules! set {

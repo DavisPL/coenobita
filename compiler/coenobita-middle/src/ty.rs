@@ -1,8 +1,7 @@
 use itertools::Itertools;
-use std::{
-    collections::{HashMap, VecDeque},
-    fmt::Display,
-};
+
+use std::collections::HashMap;
+use std::fmt::Display;
 
 use crate::set::{Set, SetCtx};
 
@@ -164,8 +163,6 @@ impl Type {
     }
 
     pub fn replace(&mut self, var: &str, set: &Set) {
-        println!("[TYPE] Replacing {var} for {set}...");
-
         self.kind.replace(var, set);
 
         for i in 0..3 {

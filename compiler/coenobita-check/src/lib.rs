@@ -1,27 +1,5 @@
 #![feature(rustc_private)]
 
-mod cx;
-
-use coenobita_middle::ty::{PassError, ProvType, SetVar, Type, TypeKind};
-
-use coenobita_parse::parse::CoenobitaParser;
-use coenobita_parse::{Field, Input, Other};
-use rustc_abi::{VariantIdx, FIRST_VARIANT};
-use rustc_errors::PResult;
-use rustc_hir::FnRetTy;
-
-use std::collections::{BTreeSet, HashMap, VecDeque};
-use std::fmt::Display;
-
-use std::cmp::Eq;
-use std::hash::Hash;
-
-use itertools::Itertools;
-use rustc_middle::ty::{Ty, TyCtxt, TyKind};
-use rustc_span::{ErrorGuaranteed, Ident, Span, Symbol};
-
-use coenobita_middle::set::{Set, SetCtx};
-
 extern crate rustc_abi;
 extern crate rustc_ast;
 extern crate rustc_data_structures;
@@ -36,51 +14,33 @@ extern crate rustc_span;
 extern crate rustc_target;
 extern crate rustc_trait_selection;
 
-use rustc_hir::def::{CtorOf, DefKind, Res};
-use rustc_hir::{
-    def_id::DefId, Arm, AttrArgs, AttrKind, Attribute, Block, BodyId, Closure, Expr, ExprField, ExprKind,
-    FnSig, HirId, Impl, ImplItem, ImplItemKind, Item, ItemKind, LangItem, LetExpr, LetStmt, MatchSource,
-    PatField, PatKind, QPath, Stmt, StmtKind,
-};
-use rustc_middle::ty::{self, FieldDef, GenericArg, TypeckResults, TypingEnv};
+mod cx;
 
+use crate::cx::{Ctx, InfCtx};
+
+use coenobita_middle::set::{Set, SetCtx};
+use coenobita_middle::ty::{PassError, ProvType, SetVar, Type, TypeKind};
+use coenobita_parse::parse::CoenobitaParser;
+use coenobita_parse::{create_parser, create_psess, Param};
+use coenobita_parse::{Field, Input, Other};
+
+use std::collections::{BTreeSet, HashMap};
+
+use itertools::Itertools;
 use log::{debug, warn};
 
+use rustc_abi::{VariantIdx, FIRST_VARIANT};
+use rustc_errors::PResult;
+use rustc_hir::def::{CtorOf, DefKind, Res};
+use rustc_hir::def_id::DefId;
+use rustc_hir::{
+    Arm, AttrArgs, AttrKind, Attribute, Block, BodyId, Closure, Expr, ExprField, ExprKind, FnSig, HirId,
+    Item, ItemKind, LangItem, LetExpr, LetStmt, MatchSource, PatField, PatKind, QPath, Stmt, StmtKind,
+};
+use rustc_middle::ty::{FieldDef, Ty, TyCtxt, TyKind};
+use rustc_span::{ErrorGuaranteed, Ident, Span, Symbol};
+
 pub type Result<T = ()> = std::result::Result<T, ErrorGuaranteed>;
-type Bound = (String, Set);
-
-use coenobita_parse::{create_parser, create_psess, parse::Parse, Param};
-
-use crate::cx::InfCtx;
-
-struct Ctx<K, V> {
-    scopes: Vec<HashMap<K, V>>,
-}
-
-impl<K: Hash + Eq, V> Ctx<K, V> {
-    fn new() -> Self {
-        Self { scopes: vec![] }
-    }
-
-    fn enter(&mut self) {
-        self.scopes.push(HashMap::new());
-    }
-
-    fn exit(&mut self) {
-        self.scopes.pop();
-    }
-
-    pub fn get(&self, k: &K) -> Option<&V> {
-        self.scopes.iter().rev().find_map(|cx| cx.get(k))
-    }
-
-    pub fn set(&mut self, k: K, v: V) {
-        match self.scopes.last_mut() {
-            Some(cx) => cx.insert(k, v),
-            None => None,
-        };
-    }
-}
 
 pub struct Checker<'tcx> {
     tcx: TyCtxt<'tcx>,
@@ -91,8 +51,6 @@ pub struct Checker<'tcx> {
     field_attr: Vec<Symbol>,
     local_attr: Vec<Symbol>,
 
-    // take_attr: Vec<Symbol>,
-    // pass_attr: Vec<Symbol>,
     scx: SetCtx,
 
     str_to_hir: HashMap<String, HirId>,
@@ -105,7 +63,6 @@ pub struct Checker<'tcx> {
     icx: InfCtx,
 
     crate_name: String,
-    // items: HashMap<DefId, Type>,
 }
 
 impl<'tcx> Checker<'tcx> {
@@ -148,11 +105,7 @@ impl<'tcx> Checker<'tcx> {
         Ok(())
     }
 
-    fn origin(&self) -> Set {
-        todo!()
-    }
-
-    fn check_item_fn(&mut self, sig: &FnSig, body_id: BodyId) -> Result {
+    fn check_item_fn(&mut self, _: &FnSig, body_id: BodyId) -> Result {
         let def_id = body_id.hir_id.owner.to_def_id();
         let local_def_id = def_id.as_local().unwrap();
 
@@ -262,8 +215,6 @@ impl<'tcx> Checker<'tcx> {
 
     /// Given the `DefId` of a function, return its type.
     fn fn_ty(&mut self, def_id: DefId) -> Type {
-        println!("Getting type for func {:?}", def_id);
-
         if let Some(ty) = self.items.get(&def_id) {
             return ty.clone();
         }
@@ -319,50 +270,28 @@ impl<'tcx> Checker<'tcx> {
     fn get_constr_for_ty(&mut self, ty: &Ty<'tcx>) -> Type {
         // TODO: Actually get the constructor
         match ty.kind() {
-            TyKind::Adt(adt_def, substs) => {
+            TyKind::Adt(adt_def, _) => {
                 // Structs, enums, unions (Vec, HashMap, your types, etc.)
                 let type_def_id = adt_def.did();
-                println!("ADT DefId: {:?}", type_def_id);
 
                 return self
                     .get_type_constr(type_def_id)
                     .unwrap_or(&Type::opaque())
                     .clone();
             }
-            TyKind::Int(int_ty) => {
-                // i8, i16, i32, i64, i128, isize
-                println!("Integer type: {:?}", int_ty);
-            }
-            TyKind::Uint(uint_ty) => {
-                // u8, u16, u32, u64, u128, usize
-                println!("Unsigned integer type: {:?}", uint_ty);
-            }
-            TyKind::Float(float_ty) => {
-                // f32, f64
-                println!("Float type: {:?}", float_ty);
-            }
-            TyKind::Bool => {
-                println!("Bool type");
-            }
-            TyKind::Char => {
-                println!("Char type");
-            }
-            TyKind::Str => {
-                // The str slice type (not String)
-                println!("Str type");
-            }
-            TyKind::Ref(region, ty, mutability) => {
+            TyKind::Int(_) => {}
+            TyKind::Uint(_) => {}
+            TyKind::Float(_) => {}
+            TyKind::Bool => {}
+            TyKind::Char => {}
+            TyKind::Str => {}
+            TyKind::Tuple(_) => {}
+            TyKind::Ref(_, ty, _) => {
                 // References like &T or &mut T
-                println!("Reference to {:?}", ty);
-
                 return self.get_constr_for_ty(ty);
             }
-            TyKind::Tuple(types) => {
-                // Tuples like (i32, String)
-                println!("Tuple with {} elements", types.len());
-            }
             _ => {
-                println!("Other type kind: {:?}", ty.kind());
+                debug!("Other type kind: {:?}", ty.kind());
             }
         };
 
@@ -421,9 +350,6 @@ impl<'tcx> Checker<'tcx> {
     }
 
     fn pass(&self, ty: &mut Type, span: Span, set: Set, variables: &HashMap<String, Span>) -> Result {
-        // let Pass { left, set, right } = pass;
-        // let span = left.1;
-
         self.ensure_variables_exist(&set, variables)?;
 
         if let Err(e) = ty.pass(&self.scx, set.clone()) {
@@ -483,8 +409,6 @@ impl<'tcx> Checker<'tcx> {
 
     /// Serves as the type checking entrypoint for all expressions.
     fn check_expr(&mut self, expr: &Expr, expectation: Option<&Type>, is_lvalue: bool) -> Result<Type> {
-        debug!("Checking expr... {:?}", expr);
-
         let ty = match expr.kind {
             ExprKind::ConstBlock(_) => todo!(),
             ExprKind::Become(_) => todo!(),
@@ -667,7 +591,7 @@ impl<'tcx> Checker<'tcx> {
                         let kind = ty.kind();
 
                         match kind {
-                            ty::TyKind::Adt(adt_def, _) => {
+                            TyKind::Adt(adt_def, _) => {
                                 self.adt_ty(adt_def.did(), adt_def.did(), FIRST_VARIANT)
                             }
                             _ => todo!(),
@@ -680,7 +604,7 @@ impl<'tcx> Checker<'tcx> {
 
             Res::SelfCtor(alias_to) | Res::SelfTyAlias { alias_to, .. } => {
                 match self.tcx.type_of(alias_to).skip_binder().kind() {
-                    ty::TyKind::Adt(adt_def, _) => {
+                    TyKind::Adt(adt_def, _) => {
                         let did = adt_def.did();
                         self.adt_ty(did, did, FIRST_VARIANT)
                     }
@@ -730,14 +654,9 @@ impl<'tcx> Checker<'tcx> {
 
         let mut fty = self.check_expr(fun, None, false)?;
 
-        println!("Function type: {fty}");
-
+        // TODO: Reorganize this logic significantly... there is WAY too much cloning here
         let mut ty = match fty.clone().kind {
-            TypeKind::Fn(arg_tys, ret_ty) => {
-                if args.len() != arg_tys.len() {
-                    warn!("arg ct doesnt match up");
-                }
-
+            TypeKind::Fn(arg_tys, _) => {
                 let mut atys = Vec::new();
 
                 for (expected, expr) in arg_tys.into_iter().zip(args) {
@@ -765,8 +684,6 @@ impl<'tcx> Checker<'tcx> {
 
                             fty.binder[index].value = Some(actual.intrinsic[i].clone());
                             fty.replace(&v, &actual.intrinsic[i]);
-
-                            println!("Type is now {fty}");
                         }
                     }
                 }
@@ -964,12 +881,7 @@ impl<'tcx> Checker<'tcx> {
     /// Checks the type of an assignment expression.
     fn check_expr_assign(&mut self, dest: &Expr, expr: &Expr) -> Result<Type> {
         let expected = self.check_expr(dest, None, true)?;
-
-        println!("(ASSIGN) LEFT: {expected}");
-
         let ty = self.check_expr(expr, Some(&expected), false)?;
-
-        println!("(ASSIGN) RIGHT: {ty}");
 
         Ok(ty)
     }
@@ -1136,12 +1048,6 @@ impl<'tcx> Checker<'tcx> {
         for attr in self.tcx.hir().attrs(local.hir_id) {
             if attr.path_matches(&self.local_attr) {
                 let Other { integrity, variables } = self.parse_local(attr)?;
-
-                println!(
-                    "Comparing left ({:?}) to right ({:?})",
-                    integrity.iter().clone().map(|ss| ss.value.clone()).join(" "),
-                    ty.intrinsic
-                );
 
                 for (i, ss) in integrity.iter().enumerate() {
                     self.ensure_variables_exist(&ss.value, &variables)?;

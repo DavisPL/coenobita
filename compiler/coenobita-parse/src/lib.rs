@@ -9,18 +9,19 @@ extern crate rustc_parse;
 extern crate rustc_session;
 extern crate rustc_span;
 
-use std::collections::{BTreeSet, HashSet};
-use std::fmt::Debug;
+pub mod parse;
+pub(crate) mod token;
+
+use parse::CoenobitaParser;
+use token::*;
+
+use std::collections::{BTreeSet, HashMap};
 use std::io;
 use std::sync::Arc;
 
-use coenobita_middle::property::Property;
 use coenobita_middle::set::Set;
-use std::collections::HashMap;
-// use coenobita_middle::ty::{Integrity, Type};
-use parse::{CoenobitaParser, Parse};
-use rustc_ast::token::TokenKind::{CloseDelim, Ident, OpenDelim};
-use rustc_ast::token::{Delimiter, LitKind, Token, TokenKind};
+
+use rustc_ast::token::{LitKind, TokenKind};
 use rustc_ast::tokenstream::TokenStream;
 
 use rustc_data_structures::sync;
@@ -40,32 +41,11 @@ use rustc_session::parse::ParseSess;
 use rustc_span::source_map::SourceMap;
 use rustc_span::{BytePos, Span};
 
-// use coenobita_ast::{TyAST, TypeFormAST};
-
-use log::debug;
-
-pub mod parse;
-pub(crate) mod token;
-
-use token::*;
-
 pub struct Param {
     pub left: Spanned<String>,
     pub bound: Spanned<Set>,
     pub right: HashMap<String, Span>,
 }
-
-// pub enum PassTarget {
-//     Infer,
-//     Return,
-//     Argument(usize),
-// }
-
-// pub struct Pass {
-//     pub left: (PassTarget, Span),
-//     pub set: Set,
-//     pub right: HashMap<String, Span>,
-// }
 
 pub struct Spanned<T> {
     pub value: T,
@@ -190,66 +170,6 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
             right: self.variables.clone(),
         })
     }
-
-    // pub fn parse_pass(&mut self) -> PResult<'cnbt, Pass> {
-    //     let span = self.parser.token.span;
-
-    //     let target = match self.parser.token.kind {
-    //         TokenKind::RArrow => {
-    //             self.parser.bump();
-    //             PassTarget::Return
-    //         }
-
-    //         TokenKind::Literal(lit) => match lit.kind {
-    //             LitKind::Integer => {
-    //                 let index: usize = lit.symbol.to_string().parse().map_err(|e| {
-    //                     self.parser
-    //                         .dcx()
-    //                         .struct_span_err(self.parser.token.span, format!("invalid index {}", lit.symbol))
-    //                 })?;
-
-    //                 self.parser.bump();
-
-    //                 PassTarget::Argument(index)
-    //             }
-
-    //             _ => {
-    //                 return Err(self.parser.dcx().struct_span_err(
-    //                     self.parser.token.span,
-    //                     format!("expected nonzero integer, found {}", lit.symbol),
-    //                 ))
-    //             }
-    //         },
-
-    //         TokenKind::Ident(symbol, _) => {
-    //             if symbol.as_str() == "_" {
-    //                 self.parser.bump();
-
-    //                 PassTarget::Infer
-    //             } else {
-    //                 return Err(self
-    //                     .parser
-    //                     .dcx()
-    //                     .struct_span_err(self.parser.token.span, format!("expected '_', found {}", symbol)));
-    //             }
-    //         }
-
-    //         _ => {
-    //             return Err(self
-    //                 .parser
-    //                 .dcx()
-    //                 .struct_span_err(self.parser.token.span, format!("invalid pass target")))
-    //         }
-    //     };
-
-    //     let set = self.parse_set()?;
-
-    //     Ok(Pass {
-    //         left: (target, span),
-    //         set,
-    //         right: self.variables.clone(),
-    //     })
-    // }
 
     pub fn parse_set(&mut self) -> PResult<'cnbt, Spanned<Set>> {
         let start = self.start();

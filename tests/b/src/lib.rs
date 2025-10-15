@@ -106,9 +106,7 @@ struct Capability<T> {
     _inner: T
 }
 
-#[coenobita::pass(0 {a})]
-#[coenobita::pass(0 {a})]
-#[coenobita::pass(0 {a})]
+#[coenobita::input(0 {b} {b} {b} | {a})]
 fn some(x: i32) -> i32 {
     x
 }
@@ -137,7 +135,7 @@ fn bar(zap: &mut Zap) -> Bing {
     // #[coenobita::pass(_ {a,b,c})]
     // #[coenobita::pass(_ {a,b,c})]
     // #[coenobita::pass(_ {a,b,c})]
-    let z = num();
+    let z = 5; //num();
 
     #[coenobita::local({a,b,c} {a,b,c} {a,b,c})]
     let f = foo(z);

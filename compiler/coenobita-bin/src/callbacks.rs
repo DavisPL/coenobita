@@ -1,5 +1,4 @@
 use coenobita_check::Checker;
-use coenobita_middle::{flow::FlowPair, provenance::ProvenancePair};
 use rustc_driver::{Callbacks, Compilation};
 use rustc_hir::{intravisit::Visitor, Item};
 use rustc_middle::{hir::nested_filter::OnlyBodies, ty::TyCtxt};
