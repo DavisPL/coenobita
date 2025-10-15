@@ -14,6 +14,11 @@ pub const KW_STRUCT: ExpKeywordPair = ExpKeywordPair {
     token_type: TokenType::KwStruct,
 };
 
+pub const PIPE: ExpTokenPair = ExpTokenPair {
+    tok: &BinOp(BinOpToken::Or),
+    token_type: TokenType::Or,
+};
+
 pub const OPEN_PAREN: ExpTokenPair = ExpTokenPair {
     tok: &OpenDelim(Delimiter::Parenthesis),
     token_type: TokenType::OpenParen,

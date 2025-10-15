@@ -95,23 +95,37 @@
 // }
 
 struct Zap {
-  #[coenobita::pass(_ {a})]
+  #[coenobita::field({a} {a} {a} | {a})]
     x: i64
+}
+
+/// This capability defends against confused deputy attacks by
+/// only accepting payloads from the root origin.
+struct Capability<T> {
+    #[coenobita::tag({root} {root} {root})]
+    _inner: T
+}
+
+#[coenobita::pass(0 {a})]
+#[coenobita::pass(0 {a})]
+#[coenobita::pass(0 {a})]
+fn some(x: i32) -> i32 {
+    x
+}
+
+fn num() -> i32 {
+    5
 }
 
 struct Bing {
-    #[coenobita::pass(_ {a, b})]
+    #[coenobita::field({a,b} {a,b} {a,b} | {b})]
     x: i64
 }
 
-#[coenobita::take(A sub= {a,b,c})]
-#[coenobita::pass(0 A)]
-#[coenobita::pass(0 A)]
-#[coenobita::pass(0 A)]
 
-#[coenobita::pass(-> A)]
-#[coenobita::pass(-> A)]
-#[coenobita::pass(-> A U {b})]
+#[coenobita::parameter(A sub= {a, b, c})]
+#[coenobita::input(0 A A A | {a,b})]
+#[coenobita::output(A A A U {b})]
 fn foo(x: i32) -> i32 {
     x
 }
@@ -120,17 +134,19 @@ fn bar(zap: &mut Zap) -> Bing {
     // ERROR: expected '{a} {*} {*}' but found '{b} {b} {b}'
     // zap.x = 6;
 
-    #[coenobita::pass(_ {a,b,c})]
-    #[coenobita::pass(_ {a,b,c})]
-    #[coenobita::pass(_ {a,b,c})]
-    let z = 5;
+    // #[coenobita::pass(_ {a,b,c})]
+    // #[coenobita::pass(_ {a,b,c})]
+    // #[coenobita::pass(_ {a,b,c})]
+    let z = num();
 
-    #[coenobita::pass(_ {a,b,c})]
+    #[coenobita::local({a,b,c} {a,b,c} {a,b,c})]
     let f = foo(z);
 
     let mut b = Bing { x: 5 };
 
-    b.x = 6;
+    // some(5);
+
+    b.x = z as i64;
 
     b
 }

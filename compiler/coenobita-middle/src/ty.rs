@@ -16,12 +16,42 @@ pub enum PassError {
 }
 
 #[derive(Clone, Debug)]
+pub struct ProvType {
+    pub ty: Type,
+    pub providers: Set,
+}
+
+impl ProvType {
+    pub fn new(ty: Type) -> Self {
+        ProvType {
+            ty: ty,
+            providers: Set::Universe,
+        }
+    }
+}
+
+impl Default for ProvType {
+    fn default() -> Self {
+        ProvType {
+            ty: Type::opaque(),
+            providers: Set::Universe,
+        }
+    }
+}
+
+impl Display for ProvType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} | {}", self.ty, self.providers)
+    }
+}
+
+#[derive(Clone, Debug)]
 pub enum TypeKind {
     Opaque,
-    Fn(Vec<Type>, Box<Type>),
-    Rec(HashMap<String, Type>),
-    Array(Box<Type>),
-    Tuple(Vec<Type>),
+    Fn(Vec<ProvType>, Box<Type>),
+    Rec(HashMap<String, ProvType>),
+    Array(Box<ProvType>),
+    Tuple(Vec<ProvType>),
 }
 
 #[derive(Clone, Debug)]
@@ -92,27 +122,27 @@ impl Display for Type {
 impl TypeKind {
     pub fn replace(&mut self, var: &str, set: &Set) {
         match self {
-            TypeKind::Array(ty) => {
-                ty.replace(var, set);
+            TypeKind::Array(pty) => {
+                pty.ty.replace(var, set);
             }
 
             TypeKind::Fn(params, rty) => {
                 for param in params {
-                    param.replace(var, set);
+                    param.ty.replace(var, set);
                 }
 
                 rty.replace(var, set);
             }
 
             TypeKind::Rec(fields) => {
-                for ty in fields.values_mut() {
-                    ty.replace(var, set);
+                for pty in fields.values_mut() {
+                    pty.ty.replace(var, set);
                 }
             }
 
             TypeKind::Tuple(elements) => {
                 for e in elements {
-                    e.replace(var, set);
+                    e.ty.replace(var, set);
                 }
             }
 
@@ -144,7 +174,7 @@ impl Type {
     }
 
     pub fn fun(n: usize) -> Self {
-        let args = (0..n).map(|_| Type::opaque()).collect();
+        let args = (0..n).map(|_| ProvType::default()).collect();
 
         Self {
             kind: TypeKind::Fn(args, Box::new(Type::opaque())),
@@ -156,7 +186,7 @@ impl Type {
         }
     }
 
-    pub fn record(fields: HashMap<String, Type>) -> Self {
+    pub fn record(fields: HashMap<String, ProvType>) -> Self {
         Self {
             kind: TypeKind::Rec(fields),
             binder: vec![],
@@ -172,7 +202,7 @@ impl Type {
             (TypeKind::Opaque, TypeKind::Opaque) => true,
             (TypeKind::Fn(ps1, r1), TypeKind::Fn(ps2, r2)) => {
                 for (p1, p2) in ps1.iter().zip(ps2.iter()) {
-                    if !p1.satisfies(scx, p2) {
+                    if !p1.ty.satisfies(scx, &p2.ty) {
                         return false;
                     }
                 }
@@ -182,10 +212,10 @@ impl Type {
 
             (TypeKind::Rec(f1), TypeKind::Rec(f2)) => {
                 // It's NOT okay for fields in 'f2' to be absent from 'f1'
-                for (field, ty2) in f2 {
+                for (field, pty2) in f2 {
                     match f1.get(field) {
-                        Some(ty1) => {
-                            if !ty1.satisfies(scx, ty2) {
+                        Some(pty1) => {
+                            if !pty1.ty.satisfies(scx, &pty2.ty) {
                                 return false;
                             }
                         }

@@ -2,9 +2,12 @@
 
 mod cx;
 
-use coenobita_middle::ty::{PassError, SetVar, Type, TypeKind};
-use coenobita_parse::PassTarget;
+use coenobita_middle::ty::{PassError, ProvType, SetVar, Type, TypeKind};
+
+use coenobita_parse::parse::CoenobitaParser;
+use coenobita_parse::{Field, Input, Other};
 use rustc_abi::{VariantIdx, FIRST_VARIANT};
+use rustc_errors::PResult;
 use rustc_hir::FnRetTy;
 
 use std::collections::{BTreeSet, HashMap, VecDeque};
@@ -46,7 +49,7 @@ use log::{debug, warn};
 pub type Result<T = ()> = std::result::Result<T, ErrorGuaranteed>;
 type Bound = (String, Set);
 
-use coenobita_parse::{create_parser, create_psess, parse::Parse, Pass, Take};
+use coenobita_parse::{create_parser, create_psess, parse::Parse, Param};
 
 use crate::cx::InfCtx;
 
@@ -81,9 +84,15 @@ impl<K: Hash + Eq, V> Ctx<K, V> {
 
 pub struct Checker<'tcx> {
     tcx: TyCtxt<'tcx>,
-    take_attr: Vec<Symbol>,
-    pass_attr: Vec<Symbol>,
 
+    param_attr: Vec<Symbol>,
+    input_attr: Vec<Symbol>,
+    output_attr: Vec<Symbol>,
+    field_attr: Vec<Symbol>,
+    local_attr: Vec<Symbol>,
+
+    // take_attr: Vec<Symbol>,
+    // pass_attr: Vec<Symbol>,
     scx: SetCtx,
 
     str_to_hir: HashMap<String, HirId>,
@@ -103,8 +112,13 @@ impl<'tcx> Checker<'tcx> {
     pub fn new(crate_name: String, tcx: TyCtxt<'tcx>) -> Self {
         Checker {
             tcx,
-            take_attr: vec![Symbol::intern("coenobita"), Symbol::intern("take")],
-            pass_attr: vec![Symbol::intern("coenobita"), Symbol::intern("pass")],
+
+            param_attr: vec![Symbol::intern("coenobita"), Symbol::intern("parameter")],
+            output_attr: vec![Symbol::intern("coenobita"), Symbol::intern("output")],
+            input_attr: vec![Symbol::intern("coenobita"), Symbol::intern("input")],
+            local_attr: vec![Symbol::intern("coenobita"), Symbol::intern("local")],
+            field_attr: vec![Symbol::intern("coenobita"), Symbol::intern("field")],
+
             scx: SetCtx::new(),
 
             str_to_hir: HashMap::new(),
@@ -134,6 +148,10 @@ impl<'tcx> Checker<'tcx> {
         Ok(())
     }
 
+    fn origin(&self) -> Set {
+        todo!()
+    }
+
     fn check_item_fn(&mut self, sig: &FnSig, body_id: BodyId) -> Result {
         let def_id = body_id.hir_id.owner.to_def_id();
         let local_def_id = def_id.as_local().unwrap();
@@ -145,26 +163,26 @@ impl<'tcx> Checker<'tcx> {
         let mut var_to_idx = HashMap::new();
 
         // Collect all set variables introduced by this function
-        for attr in self.tcx.get_attrs_by_path(def_id, &self.take_attr) {
-            let Take { right, bound, left } = self.parse_attr_take(attr)?;
+        for attr in self.tcx.get_attrs_by_path(def_id, &self.param_attr) {
+            let Param { right, bound, left } = self.parse_param(attr)?;
 
             // Make sure this variable hasn't been introduced yet
-            if let Some(bound) = self.scx.get(&left.0) {
+            if let Some(bound) = self.scx.get(&left.value) {
                 return Err(self.tcx.dcx().span_err(
-                    left.1,
+                    left.span,
                     format!("variable already introduced with upper bound {bound}"),
                 ));
             }
 
             // Make sure all variables in the bound exist
-            self.ensure_variables_exist(&bound, &right)?;
+            self.ensure_variables_exist(&bound.value, &right)?;
 
             // Add upper bound to set variable context
-            self.scx.set(left.0.clone(), bound.clone());
+            self.scx.set(left.value.clone(), bound.value.clone());
 
             // Add set variable to binder
-            binder.push(SetVar::new(left.0.clone(), bound));
-            var_to_idx.insert(left.0, binder.len() - 1);
+            binder.push(SetVar::new(left.value.clone(), bound.value));
+            var_to_idx.insert(left.value, binder.len() - 1);
         }
 
         let mut params = Vec::new();
@@ -176,7 +194,7 @@ impl<'tcx> Checker<'tcx> {
             let raw = self.tcx.typeck(local_def_id).node_type(param.hir_id);
             let ty = self.get_constr_for_ty(&raw);
 
-            params.push(ty.clone());
+            params.push(ProvType::new(ty.clone()));
         }
 
         let fn_sig = self.tcx.fn_sig(def_id).skip_binder();
@@ -184,20 +202,37 @@ impl<'tcx> Checker<'tcx> {
 
         let mut rty = self.get_constr_for_ty(&return_ty.skip_binder());
 
-        // Collect all set applications
-        for attr in self.tcx.get_attrs_by_path(def_id, &self.pass_attr) {
-            let pass = self.parse_pass(attr)?;
+        // Collect all input annotations
+        for attr in self.tcx.get_attrs_by_path(def_id, &self.input_attr) {
+            let Input {
+                index,
+                integrity,
+                providers,
+                variables,
+            } = self.parse_input(attr)?;
 
-            match pass.left.0 {
-                PassTarget::Argument(index) => self.pass(&mut params[index], pass)?,
-                PassTarget::Return => self.pass(&mut rty, pass)?,
-                PassTarget::Infer => warn!("Set pass with inferred target has no effect on function items"),
+            for ss in integrity {
+                self.pass(&mut params[index.value].ty, index.span, ss.value, &variables)?;
+
+                // TODO: Consider provider tracking more carefully
+                self.ensure_variables_exist(&providers.value, &variables)?;
+                params[index.value].providers = providers.value.clone();
+            }
+        }
+
+        // TODO: Only collect one output annotation
+        for attr in self.tcx.get_attrs_by_path(def_id, &self.output_attr) {
+            let Other { integrity, variables } = self.parse_output(attr)?;
+
+            for (i, ss) in integrity.iter().enumerate() {
+                self.ensure_variables_exist(&ss.value, &variables)?;
+                rty.intrinsic[i] = ss.value.clone();
             }
         }
 
         // Now that all the parameter types have their integrity triples filled, process the patterns
         for (i, param) in body.params.iter().enumerate() {
-            self.process_pattern(param.pat.kind, params[i].clone(), param.pat.hir_id);
+            self.process_pattern(param.pat.kind, params[i].ty.clone(), param.pat.hir_id);
         }
 
         self.check_expr(&body.value, Some(&rty), false)?;
@@ -385,11 +420,11 @@ impl<'tcx> Checker<'tcx> {
         }
     }
 
-    fn pass(&self, ty: &mut Type, pass: Pass) -> Result {
-        let Pass { left, set, right } = pass;
-        let span = left.1;
+    fn pass(&self, ty: &mut Type, span: Span, set: Set, variables: &HashMap<String, Span>) -> Result {
+        // let Pass { left, set, right } = pass;
+        // let span = left.1;
 
-        self.ensure_variables_exist(&set, &right)?;
+        self.ensure_variables_exist(&set, variables)?;
 
         if let Err(e) = ty.pass(&self.scx, set.clone()) {
             match e {
@@ -417,14 +452,26 @@ impl<'tcx> Checker<'tcx> {
 
         // Collect all 'pass' attributes on every field
         for field in field_defs {
-            let mut ty = Type::opaque();
+            let mut pty = ProvType::default();
 
-            for attr in self.tcx.get_attrs_by_path(field.did, &self.pass_attr) {
-                let pass = self.parse_pass(attr)?;
-                self.pass(&mut ty, pass)?;
+            for attr in self.tcx.get_attrs_by_path(field.did, &self.field_attr) {
+                let Field {
+                    integrity,
+                    providers,
+                    variables,
+                } = self.parse_field(attr)?;
+
+                for (i, ss) in integrity.iter().enumerate() {
+                    self.ensure_variables_exist(&ss.value, &variables)?;
+
+                    pty.ty.intrinsic[i] = ss.value.clone();
+                }
+
+                self.ensure_variables_exist(&providers.value, &variables)?;
+                pty.providers = providers.value.clone();
             }
 
-            fields.insert(field.name.to_string(), ty);
+            fields.insert(field.name.to_string(), pty);
         }
 
         self.items.insert(def_id, Type::record(fields));
@@ -691,11 +738,15 @@ impl<'tcx> Checker<'tcx> {
                     warn!("arg ct doesnt match up");
                 }
 
+                let mut atys = Vec::new();
+
                 for (expected, expr) in arg_tys.into_iter().zip(args) {
                     let actual = self.check_expr(expr, None, false)?;
 
+                    atys.push(actual.clone());
+
                     for i in 0..3 {
-                        if let Set::Variable(v) = expected.intrinsic[i].clone() {
+                        if let Set::Variable(v) = expected.ty.intrinsic[i].clone() {
                             // This set is a variable that needs to be replaced... which one is it?
                             let index = fty.var_to_idx[&v];
 
@@ -720,15 +771,40 @@ impl<'tcx> Checker<'tcx> {
                     }
                 }
 
-                let TypeKind::Fn(args, rty) = fty.kind.clone() else {
+                let TypeKind::Fn(arg_tys, rty) = fty.kind.clone() else {
                     unreachable!()
                 };
+
+                for i in 0..args.len() {
+                    let expr = &args[i];
+                    let actual = &atys[i];
+                    let expected = &arg_tys[i];
+
+                    if !actual.satisfies(&self.scx, &expected.ty) {
+                        let msg = format!("expected {} but found {}", expected, actual);
+
+                        return Err(self.tcx.dcx().span_err(expr.span, msg));
+                    }
+
+                    // TODO: Construct this set once and access via helper method
+                    if !Set::Concrete(BTreeSet::from([self.crate_name.clone()]))
+                        .subset(&self.scx, &expected.providers)
+                    {
+                        let msg = format!(
+                            "origin {} absent from set of valid providers {}",
+                            self.crate_name, expected.providers
+                        );
+
+                        return Err(self.tcx.dcx().span_err(expr.span, msg));
+                    }
+                }
+
                 *rty
             }
 
             TypeKind::Rec(elements) => {
                 for (i, arg) in args.iter().enumerate() {
-                    let ty = elements[&i.to_string()].clone();
+                    let ty = elements[&i.to_string()].clone().ty;
                     self.check_expr(arg, Some(&ty), false)?;
                 }
 
@@ -794,8 +870,8 @@ impl<'tcx> Checker<'tcx> {
                         }
 
                         let args = std::iter::once(receiver).chain(args.iter());
-                        for (ty, expr) in arg_tys.into_iter().zip(args) {
-                            self.check_expr(expr, Some(&ty), false)?;
+                        for (pty, expr) in arg_tys.into_iter().zip(args) {
+                            self.check_expr(expr, Some(&pty.ty), false)?;
                         }
 
                         Ok(*ret_ty)
@@ -926,7 +1002,7 @@ impl<'tcx> Checker<'tcx> {
         match &ty.kind {
             TypeKind::Rec(tys) => {
                 for field in fields {
-                    let ty = tys[&field.ident.to_string()].clone();
+                    let ty = tys[&field.ident.to_string()].clone().ty;
                     self.check_expr(field.expr, Some(&ty), false)?;
                 }
             }
@@ -953,7 +1029,7 @@ impl<'tcx> Checker<'tcx> {
             item = self.join(vec![item, pending]);
         }
 
-        result.kind = TypeKind::Array(Box::new(item));
+        result.kind = TypeKind::Array(Box::new(ProvType::new(item)));
 
         Ok(result)
     }
@@ -965,7 +1041,8 @@ impl<'tcx> Checker<'tcx> {
         let mut items = vec![];
 
         for expr in exprs {
-            items.push(self.check_expr(expr, None, false)?);
+            let pty = ProvType::new(self.check_expr(expr, None, false)?);
+            items.push(pty);
         }
 
         result.kind = TypeKind::Tuple(items);
@@ -994,7 +1071,7 @@ impl<'tcx> Checker<'tcx> {
                     self.tcx.dcx().span_err(field.span, msg);
                     Ok(self.top_type())
                 } else {
-                    Ok(field_map[&field.to_string()].clone())
+                    Ok(field_map[&field.to_string()].clone().ty)
                 }
             }
 
@@ -1006,7 +1083,7 @@ impl<'tcx> Checker<'tcx> {
                     self.tcx.dcx().span_err(field.span, msg);
                     Ok(self.top_type())
                 } else {
-                    Ok(fields[index].clone())
+                    Ok(fields[index].clone().ty)
                 }
             }
 
@@ -1055,35 +1132,33 @@ impl<'tcx> Checker<'tcx> {
         //     self.process_pattern(local.pat.kind, self.top_type(), local.pat.hir_id);
         // }
 
-        let mut idx = 0;
-
+        // TODO: Only collect one such attribute
         for attr in self.tcx.hir().attrs(local.hir_id) {
-            if attr.path_matches(&self.pass_attr) {
-                let Pass { left, set, right } = self.parse_pass(attr)?;
+            if attr.path_matches(&self.local_attr) {
+                let Other { integrity, variables } = self.parse_local(attr)?;
 
-                self.ensure_variables_exist(&set, &right)?;
+                println!(
+                    "Comparing left ({:?}) to right ({:?})",
+                    integrity.iter().clone().map(|ss| ss.value.clone()).join(" "),
+                    ty.intrinsic
+                );
 
-                if idx > 2 {
-                    return Err(self.tcx.dcx().span_err(left.1, format!("unexpected pass")));
+                for (i, ss) in integrity.iter().enumerate() {
+                    self.ensure_variables_exist(&ss.value, &variables)?;
+
+                    if !ty.intrinsic[i].subset(&self.scx, &ss.value) {
+                        let msg = format!(
+                            "value has incompatible integrity {} since {} ⊈ {}",
+                            ty.intrinsic.iter().join(" "),
+                            ty.intrinsic[i],
+                            ss.value
+                        );
+
+                        return Err(self.tcx.dcx().span_err(local.init.unwrap().span, msg));
+                    }
+
+                    ty.intrinsic[i] = ss.value.clone();
                 }
-
-                ty.intrinsic[idx] = set;
-                idx += 1;
-
-                // if let Err(e) = ty.pass(&self.scx, set.clone()) {
-                //     match e {
-                //         PassError::BoundMismatch(bound) => {
-                //             return Err(self
-                //                 .tcx
-                //                 .dcx()
-                //                 .span_err(left.1, format!("set {set} is not a subset of {bound}")))
-                //         }
-
-                //         PassError::Unexpected => {
-                //             return Err(self.tcx.dcx().span_err(left.1, format!("unexpected pass")))
-                //         }
-                //     }
-                // }
             }
         }
 
@@ -1092,7 +1167,10 @@ impl<'tcx> Checker<'tcx> {
         Ok(())
     }
 
-    fn parse_attr_take(&self, attr: &Attribute) -> Result<Take> {
+    fn parse<T, F>(&self, attr: &Attribute, p: F) -> Result<T>
+    where
+        F: for<'a> Fn(&'a mut CoenobitaParser<'a>) -> PResult<'a, T>,
+    {
         let AttrKind::Normal(normal) = &attr.kind else {
             unreachable!()
         };
@@ -1102,44 +1180,33 @@ impl<'tcx> Checker<'tcx> {
         if let AttrArgs::Delimited(delim_args) = normal.args.clone() {
             let mut parser = create_parser(&psess, delim_args.tokens);
 
-            parser
-                .parse_take()
-                .map_err(|err| self.tcx.dcx().span_err(err.span.clone(), "failed to parse"))
+            p(&mut parser).map_err(|err| self.tcx.dcx().span_err(err.span.clone(), "failed to parse"))
         } else {
             panic!()
         }
     }
 
-    fn parse_pass(&self, attr: &Attribute) -> Result<Pass> {
-        let AttrKind::Normal(normal) = &attr.kind else {
-            unreachable!()
-        };
+    fn parse_field(&self, attr: &Attribute) -> Result<Field> {
+        self.parse(attr, |parser| parser.parse_field())
+    }
 
-        let psess = create_psess(&self.tcx);
+    fn parse_input(&self, attr: &Attribute) -> Result<Input> {
+        self.parse(attr, |parser| parser.parse_input())
+    }
 
-        if let AttrArgs::Delimited(delim_args) = normal.args.clone() {
-            let mut parser = create_parser(&psess, delim_args.tokens);
+    fn parse_local(&self, attr: &Attribute) -> Result<Other> {
+        self.parse(attr, |parser| parser.parse_local())
+    }
 
-            parser
-                .parse_pass()
-                .map_err(|err| self.tcx.dcx().span_err(err.span.clone(), "failed to parse"))
-        } else {
-            panic!()
-        }
+    fn parse_output(&self, attr: &Attribute) -> Result<Other> {
+        self.parse(attr, |parser| parser.parse_output())
+    }
+
+    fn parse_param(&self, attr: &Attribute) -> Result<Param> {
+        self.parse(attr, |parser| parser.parse_param())
     }
 
     // ======== PATTERNS ======== //
-
-    // fn process_pattern(&mut self, pat_kind: PatKind, ty: Type) {
-    //     match pat_kind {
-    //         PatKind::Binding(_, hir_id, ident, _) => {
-    //             self.str_to_hir.insert(ident.to_string(), hir_id);
-    //             self.hir_to_ty.insert(hir_id, ty.clone());
-    //         }
-
-    //         _ => {}
-    //     };
-    // }
 
     fn process_pattern(&mut self, pat_kind: PatKind, ty: Type, hir_id: HirId) {
         self.icx.enter(&ty.intrinsic[2]);
@@ -1179,8 +1246,8 @@ impl<'tcx> Checker<'tcx> {
 
             PatKind::Tuple(pats, _) => match ty.kind {
                 TypeKind::Tuple(elements) => {
-                    for (pat, ty) in pats.iter().zip(elements) {
-                        self.process_pattern(pat.kind, ty, pat.hir_id);
+                    for (pat, pty) in pats.iter().zip(elements) {
+                        self.process_pattern(pat.kind, pty.ty, pat.hir_id);
                     }
                 }
 
@@ -1239,7 +1306,7 @@ impl<'tcx> Checker<'tcx> {
             Ok(ty) => match &ty.kind {
                 TypeKind::Rec(map) => {
                     for field in fields {
-                        let ty = self.extract(&map[&field.ident.to_string()], &ty);
+                        let ty = self.extract(&map[&field.ident.to_string()].ty, &ty);
                         self.process_pattern(field.pat.kind, ty, field.pat.hir_id);
                     }
                 }
