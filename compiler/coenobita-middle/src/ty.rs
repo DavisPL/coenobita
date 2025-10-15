@@ -1,174 +1,270 @@
-use std::{collections::HashMap, fmt::Display};
-
-use crate::flow::FlowPair;
-use crate::origin::OriginSet;
-use crate::property::Property;
 use itertools::Itertools;
 
-use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::fmt::Display;
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Ty<P: Property> {
-    pub property: P,
+use crate::set::{Set, SetCtx};
 
-    pub kind: TyKind<P>,
+#[derive(Debug)]
+pub enum PassError {
+    /// The provided set is not a subset of the known upper bound.
+    BoundMismatch(Set),
+
+    /// No set was expected.
+    Unexpected,
 }
 
-impl<'a, P: Property> Ty<P> {
-    pub fn new(property: P, kind: TyKind<P>) -> Self {
-        Ty { property, kind }
+#[derive(Clone, Debug)]
+pub struct ProvType {
+    pub ty: Type,
+    pub providers: Set,
+}
+
+impl ProvType {
+    pub fn new(ty: Type) -> Self {
+        ProvType {
+            ty: ty,
+            providers: Set::Universe,
+        }
     }
+}
 
-    pub fn kind(&self) -> TyKind<P> {
-        self.kind.clone()
+impl Default for ProvType {
+    fn default() -> Self {
+        ProvType {
+            ty: Type::opaque(),
+            providers: Set::Universe,
+        }
     }
+}
 
-    pub fn ty_fn(n: usize) -> Self {
-        let property = P::default();
-        let default_ty = Ty::new(property.clone(), TyKind::Infer);
-
-        let args = vec![default_ty.clone(); n];
-        let kind = TyKind::Fn(None, args, Box::new(default_ty));
-
-        Ty { property, kind }
+impl Display for ProvType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} | {}", self.ty, self.providers)
     }
+}
 
-    pub fn satisfies(&self, other: &Ty<P>) -> bool {
-        let s = self.property.satisfies(&other.property);
+#[derive(Clone, Debug)]
+pub enum TypeKind {
+    Opaque,
+    Fn(Vec<ProvType>, Box<Type>),
+    Rec(HashMap<String, ProvType>),
+    Array(Box<ProvType>),
+    Tuple(Vec<ProvType>),
+}
 
-        s && match (self.kind(), other.kind()) {
-            // TODO: `Abs` should really be `Infer`
-            (_, TyKind::Opaque) => true,
-            (_, TyKind::Infer) => true,
-            (TyKind::Adt(f1), TyKind::Adt(f2)) => {
-                if f1.len() != f2.len() {
-                    false
+#[derive(Clone, Debug)]
+pub struct SetVar {
+    pub ident: String,
+    pub value: Option<Set>,
+    pub bound: Set,
+}
+
+impl SetVar {
+    pub fn new(ident: String, bound: Set) -> Self {
+        Self {
+            ident,
+            value: None,
+            bound,
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct Type {
+    pub kind: TypeKind,
+    pub binder: Vec<SetVar>,
+    pub var_to_idx: HashMap<String, usize>,
+    pub binder_idx: usize,
+    pub intrinsic: [Set; 3],
+    pub intrinsic_idx: usize,
+}
+
+impl Display for Type {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self.kind {
+            TypeKind::Rec(fields) => {
+                write!(
+                    f,
+                    "{{ {} }} {}",
+                    fields.iter().map(|(k, v)| format!("{k} : {v}")).join(", "),
+                    self.intrinsic.iter().join(" ")
+                )
+            }
+
+            TypeKind::Fn(params, rty) => {
+                let params = params.iter().join(", ");
+
+                if self.binder.len() > 0 {
+                    let set_vars = self
+                        .binder
+                        .iter()
+                        .map(|sv| format!("{} ⊆ {}", sv.ident, sv.bound))
+                        .join(", ");
+
+                    write!(
+                        f,
+                        "fn[{set_vars}]({params}) (→ {}) {rty}",
+                        self.intrinsic.iter().join(" ")
+                    )
                 } else {
-                    for (field, ty) in f1 {
-                        if !f2.contains_key(&field) || !ty.satisfies(&f2[&field]) {
-                            return false;
-                        }
-                    }
-
-                    true
+                    write!(f, "fn({params}) (→ {}) {rty}", self.intrinsic.iter().join(" "))
                 }
             }
-            (TyKind::Array(t1), TyKind::Array(t2)) => t1.satisfies(&t2),
-            (TyKind::Fn(_, as1, r1), TyKind::Fn(_, as2, r2)) => {
-                // TODO: Subtyping should be contravariant for argument types!
-                if as1.len() != as2.len() {
-                    return false;
-                } else {
-                    for (a1, a2) in as1.iter().zip(as2) {
-                        if !a1.satisfies(&a2) {
-                            return false;
-                        }
-                    }
+
+            // TODO: Implement proper printing for every kind
+            _ => write!(f, "{}", self.intrinsic.iter().join(" ")),
+        }
+    }
+}
+
+impl TypeKind {
+    pub fn replace(&mut self, var: &str, set: &Set) {
+        match self {
+            TypeKind::Array(pty) => {
+                pty.ty.replace(var, set);
+            }
+
+            TypeKind::Fn(params, rty) => {
+                for param in params {
+                    param.ty.replace(var, set);
                 }
 
-                r1.satisfies(&r2)
+                rty.replace(var, set);
             }
-            (TyKind::Tuple(items1), TyKind::Tuple(items2)) => {
-                for (i1, i2) in items1.iter().zip(items2) {
-                    if !i1.satisfies(&i2) {
+
+            TypeKind::Rec(fields) => {
+                for pty in fields.values_mut() {
+                    pty.ty.replace(var, set);
+                }
+            }
+
+            TypeKind::Tuple(elements) => {
+                for e in elements {
+                    e.ty.replace(var, set);
+                }
+            }
+
+            _ => {}
+        }
+    }
+}
+
+impl Type {
+    pub fn opaque() -> Self {
+        Self {
+            kind: TypeKind::Opaque,
+            binder: vec![],
+            binder_idx: 0,
+            var_to_idx: HashMap::new(),
+            intrinsic: [Set::Universe, Set::Universe, Set::Universe],
+            intrinsic_idx: 0,
+        }
+    }
+
+    pub fn replace(&mut self, var: &str, set: &Set) {
+        self.kind.replace(var, set);
+
+        for i in 0..3 {
+            self.intrinsic[i] = self.intrinsic[i].replace(var, set)
+        }
+    }
+
+    pub fn fun(n: usize) -> Self {
+        let args = (0..n).map(|_| ProvType::default()).collect();
+
+        Self {
+            kind: TypeKind::Fn(args, Box::new(Type::opaque())),
+            binder: vec![],
+            binder_idx: 0,
+            var_to_idx: HashMap::new(),
+            intrinsic: [Set::Universe, Set::Universe, Set::Universe],
+            intrinsic_idx: 0,
+        }
+    }
+
+    pub fn record(fields: HashMap<String, ProvType>) -> Self {
+        Self {
+            kind: TypeKind::Rec(fields),
+            binder: vec![],
+            binder_idx: 0,
+            var_to_idx: HashMap::new(),
+            intrinsic: [Set::Universe, Set::Universe, Set::Universe],
+            intrinsic_idx: 0,
+        }
+    }
+
+    pub fn satisfies(&self, scx: &SetCtx, other: &Type) -> bool {
+        let kind = match (&self.kind, &other.kind) {
+            (TypeKind::Opaque, TypeKind::Opaque) => true,
+            (TypeKind::Fn(ps1, r1), TypeKind::Fn(ps2, r2)) => {
+                for (p1, p2) in ps1.iter().zip(ps2.iter()) {
+                    if !p1.ty.satisfies(scx, &p2.ty) {
                         return false;
+                    }
+                }
+
+                r2.satisfies(scx, &r1)
+            }
+
+            (TypeKind::Rec(f1), TypeKind::Rec(f2)) => {
+                // It's NOT okay for fields in 'f2' to be absent from 'f1'
+                for (field, pty2) in f2 {
+                    match f1.get(field) {
+                        Some(pty1) => {
+                            if !pty1.ty.satisfies(scx, &pty2.ty) {
+                                return false;
+                            }
+                        }
+
+                        None => return false,
                     }
                 }
 
                 true
             }
+
+            // TODO: Handle comparison between other types
             _ => false,
-        }
-    }
+        };
 
-    pub fn merge(&self, other: Self) -> Self {
-        let property = self.property.merge(other.property);
-        Self {
-            property,
-            kind: self.kind(),
-        }
-    }
-
-    pub fn influence(&self, mut other: Self) -> Self {
-        other.property = self.property.influence(other.property);
-        other
-    }
-}
-
-impl Ty<FlowPair> {
-    pub fn with_explicit(mut self, explicit: OriginSet) -> Self {
-        self.property.explicit = explicit;
-        self
-    }
-
-    pub fn ty_adt(n: usize) -> Ty<FlowPair> {
-        let default_flow_pair = FlowPair::new(OriginSet::Universal, OriginSet::Universal);
-        let default_ty = Ty::new(default_flow_pair.clone(), TyKind::Infer);
-
-        let args = vec![default_ty.clone(); n]; // Create `n` copies of `default_ty`
-        let mut map = HashMap::new();
-
-        for (i, arg) in (0..n).zip(args) {
-            map.insert(i.to_string(), arg);
+        if !kind {
+            return false;
         }
 
-        Ty {
-            property: default_flow_pair,
-            kind: TyKind::Adt(map),
+        for (s1, s2) in self.intrinsic.iter().zip(other.intrinsic.iter()) {
+            if !s1.subset(scx, s2) {
+                return false;
+            }
         }
+
+        true
     }
-}
 
-impl<P: Property> Display for Ty<P> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}{}", self.property, self.kind)
-    }
-}
+    /// Replace variable `var` with `val` in every type this one contains, recursively, as long as `val` satisfies the bound on the outermost binder
+    /// Return error if variable passed when binder is empty
+    pub fn pass(&mut self, scx: &SetCtx, val: Set) -> std::result::Result<(), PassError> {
+        if self.binder_idx < self.binder.len() {
+            let slot = self.binder[self.binder_idx].clone();
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub enum TyKind<P: Property> {
-    Opaque,
-    Fn(Option<Box<Ty<P>>>, Vec<Ty<P>>, Box<Ty<P>>),
-    Tuple(Vec<Ty<P>>),
-    Array(Box<Ty<P>>),
-    Adt(HashMap<String, Ty<P>>),
-    Infer,
-}
-
-impl<P: Property> Display for TyKind<P> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Fn(tup_ty, arg_tys, ret_ty) => {
-                let args = arg_tys.iter().map(|ty| ty.to_string()).sorted().join(",");
-                let tup_ty = tup_ty.clone().map_or(String::from(""), |ty| ty.to_string());
-
-                write!(f, " fn {tup_ty}({args}) -> {}", ret_ty)
+            if !val.subset(scx, &slot.bound) {
+                return Err(PassError::BoundMismatch(slot.bound.clone()));
             }
 
-            Self::Tuple(item_tys) => {
-                let items = item_tys
-                    .iter()
-                    .map(|ty| ty.to_string())
-                    .collect::<Vec<_>>()
-                    .join(",");
-                write!(f, " ({})", items)
-            }
+            self.binder[self.binder_idx].value = Some(val.clone());
+            self.binder_idx += 1;
 
-            Self::Array(item_ty) => write!(f, " [{}]", item_ty),
+            self.kind.replace(&slot.ident, &val);
 
-            Self::Adt(field_tys) => {
-                let fields = field_tys
-                    .iter()
-                    .sorted_by_key(|&(key, _)| key)
-                    .map(|(key, value)| format!("{key}:{value}"))
-                    .collect::<Vec<_>>()
-                    .join(",");
-
-                write!(f, " struct {{{fields}}}")
-            }
-
-            Self::Opaque => write!(f, ""),
-            Self::Infer => write!(f, ""),
+            return Ok(());
         }
+
+        if self.intrinsic_idx == 3 {
+            return Err(PassError::Unexpected);
+        }
+
+        self.intrinsic[self.intrinsic_idx] = val;
+        self.intrinsic_idx += 1;
+        Ok(())
     }
 }

@@ -1,5 +1,4 @@
-use coenobita_check::{Check, Checker};
-use coenobita_middle::{flow::FlowPair, provenance::ProvenancePair};
+use coenobita_check::Checker;
 use rustc_driver::{Callbacks, Compilation};
 use rustc_hir::{intravisit::Visitor, Item};
 use rustc_middle::{hir::nested_filter::OnlyBodies, ty::TyCtxt};
@@ -18,7 +17,7 @@ impl CoenobitaCallbacks {
     }
 }
 
-const SKIP: [&str; 4] = ["trybuild", "syn", "quote", "proc_macro2"];
+const SKIP: [&str; 5] = ["trybuild", "syn", "quote", "proc_macro2", "libc"];
 
 impl Callbacks for CoenobitaCallbacks {
     fn after_analysis<'tcx>(
@@ -45,8 +44,7 @@ impl Callbacks for CoenobitaCallbacks {
 struct CoenobitaVisitor<'cnbt, 'tcx> {
     crate_name: &'cnbt str,
     tcx: TyCtxt<'tcx>,
-    ichecker: Checker<'tcx, FlowPair>,
-    pchecker: Checker<'tcx, ProvenancePair>,
+    checker: Checker<'tcx>,
 }
 
 impl<'c, 'tcx> CoenobitaVisitor<'c, 'tcx> {
@@ -55,8 +53,7 @@ impl<'c, 'tcx> CoenobitaVisitor<'c, 'tcx> {
         CoenobitaVisitor {
             crate_name,
             tcx,
-            ichecker: Checker::new(crate_name.to_owned(), tcx),
-            pchecker: Checker::new(crate_name.to_string(), tcx),
+            checker: Checker::new(crate_name.to_owned(), tcx),
         }
     }
 }
@@ -70,9 +67,6 @@ impl<'c, 'tcx> Visitor<'tcx> for CoenobitaVisitor<'c, 'tcx> {
 
     fn visit_item(&mut self, item: &'tcx Item<'tcx>) -> Self::Result {
         // Check integrity
-        // let _ = self.ichecker.check_item(item);
-
-        // Check provenance
-        let _ = self.pchecker.check_item(item);
+        let _ = self.checker.check_item(item);
     }
 }

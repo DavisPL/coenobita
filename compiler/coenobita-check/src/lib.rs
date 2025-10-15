@@ -14,126 +14,225 @@ extern crate rustc_span;
 extern crate rustc_target;
 extern crate rustc_trait_selection;
 
-use std::collections::HashMap;
-use std::fs;
-use std::path::Path;
+mod cx;
 
-use clippy_utils::ty::implements_trait_with_env_from_iter;
-use coenobita_ast::TyAST;
-use coenobita_middle::property::Property;
-use coenobita_middle::ty::{Ty, TyKind};
+use crate::cx::{Ctx, InfCtx};
+
+use coenobita_middle::set::{Set, SetCtx};
+use coenobita_middle::ty::{PassError, ProvType, SetVar, Type, TypeKind};
+use coenobita_parse::parse::CoenobitaParser;
+use coenobita_parse::{create_parser, create_psess, Param};
+use coenobita_parse::{Field, Input, Other};
+
+use std::collections::{BTreeSet, HashMap};
+
+use itertools::Itertools;
+use log::{debug, warn};
+
 use rustc_abi::{VariantIdx, FIRST_VARIANT};
-
-use coenobita_parse::{create_parser, create_psess, parse::Parse};
-use expectation::Expectation;
-
-use rustc_hir::{AttrArgs, AttrKind, Attribute};
-
+use rustc_errors::PResult;
 use rustc_hir::def::{CtorOf, DefKind, Res};
 use rustc_hir::def_id::DefId;
 use rustc_hir::{
-    Arm, Block, BodyId, Closure, Expr, ExprField, ExprKind, FnSig, HirId, Impl, ImplItem, ImplItemKind, Item,
-    ItemKind, LangItem, LetExpr, LetStmt, MatchSource, PatField, PatKind, QPath, Stmt, StmtKind,
+    Arm, AttrArgs, AttrKind, Attribute, Block, BodyId, Closure, Expr, ExprField, ExprKind, FnSig, HirId,
+    Item, ItemKind, LangItem, LetExpr, LetStmt, MatchSource, PatField, PatKind, QPath, Stmt, StmtKind,
 };
-
-use rustc_middle::ty::{self, FieldDef, GenericArg, TyCtxt, TypeckResults, TypingEnv};
-use rustc_span::symbol::Ident;
-use rustc_span::{ErrorGuaranteed, Span, Symbol};
-
-use log::{debug, warn};
-use serde::de::DeserializeOwned;
-use serde::{Deserialize, Serialize};
-
-mod expectation;
-mod shared;
+use rustc_middle::ty::{FieldDef, Ty, TyCtxt, TyKind};
+use rustc_span::{ErrorGuaranteed, Ident, Span, Symbol};
 
 pub type Result<T = ()> = std::result::Result<T, ErrorGuaranteed>;
 
-#[derive(Serialize, Deserialize)]
-pub struct TraitData {
-    name: String,
-    args: Vec<String>,
-    allowed: Vec<String>,
-    denied: Vec<String>,
+pub struct Checker<'tcx> {
+    tcx: TyCtxt<'tcx>,
+
+    param_attr: Vec<Symbol>,
+    input_attr: Vec<Symbol>,
+    output_attr: Vec<Symbol>,
+    field_attr: Vec<Symbol>,
+    local_attr: Vec<Symbol>,
+
+    scx: SetCtx,
+
+    str_to_hir: HashMap<String, HirId>,
+    hir_to_ty: HashMap<HirId, Type>,
+
+    items: HashMap<DefId, Type>,
+
+    vctx: Ctx<HirId, Type>,
+
+    icx: InfCtx,
+
+    crate_name: String,
 }
 
-pub trait Check<'tcx, P: Property + Parse> {
-    // ======== GETTERS ======== //
+impl<'tcx> Checker<'tcx> {
+    pub fn new(crate_name: String, tcx: TyCtxt<'tcx>) -> Self {
+        Checker {
+            tcx,
 
-    /// Return a shared reference to the intrinsic annotations.
-    fn get_type_intrinsics(&self) -> &HashMap<String, Ty<P>>;
+            param_attr: vec![Symbol::intern("coenobita"), Symbol::intern("parameter")],
+            output_attr: vec![Symbol::intern("coenobita"), Symbol::intern("output")],
+            input_attr: vec![Symbol::intern("coenobita"), Symbol::intern("input")],
+            local_attr: vec![Symbol::intern("coenobita"), Symbol::intern("local")],
+            field_attr: vec![Symbol::intern("coenobita"), Symbol::intern("field")],
 
-    fn get_trait_intrinsics(&self) -> &Vec<TraitData>;
+            scx: SetCtx::new(),
 
-    /// Return a shared reference to the attribute we are seeking.
-    fn get_attr(&self) -> &[Symbol];
+            str_to_hir: HashMap::new(),
+            hir_to_ty: HashMap::new(),
 
-    /// Return an immutable reference to the global typing context.
-    fn get_tcx(&self) -> &TyCtxt<'tcx>;
+            items: HashMap::new(),
 
-    /// Return a mutable reference to the global typing context.
-    fn get_tcx_mut(&mut self) -> &mut TyCtxt<'tcx>;
+            vctx: Ctx::new(),
 
-    /// Return a shared reference to the item map.
-    fn get_items(&self) -> &HashMap<DefId, Ty<P>>;
+            icx: InfCtx::new(crate_name.clone()),
 
-    /// Return a mutable reference to the item map.
-    fn get_items_mut(&mut self) -> &mut HashMap<DefId, Ty<P>>;
+            crate_name,
+        }
+    }
 
-    /// Return a shared reference to the local map.
-    fn get_locals(&self) -> &HashMap<HirId, Ty<P>>;
+    // ======== NONLOCAL ITEMS ======== //
 
-    /// Return a mutable reference to the local map.
-    fn get_locals_mut(&mut self) -> &mut HashMap<HirId, Ty<P>>;
+    fn check_item_fn_nonlocal(&mut self, def_id: DefId) -> Result {
+        let n = self.tcx.fn_sig(def_id).skip_binder().inputs().iter().count();
 
-    fn get_crate_name_owned(&self) -> String;
+        let default = self.icx.influence(Type::fun(n));
 
-    // ======== CONTEXT ======== //
+        // TODO: Collect attributes
 
-    /// Enter the scope influenced by type `ty`.
-    fn enter_scope(&mut self, ty: &Ty<P>);
+        self.items.insert(def_id, default);
 
-    /// Exit the last entered (innermost) scope.
-    fn exit_scope(&mut self);
+        Ok(())
+    }
 
-    /// Influence the provided type given the current context.
-    fn influence(&self, ty: Ty<P>) -> Ty<P>;
+    fn check_item_fn(&mut self, _: &FnSig, body_id: BodyId) -> Result {
+        let def_id = body_id.hir_id.owner.to_def_id();
+        let local_def_id = def_id.as_local().unwrap();
 
-    /// Return the ⊥ type in this context.
-    fn ty_bottom(&self) -> Ty<P>;
+        // Enter a new scope in the set context
+        self.scx.enter();
 
-    /// Return the ⊤ type in this context.
-    fn ty_top(&self) -> Ty<P>;
+        let mut binder = Vec::new();
+        let mut var_to_idx = HashMap::new();
+
+        // Collect all set variables introduced by this function
+        for attr in self.tcx.get_attrs_by_path(def_id, &self.param_attr) {
+            let Param { right, bound, left } = self.parse_param(attr)?;
+
+            // Make sure this variable hasn't been introduced yet
+            if let Some(bound) = self.scx.get(&left.value) {
+                return Err(self.tcx.dcx().span_err(
+                    left.span,
+                    format!("variable already introduced with upper bound {bound}"),
+                ));
+            }
+
+            // Make sure all variables in the bound exist
+            self.ensure_variables_exist(&bound.value, &right)?;
+
+            // Add upper bound to set variable context
+            self.scx.set(left.value.clone(), bound.value.clone());
+
+            // Add set variable to binder
+            binder.push(SetVar::new(left.value.clone(), bound.value));
+            var_to_idx.insert(left.value, binder.len() - 1);
+        }
+
+        let mut params = Vec::new();
+
+        let body = self.tcx.hir_body(body_id);
+
+        // Get the type for every parameter
+        for param in body.params.iter() {
+            let raw = self.tcx.typeck(local_def_id).node_type(param.hir_id);
+            let ty = self.get_constr_for_ty(&raw);
+
+            params.push(ProvType::new(ty.clone()));
+        }
+
+        let fn_sig = self.tcx.fn_sig(def_id).skip_binder();
+        let return_ty = fn_sig.output();
+
+        let mut rty = self.get_constr_for_ty(&return_ty.skip_binder());
+
+        // Collect all input annotations
+        for attr in self.tcx.get_attrs_by_path(def_id, &self.input_attr) {
+            let Input {
+                index,
+                integrity,
+                providers,
+                variables,
+            } = self.parse_input(attr)?;
+
+            for ss in integrity {
+                self.pass(&mut params[index.value].ty, index.span, ss.value, &variables)?;
+
+                // TODO: Consider provider tracking more carefully
+                self.ensure_variables_exist(&providers.value, &variables)?;
+                params[index.value].providers = providers.value.clone();
+            }
+        }
+
+        // TODO: Only collect one output annotation
+        for attr in self.tcx.get_attrs_by_path(def_id, &self.output_attr) {
+            let Other { integrity, variables } = self.parse_output(attr)?;
+
+            for (i, ss) in integrity.iter().enumerate() {
+                self.ensure_variables_exist(&ss.value, &variables)?;
+                rty.intrinsic[i] = ss.value.clone();
+            }
+        }
+
+        // Now that all the parameter types have their integrity triples filled, process the patterns
+        for (i, param) in body.params.iter().enumerate() {
+            self.process_pattern(param.pat.kind, params[i].ty.clone(), param.pat.hir_id);
+        }
+
+        self.check_expr(&body.value, Some(&rty), false)?;
+
+        // Build the function type from scratch
+        let kind = TypeKind::Fn(params, Box::new(rty));
+        let set = Set::Concrete(BTreeSet::from([self.crate_name.clone()]));
+
+        let ty = Type {
+            kind,
+            var_to_idx,
+            binder,
+            binder_idx: 0,
+            intrinsic: [set.clone(), set.clone(), set.clone()],
+            intrinsic_idx: 0,
+        };
+
+        self.items.insert(def_id, ty);
+
+        // Exit this scope
+        self.scx.exit();
+
+        Ok(())
+    }
 
     // ======== TYPES ======== //
 
     /// Given the `DefId` of a function, return its type.
-    fn fn_ty(&mut self, def_id: DefId) -> Ty<P> {
-        let canonical_path = self.get_tcx().def_path_str(def_id);
-        let intrinsics = self.get_type_intrinsics();
-
-        if intrinsics.contains_key(&canonical_path) {
-            return intrinsics[&canonical_path].clone();
-        }
-
-        if let Some(ty) = self.get_items().get(&def_id) {
+    fn fn_ty(&mut self, def_id: DefId) -> Type {
+        if let Some(ty) = self.items.get(&def_id) {
             return ty.clone();
         }
 
         // We haven't processed the definition of this function yet
         let _ = self.check_item_fn_nonlocal(def_id);
-        self.get_items().get(&def_id).unwrap().clone()
+        self.items.get(&def_id).unwrap().clone()
     }
 
     /// Given the parent and variant `DefId`s of an ADT (as well as its index), return its type.
-    fn adt_ty(&mut self, def_id_parent: DefId, def_id_variant: DefId, index: VariantIdx) -> Ty<P> {
-        if let Some(ty) = self.get_items().get(&def_id_variant) {
+    fn adt_ty(&mut self, def_id_parent: DefId, def_id_variant: DefId, index: VariantIdx) -> Type {
+        if let Some(ty) = self.get_type_constr(def_id_variant) {
             return ty.clone();
         }
 
         // We haven't processed the definition of this function yet
         let field_defs = &self
-            .get_tcx_mut()
+            .tcx
             .adt_def(def_id_parent)
             .variants()
             .get(index)
@@ -142,55 +241,889 @@ pub trait Check<'tcx, P: Property + Parse> {
             .raw;
 
         let _ = self.check_item_struct(def_id_variant, field_defs);
-        self.get_items().get(&def_id_variant).unwrap().clone()
+        self.get_type_constr(def_id_variant).unwrap().clone()
     }
 
-    /// Fetch the type of a local identifier given its `HirId`
-    fn local_ty(&mut self, hir_id: HirId) -> Ty<P> {
-        match self.get_locals().get(&hir_id) {
-            Some(ty) => ty.clone(),
-            None => {
-                warn!("Silently failed to get type of local variable");
-                self.ty_bottom()
+    fn top_type(&self) -> Type {
+        Type::opaque()
+    }
+
+    fn bottom_type(&self) -> Type {
+        // TODO: This type should be influenced by the current influence context and have only the origin in its sets
+        let mut ty = Type::opaque();
+
+        let set = Set::Concrete(BTreeSet::from([self.crate_name.clone()]));
+
+        ty.intrinsic = [set.clone(), set.clone(), set];
+
+        self.icx.influence(ty)
+    }
+
+    fn set_type_constr(&mut self, def_id: DefId, ty: Type) {
+        self.items.insert(def_id, ty);
+    }
+
+    fn get_type_constr(&mut self, def_id: DefId) -> Option<&Type> {
+        self.items.get(&def_id)
+    }
+
+    fn get_constr_for_ty(&mut self, ty: &Ty<'tcx>) -> Type {
+        // TODO: Actually get the constructor
+        match ty.kind() {
+            TyKind::Adt(adt_def, _) => {
+                // Structs, enums, unions (Vec, HashMap, your types, etc.)
+                let type_def_id = adt_def.did();
+
+                return self
+                    .get_type_constr(type_def_id)
+                    .unwrap_or(&Type::opaque())
+                    .clone();
+            }
+            TyKind::Int(_) => {}
+            TyKind::Uint(_) => {}
+            TyKind::Float(_) => {}
+            TyKind::Bool => {}
+            TyKind::Char => {}
+            TyKind::Str => {}
+            TyKind::Tuple(_) => {}
+            TyKind::Ref(_, ty, _) => {
+                // References like &T or &mut T
+                return self.get_constr_for_ty(ty);
+            }
+            _ => {
+                debug!("Other type kind: {:?}", ty.kind());
+            }
+        };
+
+        self.top_type()
+    }
+
+    fn ensure_variables_exist(&self, set: &Set, spans: &HashMap<String, Span>) -> Result {
+        match set {
+            Set::Variable(v) => {
+                if self.scx.get(&v).is_none() {
+                    return Err(self
+                        .tcx
+                        .dcx()
+                        .span_err(spans[v], format!("variable {v} has not been introduced")));
+                }
+
+                Ok(())
+            }
+
+            Set::Concrete(_) => Ok(()),
+            Set::Universe => Ok(()),
+
+            Set::Union(s) => {
+                for set in s {
+                    self.ensure_variables_exist(set, spans)?;
+                }
+
+                Ok(())
             }
         }
+    }
+
+    pub fn check_item(&mut self, item: &Item) -> Result {
+        let def_id = item.owner_id.to_def_id();
+
+        match item.kind {
+            ItemKind::Fn { sig, body, .. } => self.check_item_fn(&sig, body),
+            ItemKind::Struct(var_data, _) => {
+                let fields: Vec<FieldDef> = var_data
+                    .fields()
+                    .iter()
+                    .map(|f| FieldDef {
+                        did: f.def_id.to_def_id(),
+                        name: f.ident.name,
+                        vis: self.tcx.visibility(f.def_id),
+                        safety: f.safety,
+                        value: None,
+                    })
+                    .collect();
+
+                self.check_item_struct(def_id, &fields)
+            }
+
+            _ => Ok(()),
+        }
+    }
+
+    fn pass(&self, ty: &mut Type, span: Span, set: Set, variables: &HashMap<String, Span>) -> Result {
+        self.ensure_variables_exist(&set, variables)?;
+
+        if let Err(e) = ty.pass(&self.scx, set.clone()) {
+            match e {
+                PassError::BoundMismatch(bound) => {
+                    return Err(self
+                        .tcx
+                        .dcx()
+                        .span_err(span, format!("Provided set {set} is not a subset of {bound}")))
+                }
+
+                PassError::Unexpected => {
+                    return Err(self
+                        .tcx
+                        .dcx()
+                        .span_err(span, format!("No more set applications are expected")))
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    fn check_item_struct(&mut self, def_id: DefId, field_defs: &[FieldDef]) -> Result {
+        let mut fields = HashMap::new();
+
+        // Collect all 'pass' attributes on every field
+        for field in field_defs {
+            let mut pty = ProvType::default();
+
+            for attr in self.tcx.get_attrs_by_path(field.did, &self.field_attr) {
+                let Field {
+                    integrity,
+                    providers,
+                    variables,
+                } = self.parse_field(attr)?;
+
+                for (i, ss) in integrity.iter().enumerate() {
+                    self.ensure_variables_exist(&ss.value, &variables)?;
+
+                    pty.ty.intrinsic[i] = ss.value.clone();
+                }
+
+                self.ensure_variables_exist(&providers.value, &variables)?;
+                pty.providers = providers.value.clone();
+            }
+
+            fields.insert(field.name.to_string(), pty);
+        }
+
+        self.items.insert(def_id, Type::record(fields));
+
+        Ok(())
+    }
+
+    // ======== EXPRESSIONS ======== //
+
+    /// Serves as the type checking entrypoint for all expressions.
+    fn check_expr(&mut self, expr: &Expr, expectation: Option<&Type>, is_lvalue: bool) -> Result<Type> {
+        let ty = match expr.kind {
+            ExprKind::ConstBlock(_) => todo!(),
+            ExprKind::Become(_) => todo!(),
+            ExprKind::Type(_, _) => todo!(),
+            ExprKind::InlineAsm(_) => todo!(),
+            ExprKind::OffsetOf(_, _) => todo!(),
+            ExprKind::UnsafeBinderCast(_, _, _) => todo!(),
+            ExprKind::Err(_) => todo!(),
+
+            ExprKind::Lit(_) => self.bottom_type(),
+            ExprKind::Break(_, _) => self.bottom_type(),
+            ExprKind::Continue(_) => self.bottom_type(),
+
+            // TODO: Think about the typing rules for `Unary`, `AddrOf`, and `Index`
+            ExprKind::Unary(_, expr) => self.check_expr(expr, expectation, is_lvalue)?,
+            ExprKind::DropTemps(expr) => self.check_expr(expr, expectation, is_lvalue)?,
+            ExprKind::Cast(expr, _) => self.check_expr(expr, expectation, is_lvalue)?,
+            ExprKind::Repeat(expr, _) => self.check_expr(expr, expectation, is_lvalue)?,
+            ExprKind::Yield(expr, _) => self.check_expr(expr, expectation, is_lvalue)?,
+            ExprKind::AddrOf(_, _, expr) => self.check_expr(expr, None, is_lvalue)?,
+            ExprKind::Index(expr, _, _) => self.check_expr(expr, None, is_lvalue)?,
+
+            ExprKind::Assign(dest, expr, _) => self.check_expr_assign(dest, expr)?,
+            ExprKind::AssignOp(_, dest, expr) => self.check_expr_assign(dest, expr)?,
+
+            ExprKind::Block(block, _) => self.check_expr_block(block, expectation)?,
+            ExprKind::Loop(block, _, _, _) => self.check_expr_block(block, expectation)?,
+
+            ExprKind::Path(qpath) => return self.check_expr_path(expr.hir_id, &qpath, expectation),
+            ExprKind::Call(func, args) => self.check_expr_call(func, args, expr.span)?,
+            ExprKind::Let(let_expr) => self.check_expr_let(let_expr, expectation)?,
+            ExprKind::Binary(_, lhs, rhs) => self.check_expr_binary(lhs, rhs, expectation)?,
+            ExprKind::Array(exprs) => self.check_expr_array(exprs)?,
+            ExprKind::Tup(exprs) => self.check_expr_tup(exprs)?,
+            ExprKind::Ret(expr) => self.check_expr_ret(expr, expectation)?,
+            ExprKind::Closure(closure) => self.check_expr_closure(closure, expectation)?,
+
+            // TODO: Think about the typing rules for projection
+            ExprKind::Field(obj, ident) => self.check_expr_field(obj, ident)?,
+
+            ExprKind::MethodCall(_, receiver, args, _) => {
+                self.check_method_call(expr.hir_id, receiver, args, expr.span)?
+            }
+            ExprKind::If(guard, then_expr, else_expr) => {
+                self.check_expr_if(guard, then_expr, else_expr, expectation)?
+            }
+            ExprKind::Match(guard, arms, source) => {
+                self.check_expr_match(guard, arms, source, expectation)?
+            }
+            ExprKind::Struct(qpath, fields, _) => self.check_expr_struct(expr.hir_id, qpath, fields)?,
+        };
+
+        let actual = if is_lvalue { ty } else { self.icx.influence(ty) };
+
+        match expectation {
+            Some(expected) => {
+                if actual.satisfies(&self.scx, expected) {
+                    Ok(actual)
+                } else {
+                    let msg = format!("expected '{}' but found '{}'", expected, actual);
+                    Err(self.tcx.dcx().span_err(expr.span, msg))
+                }
+            }
+
+            None => Ok(actual),
+        }
+    }
+
+    /// Checks the type of a block.
+    fn check_expr_block(&mut self, block: &Block, expectation: Option<&Type>) -> Result<Type> {
+        // The number of statements in this block;
+        let len = block.stmts.len();
+
+        match block.expr {
+            Some(expr) => {
+                for stmt in block.stmts {
+                    self.check_stmt(stmt, None)?;
+                }
+
+                // This expression occurs at the very end without a semicolon
+                self.check_expr(expr, expectation, false)
+            }
+
+            None if !block.stmts.is_empty() => {
+                // Check all statements except the last one without expectation
+                for stmt in block.stmts[..len - 1].iter() {
+                    self.check_stmt(stmt, None)?;
+                }
+
+                self.check_stmt(&block.stmts.last().unwrap(), expectation)
+            }
+
+            _ => {
+                let b = Type::opaque();
+                Ok(b)
+            }
+        }
+    }
+
+    /// Checks the type of a path expression.
+    fn check_expr_path(&mut self, hir_id: HirId, qpath: &QPath, expectation: Option<&Type>) -> Result<Type> {
+        let local_def_id = hir_id.owner.to_def_id().as_local().unwrap();
+
+        let res = self.tcx.typeck(local_def_id).qpath_res(qpath, hir_id);
+
+        let ty = match res {
+            // TODO: Since some locals may not have bindings, put this access in a function that returns a default value
+            Res::Local(hir_id) => self.hir_to_ty[&hir_id].clone(),
+
+            Res::Def(def_kind, def_id) => {
+                match def_kind {
+                    // TODO: Check that `AssocFn` is handled properly
+                    DefKind::Fn | DefKind::AssocFn => self.fn_ty(def_id),
+
+                    DefKind::Struct => self.adt_ty(def_id, def_id, FIRST_VARIANT),
+
+                    DefKind::Variant => {
+                        // The variant DefId
+                        let id = def_id;
+
+                        // The parent DefId
+                        let def_id = self.tcx.parent(def_id);
+
+                        // The parent ADT definition
+                        let adt = self.tcx.adt_def(def_id);
+
+                        // The index of this variant in particular
+                        let idx = adt
+                            .variants()
+                            .iter()
+                            .enumerate()
+                            .find(|(_, vdef)| vdef.def_id == id)
+                            .unwrap()
+                            .0;
+
+                        self.adt_ty(def_id, id, idx.into())
+                    }
+
+                    // TODO: Test this thoroughly
+                    DefKind::Ctor(ctor_of, _) => match ctor_of {
+                        CtorOf::Struct => {
+                            let def_id = self.tcx.parent(def_id);
+
+                            self.adt_ty(def_id, def_id, FIRST_VARIANT)
+                        }
+
+                        CtorOf::Variant => {
+                            // Get the DefId of the variant
+                            let id = self.tcx.parent(def_id);
+
+                            // Get the DefId of the enum holding this variant
+                            let def_id = self.tcx.parent(id);
+                            let adt = self.tcx.adt_def(def_id);
+
+                            let idx = adt
+                                .variants()
+                                .iter()
+                                .enumerate()
+                                .find(|(_, vdef)| vdef.def_id == id)
+                                .unwrap()
+                                .0;
+
+                            self.adt_ty(def_id, id, idx.into())
+                        }
+                    },
+
+                    // TODO: Implement actual logic
+                    DefKind::Static { .. } => self.bottom_type(),
+
+                    // TODO: Implement actual logic
+                    DefKind::AssocConst | DefKind::Const | DefKind::ConstParam => self.bottom_type(),
+
+                    DefKind::Union => {
+                        warn!("Silently skipping union usage");
+                        self.bottom_type()
+                    }
+
+                    DefKind::TyAlias => {
+                        let ty = self.tcx.type_of(def_id).skip_binder();
+                        let kind = ty.kind();
+
+                        match kind {
+                            TyKind::Adt(adt_def, _) => {
+                                self.adt_ty(adt_def.did(), adt_def.did(), FIRST_VARIANT)
+                            }
+                            _ => todo!(),
+                        }
+                    }
+
+                    _ => todo!(),
+                }
+            }
+
+            Res::SelfCtor(alias_to) | Res::SelfTyAlias { alias_to, .. } => {
+                match self.tcx.type_of(alias_to).skip_binder().kind() {
+                    TyKind::Adt(adt_def, _) => {
+                        let did = adt_def.did();
+                        self.adt_ty(did, did, FIRST_VARIANT)
+                    }
+
+                    _ => todo!(),
+                }
+            }
+
+            _ => {
+                todo!()
+            }
+        };
+
+        let actual = ty;
+
+        match expectation {
+            Some(ty) => {
+                if actual.satisfies(&self.scx, ty) {
+                    Ok(actual)
+                } else {
+                    let msg = format!("expected {} found {}", ty, actual);
+                    Err(self.tcx.dcx().span_err(qpath.span(), msg))
+                }
+            }
+
+            None => Ok(actual),
+        }
+    }
+
+    /// Checks the type of a call expression.
+    fn check_expr_call(&mut self, fun: &Expr, args: &[Expr], _span: Span) -> Result<Type> {
+        let owner_id = fun.hir_id.owner;
+        let owner_def_kind = self.tcx.def_kind(owner_id);
+
+        if owner_def_kind.is_fn_like() {
+            let local_def_id = owner_id.to_def_id().as_local().unwrap();
+
+            if let ExprKind::Path(qpath) = fun.kind {
+                let typeck_results = self.tcx.typeck(local_def_id);
+
+                if let Res::Def(def_kind, def_id) = typeck_results.qpath_res(&qpath, fun.hir_id) {
+                    // TODO: Check intrinsic constraints
+                    // self.check_intrinsic_constraints(def_id, def_kind, args, typeck_results)?;
+                }
+            }
+        }
+
+        let mut fty = self.check_expr(fun, None, false)?;
+
+        // TODO: Reorganize this logic significantly... there is WAY too much cloning here
+        let mut ty = match fty.clone().kind {
+            TypeKind::Fn(arg_tys, _) => {
+                let mut atys = Vec::new();
+
+                for (expected, expr) in arg_tys.into_iter().zip(args) {
+                    let actual = self.check_expr(expr, None, false)?;
+
+                    atys.push(actual.clone());
+
+                    for i in 0..3 {
+                        if let Set::Variable(v) = expected.ty.intrinsic[i].clone() {
+                            // This set is a variable that needs to be replaced... which one is it?
+                            let index = fty.var_to_idx[&v];
+
+                            let set_var = &fty.binder[index];
+
+                            let candidate = actual.intrinsic[i].clone();
+
+                            if !candidate.subset(&self.scx, &set_var.bound) {
+                                let msg = format!(
+                                    "argument has type {}, but {} ⊈ {} as required",
+                                    actual, candidate, set_var.bound
+                                );
+
+                                return Err(self.tcx.dcx().span_err(expr.span, msg));
+                            }
+
+                            fty.binder[index].value = Some(actual.intrinsic[i].clone());
+                            fty.replace(&v, &actual.intrinsic[i]);
+                        }
+                    }
+                }
+
+                let TypeKind::Fn(arg_tys, rty) = fty.kind.clone() else {
+                    unreachable!()
+                };
+
+                for i in 0..args.len() {
+                    let expr = &args[i];
+                    let actual = &atys[i];
+                    let expected = &arg_tys[i];
+
+                    if !actual.satisfies(&self.scx, &expected.ty) {
+                        let msg = format!("expected {} but found {}", expected, actual);
+
+                        return Err(self.tcx.dcx().span_err(expr.span, msg));
+                    }
+
+                    // TODO: Construct this set once and access via helper method
+                    if !Set::Concrete(BTreeSet::from([self.crate_name.clone()]))
+                        .subset(&self.scx, &expected.providers)
+                    {
+                        let msg = format!(
+                            "origin {} absent from set of valid providers {}",
+                            self.crate_name, expected.providers
+                        );
+
+                        return Err(self.tcx.dcx().span_err(expr.span, msg));
+                    }
+                }
+
+                *rty
+            }
+
+            TypeKind::Rec(elements) => {
+                for (i, arg) in args.iter().enumerate() {
+                    let ty = elements[&i.to_string()].clone().ty;
+                    self.check_expr(arg, Some(&ty), false)?;
+                }
+
+                fty.clone()
+            }
+
+            _ => {
+                warn!("Cannot tell if expression is a function - {:?}", fun);
+                fty.clone()
+            }
+        };
+
+        ty = self.extract(&ty, &fty);
+
+        Ok(ty)
+    }
+
+    fn join(&self, types: Vec<Type>) -> Type {
+        // TODO: Fail if type kinds are incompatible
+        let mut it = types.iter();
+
+        let mut res = it.next().unwrap().clone();
+
+        while let Some(ty) = it.next() {
+            res.intrinsic[0] = res.intrinsic[0].clone().union(ty.intrinsic[0].clone());
+            res.intrinsic[1] = res.intrinsic[1].clone().union(ty.intrinsic[1].clone());
+            res.intrinsic[2] = res.intrinsic[2].clone().union(ty.intrinsic[2].clone());
+        }
+
+        res
+    }
+
+    /// Checks the type of a method call.
+    fn check_method_call(
+        &mut self,
+        hir_id: HirId,
+        receiver: &Expr,
+        args: &[Expr],
+        _span: Span,
+    ) -> Result<Type> {
+        let typeck_results = self.tcx.typeck(hir_id.owner.def_id);
+        let (def_kind, def_id) = typeck_results.type_dependent_def(hir_id).unwrap();
+
+        match def_kind {
+            DefKind::AssocFn => {
+                // let args = vec![receiver];
+                let mut args_ = vec![receiver.clone()];
+                args_.extend_from_slice(args);
+
+                // TODO: Check intrinsic constraints
+                // self.check_intrinsic_constraints(def_id, def_kind, &args_, typeck_results)?;
+
+                let fty = self.fn_ty(def_id);
+                // KEEP: I can use this to generate intrinsic annotations
+                // let s = serde_json::to_string(&fty).unwrap();
+                // debug!("{}", s);
+
+                match fty.kind {
+                    TypeKind::Fn(arg_tys, ret_ty) => {
+                        // We subtract one to account for the receiver
+                        if args.len() != arg_tys.len() - 1 {
+                            warn!("arg ct doesnt match up");
+                        }
+
+                        let args = std::iter::once(receiver).chain(args.iter());
+                        for (pty, expr) in arg_tys.into_iter().zip(args) {
+                            self.check_expr(expr, Some(&pty.ty), false)?;
+                        }
+
+                        Ok(*ret_ty)
+                    }
+
+                    _ => todo!(),
+                }
+            }
+
+            _ => todo!(),
+        }
+    }
+
+    /// Checks the type of an `if` expression.
+    fn check_expr_if(
+        &mut self,
+        guard: &Expr,
+        then_expr: &Expr,
+        else_expr: Option<&Expr>,
+        expectation: Option<&Type>,
+    ) -> Result<Type> {
+        let ity = self.check_expr(guard, None, false)?;
+
+        self.icx.enter(&ity.intrinsic[2]);
+
+        let mut rty = self.check_expr(then_expr, expectation, false)?;
+
+        if let Some(else_expr) = else_expr {
+            let to_be_joined = self.check_expr(else_expr, expectation, false)?;
+            rty = self.join(vec![rty, to_be_joined])
+        }
+
+        self.icx.exit();
+        Ok(rty)
+    }
+
+    /// Checks the type of a `match` expression.
+    fn check_expr_match(
+        &mut self,
+        guard: &Expr,
+        arms: &[Arm],
+        source: MatchSource,
+        expectation: Option<&Type>,
+    ) -> Result<Type> {
+        let ity = match source {
+            MatchSource::ForLoopDesugar => {
+                // The guard expression is a function call, and we want the argument
+                let ExprKind::Call(_, args) = guard.kind else {
+                    unreachable!()
+                };
+
+                self.check_expr(&args[0], None, false)?
+            }
+
+            _ => self.check_expr(guard, None, false)?,
+        };
+
+        self.icx.enter(&ity.intrinsic[2]);
+
+        let mut result = self.bottom_type();
+
+        for arm in arms {
+            self.process_pattern(arm.pat.kind, ity.clone(), arm.pat.hir_id);
+            let to_be_joined = self.check_expr(arm.body, expectation, false)?;
+            result = self.join(vec![result, to_be_joined]);
+        }
+
+        self.icx.exit();
+        Ok(result)
+    }
+
+    /// Checks the type of a `let` expression. These typically appear as the guards of `if` expressions.
+    fn check_expr_let(&mut self, let_expr: &LetExpr, expectation: Option<&Type>) -> Result<Type> {
+        let ty = self.check_expr(let_expr.init, expectation, false)?;
+
+        self.process_pattern(let_expr.pat.kind, ty.clone(), let_expr.pat.hir_id);
+
+        Ok(ty)
+    }
+
+    /// Checks the type of a binary expression.
+    fn check_expr_binary(&mut self, lhs: &Expr, rhs: &Expr, expectation: Option<&Type>) -> Result<Type> {
+        let lty = self.check_expr(lhs, expectation, false)?;
+        let rty = self.check_expr(rhs, expectation, false)?;
+        let ty = self.join(vec![lty, rty]);
+
+        Ok(ty)
+    }
+
+    /// Checks the type of an assignment expression.
+    fn check_expr_assign(&mut self, dest: &Expr, expr: &Expr) -> Result<Type> {
+        let expected = self.check_expr(dest, None, true)?;
+        let ty = self.check_expr(expr, Some(&expected), false)?;
+
+        Ok(ty)
+    }
+
+    /// Checks the type of a struct expression.
+    fn check_expr_struct(&mut self, hir_id: HirId, qpath: &QPath, fields: &[ExprField]) -> Result<Type> {
+        let ty = match qpath {
+            QPath::LangItem(item, _) => match item {
+                LangItem::Range => {
+                    // NOTE: We handle ranges in a special manner for the time being
+                    let mut result = self.bottom_type();
+
+                    for field in fields {
+                        let pending = self.check_expr(field.expr, None, false)?;
+                        result = self.join(vec![result, pending]);
+                    }
+
+                    result
+                }
+
+                _ => {
+                    warn!("Language item silently ignored");
+                    self.bottom_type()
+                }
+            },
+
+            _ => self.check_expr_path(hir_id, qpath, None)?,
+        };
+
+        match &ty.kind {
+            TypeKind::Rec(tys) => {
+                for field in fields {
+                    let ty = tys[&field.ident.to_string()].clone().ty;
+                    self.check_expr(field.expr, Some(&ty), false)?;
+                }
+            }
+
+            TypeKind::Opaque => {
+                for field in fields {
+                    self.check_expr(field.expr, None, false)?;
+                }
+            }
+
+            _ => todo!(),
+        }
+
+        Ok(ty)
+    }
+
+    /// Checks the type of an array expression.
+    fn check_expr_array(&mut self, exprs: &[Expr]) -> Result<Type> {
+        let mut result = self.bottom_type();
+        let mut item = self.bottom_type();
+
+        for expr in exprs {
+            let pending = self.check_expr(expr, None, false)?;
+            item = self.join(vec![item, pending]);
+        }
+
+        result.kind = TypeKind::Array(Box::new(ProvType::new(item)));
+
+        Ok(result)
+    }
+
+    /// Checks the type of a tuple expression.
+    fn check_expr_tup(&mut self, exprs: &[Expr]) -> Result<Type> {
+        let mut result = self.bottom_type();
+
+        let mut items = vec![];
+
+        for expr in exprs {
+            let pty = ProvType::new(self.check_expr(expr, None, false)?);
+            items.push(pty);
+        }
+
+        result.kind = TypeKind::Tuple(items);
+        Ok(result)
+    }
+
+    /// Checks the type of a return expression.
+    fn check_expr_ret(&mut self, expr: Option<&Expr>, expectation: Option<&Type>) -> Result<Type> {
+        match expr {
+            Some(expr) => Ok(self.check_expr(expr, expectation, false)?),
+            None => Ok(self.bottom_type()),
+        }
+    }
+
+    /// Checks the type of a closure expression.
+    fn check_expr_closure(&mut self, closure: &Closure, expectation: Option<&Type>) -> Result<Type> {
+        todo!()
+    }
+
+    /// Checks the type of a projection.
+    fn check_expr_field(&mut self, object: &Expr, field: Ident) -> Result<Type> {
+        match self.check_expr(object, None, false)?.kind {
+            TypeKind::Rec(field_map) => {
+                if !field_map.contains_key(&field.to_string()) {
+                    let msg = format!("unknown field '{}'", field.name);
+                    self.tcx.dcx().span_err(field.span, msg);
+                    Ok(self.top_type())
+                } else {
+                    Ok(field_map[&field.to_string()].clone().ty)
+                }
+            }
+
+            TypeKind::Tuple(fields) => {
+                let index = field.name.as_str().parse::<usize>().unwrap();
+
+                if index >= fields.len() {
+                    let msg = format!("unknown field '{}'", field.name);
+                    self.tcx.dcx().span_err(field.span, msg);
+                    Ok(self.top_type())
+                } else {
+                    Ok(fields[index].clone().ty)
+                }
+            }
+
+            TypeKind::Opaque => {
+                // For now, any field access with an unknown receiver will be universal
+                // However, in the future, I should refine my type checking to avoid this
+                Ok(self.top_type())
+            }
+
+            _ => todo!(),
+        }
+    }
+
+    /// Checks the type of a statement.
+    fn check_stmt(&mut self, stmt: &Stmt, expectation: Option<&Type>) -> Result<Type> {
+        // TODO: Think more about what type should be returned by a statement
+        match stmt.kind {
+            StmtKind::Let(local) => {
+                self.check_let_stmt(local)?;
+                Ok(self.bottom_type())
+            }
+            StmtKind::Expr(expr) => self.check_expr(expr, expectation, false),
+            StmtKind::Semi(expr) => self.check_expr(expr, expectation, false),
+            StmtKind::Item(item_id) => {
+                let item = self.tcx.hir_item(item_id);
+                self.check_item(item)?;
+                Ok(self.bottom_type())
+            }
+        }
+    }
+
+    fn check_let_stmt(&mut self, local: &LetStmt) -> Result {
+        let mut processed = false;
+
+        // TODO: We need to use a type constructor that matches the left type
+        let mut ty = if let Some(expr) = local.init {
+            self.check_expr(expr, None, false)?
+        } else {
+            self.top_type()
+        };
+
+        // if let Some(expr) = local.init {
+        //     self.check_expr(expr, Some(&ty), false)?;
+        //     self.process_pattern(local.pat.kind, ty, local.pat.hir_id);
+        // } else {
+        //     self.process_pattern(local.pat.kind, self.top_type(), local.pat.hir_id);
+        // }
+
+        // TODO: Only collect one such attribute
+        for attr in self.tcx.hir().attrs(local.hir_id) {
+            if attr.path_matches(&self.local_attr) {
+                let Other { integrity, variables } = self.parse_local(attr)?;
+
+                for (i, ss) in integrity.iter().enumerate() {
+                    self.ensure_variables_exist(&ss.value, &variables)?;
+
+                    if !ty.intrinsic[i].subset(&self.scx, &ss.value) {
+                        let msg = format!(
+                            "value has incompatible integrity {} since {} ⊈ {}",
+                            ty.intrinsic.iter().join(" "),
+                            ty.intrinsic[i],
+                            ss.value
+                        );
+
+                        return Err(self.tcx.dcx().span_err(local.init.unwrap().span, msg));
+                    }
+
+                    ty.intrinsic[i] = ss.value.clone();
+                }
+            }
+        }
+
+        self.process_pattern(local.pat.kind, ty, local.pat.hir_id);
+
+        Ok(())
+    }
+
+    fn parse<T, F>(&self, attr: &Attribute, p: F) -> Result<T>
+    where
+        F: for<'a> Fn(&'a mut CoenobitaParser<'a>) -> PResult<'a, T>,
+    {
+        let AttrKind::Normal(normal) = &attr.kind else {
+            unreachable!()
+        };
+
+        let psess = create_psess(&self.tcx);
+
+        if let AttrArgs::Delimited(delim_args) = normal.args.clone() {
+            let mut parser = create_parser(&psess, delim_args.tokens);
+
+            p(&mut parser).map_err(|err| self.tcx.dcx().span_err(err.span.clone(), "failed to parse"))
+        } else {
+            panic!()
+        }
+    }
+
+    fn parse_field(&self, attr: &Attribute) -> Result<Field> {
+        self.parse(attr, |parser| parser.parse_field())
+    }
+
+    fn parse_input(&self, attr: &Attribute) -> Result<Input> {
+        self.parse(attr, |parser| parser.parse_input())
+    }
+
+    fn parse_local(&self, attr: &Attribute) -> Result<Other> {
+        self.parse(attr, |parser| parser.parse_local())
+    }
+
+    fn parse_output(&self, attr: &Attribute) -> Result<Other> {
+        self.parse(attr, |parser| parser.parse_output())
+    }
+
+    fn parse_param(&self, attr: &Attribute) -> Result<Param> {
+        self.parse(attr, |parser| parser.parse_param())
     }
 
     // ======== PATTERNS ======== //
 
-    /// Recursively process a struct pattern, registering all identifiers with the locals map.
-    fn process_pattern_struct(&mut self, hir_id: HirId, qpath: &QPath, fields: &[PatField]) {
-        match self.check_expr_path(hir_id, qpath, &Expectation::NoExpectation) {
-            Ok(ty) => match ty.kind() {
-                TyKind::Adt(map) => {
-                    for field in fields {
-                        let ty = self.influence(map[&field.ident.to_string()].clone());
-                        self.process_pattern(field.pat.kind, ty, field.pat.hir_id);
-                    }
-                }
-
-                TyKind::Opaque | TyKind::Infer => {
-                    for field in fields {
-                        let ty = self.ty_top();
-                        self.process_pattern(field.pat.kind, ty, field.pat.hir_id);
-                    }
-                }
-
-                _ => todo!(),
-            },
-
-            Err(_) => {
-                warn!("Pattern struct processing failing silently");
-            }
-        }
-    }
-
-    fn process_pattern(&mut self, pat_kind: PatKind, ty: Ty<P>, hir_id: HirId) {
-        self.enter_scope(&ty);
+    fn process_pattern(&mut self, pat_kind: PatKind, ty: Type, hir_id: HirId) {
+        self.icx.enter(&ty.intrinsic[2]);
 
         match pat_kind {
-            PatKind::Binding(_, hir_id, _, _) => {
-                self.get_locals_mut().insert(hir_id, ty.clone());
+            PatKind::Binding(_, hir_id, ident, _) => {
+                // TODO: Figure out the HirId <-> String mapping
+                self.str_to_hir.insert(ident.to_string(), hir_id);
+                self.hir_to_ty.insert(hir_id, ty.clone());
+
+                self.vctx.set(hir_id, ty.clone());
             }
 
             PatKind::Guard(pat, _) => self.process_pattern(pat.kind, ty, pat.hir_id),
@@ -218,15 +1151,15 @@ pub trait Check<'tcx, P: Property + Parse> {
             }
 
             PatKind::Tuple(pats, _) => match ty.kind {
-                TyKind::Tuple(elements) => {
-                    for (pat, ty) in pats.iter().zip(elements) {
-                        self.process_pattern(pat.kind, ty, pat.hir_id);
+                TypeKind::Tuple(elements) => {
+                    for (pat, pty) in pats.iter().zip(elements) {
+                        self.process_pattern(pat.kind, pty.ty, pat.hir_id);
                     }
                 }
 
                 _ => {
                     // Either the type is opaque or it's simply incorrect
-                    let top = self.ty_top();
+                    let top = self.top_type();
 
                     for pat in pats.iter() {
                         self.process_pattern(pat.kind, top.clone(), pat.hir_id);
@@ -262,1090 +1195,41 @@ pub trait Check<'tcx, P: Property + Parse> {
             PatKind::Range(_, _, _) | PatKind::Wild | PatKind::Never | PatKind::Expr(_) => {}
         };
 
-        self.exit_scope();
+        self.icx.exit();
     }
 
-    // ======== NONLOCAL ITEMS ======== //
-    fn check_item_fn_nonlocal(&mut self, def_id: DefId) -> Result {
-        let expected = self
-            .get_tcx()
-            .fn_sig(def_id)
-            .skip_binder()
-            .inputs()
-            .iter()
-            .count();
+    fn extract(&self, child: &Type, parent: &Type) -> Type {
+        let mut child = child.clone();
 
-        let mut default = self.influence(Ty::ty_fn(expected));
+        child.intrinsic[2] = child.intrinsic[2].clone().union(parent.intrinsic[2].clone());
 
-        match self.get_tcx().get_attrs_by_path(def_id, &self.get_attr()).next() {
-            Some(attr) => {
-                if let Ok(ty) = self.parse_attr(attr) {
-                    default = ty.into();
-                };
-            }
-
-            None => {}
-        };
-
-        self.get_items_mut().insert(def_id, default);
-
-        Ok(())
+        child
     }
 
-    // ======== LOCAL ITEMS ======== //
-    fn check_item(&mut self, item: &Item) -> Result {
-        let def_id = item.owner_id.to_def_id();
-
-        match item.kind {
-            ItemKind::Fn { sig, body, .. } => self.check_item_fn(&sig, body),
-            ItemKind::Impl(impl_) => self.check_item_impl(impl_),
-            ItemKind::Enum(enum_def, _) => {
-                for variant in enum_def.variants {
-                    let fields: Vec<FieldDef> = variant
-                        .data
-                        .fields()
-                        .iter()
-                        .map(|f| FieldDef {
-                            did: f.def_id.to_def_id(),
-                            name: f.ident.name,
-                            vis: self.get_tcx_mut().visibility(f.def_id),
-                            safety: f.safety,
-                            value: None,
-                        })
-                        .collect();
-
-                    self.check_item_struct(def_id, &fields)?
-                }
-
-                Ok(())
-            }
-
-            ItemKind::Struct(var_data, _) => {
-                let fields: Vec<FieldDef> = var_data
-                    .fields()
-                    .iter()
-                    .map(|f| FieldDef {
-                        did: f.def_id.to_def_id(),
-                        name: f.ident.name,
-                        vis: self.get_tcx_mut().visibility(f.def_id),
-                        safety: f.safety,
-                        value: None,
-                    })
-                    .collect();
-
-                self.check_item_struct(def_id, &fields)
-            }
-
-            _ => Ok(()),
-        }
-    }
-
-    fn check_item_fn(&mut self, signature: &FnSig, body_id: BodyId) -> Result {
-        let def_id = body_id.hir_id.owner.to_def_id();
-        let expected = signature.decl.inputs.iter().count();
-
-        let mut default = self.influence(Ty::ty_fn(expected));
-
-        match self
-            .get_tcx_mut()
-            .get_attrs_by_path(def_id, self.get_attr())
-            .next()
-        {
-            Some(attr) => {
-                if let Ok(ty) = self.parse_attr(attr) {
-                    match ty.inner.kind() {
-                        TyKind::Fn(_, ref arg_tys, _) => {
-                            // Make sure the number of arguments matches
-                            let actual = arg_tys.len();
-
-                            if actual == expected {
-                                // Note that we currently don't check whether types have the correct shape
-                                default = self.influence(ty.into());
-                            } else {
-                                let msg = format!(
-                                    "Function must have {expected} arguments, but its Coenobita signature has {actual}"
-                                );
-
-                                self.get_tcx().dcx().span_err(ty.span, msg);
-                            }
-                        }
-
-                        _ => {
-                            let msg = format!("Expected function type, found {}", ty);
-                            self.get_tcx().dcx().span_err(ty.span, msg);
-                        }
-                    }
-                };
-            }
-
-            None => {}
-        }
-
-        self.get_items_mut().insert(def_id, default);
-
-        let ty_kind = self.fn_ty(def_id).kind;
-
-        let TyKind::Fn(_, args, expected) = ty_kind else {
-            panic!()
-        };
-
-        let body = self.get_tcx().hir_body(body_id);
-
-        for (param, arg) in body.params.iter().zip(args) {
-            self.get_locals_mut().insert(param.pat.hir_id, arg);
-        }
-
-        let expr = body.value;
-        let actual = self.check_expr(&body.value, &Expectation::ExpectHasType(*expected.clone()), false)?;
-
-        if !actual.satisfies(&expected) {
-            let msg = format!("Expected {expected}, found {actual}");
-            self.get_tcx_mut().dcx().span_err(expr.span, msg);
-        }
-
-        Ok(())
-    }
-
-    fn check_impl_item(&mut self, item: &ImplItem) -> Result {
-        let def_id = item.owner_id.to_def_id();
-
-        if self
-            .get_tcx_mut()
-            .get_attr(def_id, Symbol::intern("ignore"))
-            .is_some()
-        {
-            return Ok(());
-        }
-
-        match item.kind {
-            ImplItemKind::Fn(signature, body_id) => self.check_item_fn(&signature, body_id),
-            _ => Ok(()),
-        }
-    }
-
-    fn check_item_impl(&mut self, impl_: &Impl) -> Result {
-        for item_ref in impl_.items {
-            // Get the impl item
-            let impl_item = self.get_tcx_mut().hir_impl_item(item_ref.id);
-            self.check_impl_item(impl_item)?;
-        }
-
-        Ok(())
-    }
-
-    fn check_item_struct(&mut self, def_id: DefId, field_defs: &[FieldDef]) -> Result {
-        let fields = match self.get_tcx().get_attrs_by_path(def_id, &self.get_attr()).next() {
-            Some(attr) => {
-                let mut map = HashMap::new();
-
-                if let Ok(ty) = self.parse_attr(attr) {
-                    match ty.inner.kind() {
-                        TyKind::Adt(elements) => {
-                            for (name, ty) in elements {
-                                map.insert(name, self.influence(ty.clone().into()));
-                            }
-                        }
-
-                        TyKind::Tuple(ref elements) => {
-                            let len = elements.len();
-                            for (i, ty) in (0..len).zip(elements) {
-                                map.insert(i.to_string(), ty.clone().into());
-                            }
-                        }
-
-                        _ => {}
-                    }
-                };
-
-                map
-            }
-
-            None => {
-                // There is no attribute on the struct as a whole, so we will check for attributes on its fields
-                let mut fields = HashMap::new();
-
-                for field in field_defs {
-                    match self
-                        .get_tcx()
-                        .get_attrs_by_path(field.did, &self.get_attr())
-                        .next()
-                    {
-                        Some(attr) => {
-                            if let Ok(ty) = self.parse_attr(attr) {
-                                fields.insert(field.name.to_string(), ty.into());
-                            };
-                        }
-
-                        _ => {
-                            fields.insert(field.name.to_string(), self.ty_top());
-                        }
-                    };
-                }
-
-                fields
-            }
-        };
-
-        // Since this type is a struct definition, its flow pair will never be used and is only here for consistency
-        let mut ty = self.ty_bottom();
-        ty.kind = TyKind::Adt(fields);
-
-        self.get_items_mut().insert(def_id, ty);
-
-        Ok(())
-    }
-
-    fn check_let_stmt(&mut self, local: &LetStmt) -> Result {
-        let mut processed = false;
-
-        for attr in self.get_tcx_mut().hir().attrs(local.hir_id) {
-            if attr.path_matches(&self.get_attr()) {
-                if let Ok(ty) = self.parse_attr(attr) {
-                    let expected: Ty<P> = ty.into();
-                    self.process_pattern(local.pat.kind, expected.clone(), local.pat.hir_id);
-
-                    if let Some(expr) = local.init {
-                        self.check_expr(expr, &Expectation::ExpectHasType(expected.clone()), false)?;
-                    } else {
-                        self.process_pattern(local.pat.kind, self.ty_top(), local.pat.hir_id);
-                    }
-                };
-
-                processed = true;
-            }
-        }
-
-        if !processed {
-            // There was no tag, so we cannot make any assumptions about the intended type
-            if let Some(expr) = local.init {
-                self.check_expr(expr, &Expectation::NoExpectation, false)?;
-            }
-
-            self.process_pattern(local.pat.kind, self.influence(self.ty_top()), local.pat.hir_id);
-        }
-
-        Ok(())
-    }
-
-    // ======== EXPRESSIONS ======== //
-
-    /// Serves as the type checking entrypoint for all expressions.
-    fn check_expr(&mut self, expr: &Expr, expectation: &Expectation<P>, is_lvalue: bool) -> Result<Ty<P>> {
-        let ty = match expr.kind {
-            ExprKind::Lit(_) => self.ty_bottom(),
-            ExprKind::Break(_, _) => self.ty_bottom(),
-            ExprKind::Continue(_) => self.ty_bottom(),
-
-            // TODO: Think about the typing rules for `Unary`, `AddrOf`, and `Index`
-            ExprKind::Unary(_, expr) => self.check_expr(expr, expectation, is_lvalue)?,
-            ExprKind::DropTemps(expr) => self.check_expr(expr, expectation, is_lvalue)?,
-            ExprKind::Cast(expr, _) => self.check_expr(expr, expectation, is_lvalue)?,
-            ExprKind::Repeat(expr, _) => self.check_expr(expr, expectation, is_lvalue)?,
-            ExprKind::Yield(expr, _) => self.check_expr(expr, expectation, is_lvalue)?,
-            ExprKind::AddrOf(_, _, expr) => self.check_expr(expr, &Expectation::NoExpectation, is_lvalue)?,
-            ExprKind::Index(expr, _, _) => self.check_expr(expr, &Expectation::NoExpectation, is_lvalue)?,
-
-            ExprKind::Assign(dest, expr, _) => self.check_expr_assign(dest, expr)?,
-            ExprKind::AssignOp(_, dest, expr) => self.check_expr_assign(dest, expr)?,
-
-            ExprKind::Block(block, _) => self.check_expr_block(block, expectation)?,
-            ExprKind::Loop(block, _, _, _) => self.check_expr_block(block, expectation)?,
-
-            ExprKind::Path(qpath) => return self.check_expr_path(expr.hir_id, &qpath, expectation),
-            ExprKind::Call(func, args) => self.check_expr_call(func, args, expr.span)?,
-            ExprKind::Let(let_expr) => self.check_expr_let(let_expr, expectation)?,
-            ExprKind::Binary(_, lhs, rhs) => self.check_expr_binary(lhs, rhs, expectation)?,
-            ExprKind::Array(exprs) => self.check_expr_array(exprs)?,
-            ExprKind::Tup(exprs) => self.check_expr_tup(exprs)?,
-            ExprKind::Ret(expr) => self.check_expr_ret(expr, expectation)?,
-            ExprKind::Closure(closure) => self.check_expr_closure(closure, expectation)?,
-
-            // TODO: Think about the typing rules for projection
-            ExprKind::Field(obj, ident) => self.check_expr_field(obj, ident)?,
-
-            ExprKind::MethodCall(_, receiver, args, _) => {
-                self.check_method_call(expr.hir_id, receiver, args, expr.span)?
-            }
-            ExprKind::If(guard, then_expr, else_expr) => {
-                self.check_expr_if(guard, then_expr, else_expr, expectation)?
-            }
-            ExprKind::Match(guard, arms, source) => {
-                self.check_expr_match(guard, arms, source, expectation)?
-            }
-            ExprKind::Struct(qpath, fields, _) => self.check_expr_struct(expr.hir_id, qpath, fields)?,
-
-            _ => {
-                warn!("Skipping expression of kind {:?}", expr.kind);
-                todo!()
-            }
-        };
-
-        if is_lvalue {
-            expectation.check(*self.get_tcx_mut(), ty, expr.span)
-        } else {
-            expectation.check(*self.get_tcx_mut(), self.influence(ty), expr.span)
-        }
-    }
-
-    /// Checks the type of a path expression.
-    fn check_expr_path(
-        &mut self,
-        hir_id: HirId,
-        qpath: &QPath,
-        expectation: &Expectation<P>,
-    ) -> Result<Ty<P>> {
-        let local_def_id = hir_id.owner.to_def_id().as_local().unwrap();
-
-        let res = self.get_tcx_mut().typeck(local_def_id).qpath_res(qpath, hir_id);
-        let ty = match res {
-            Res::Local(hir_id) => self.local_ty(hir_id),
-            Res::Def(def_kind, def_id) => {
-                match def_kind {
-                    // TODO: Check that `AssocFn` is handled properly
-                    DefKind::Fn | DefKind::AssocFn => self.fn_ty(def_id),
-
-                    DefKind::Struct => self.adt_ty(def_id, def_id, FIRST_VARIANT),
-
-                    DefKind::Variant => {
-                        // The variant DefId
-                        let id = def_id;
-
-                        // The parent DefId
-                        let def_id = self.get_tcx_mut().parent(def_id);
-
-                        // The parent ADT definition
-                        let adt = self.get_tcx_mut().adt_def(def_id);
-
-                        // The index of this variant in particular
-                        let idx = adt
-                            .variants()
-                            .iter()
-                            .enumerate()
-                            .find(|(_, vdef)| vdef.def_id == id)
-                            .unwrap()
-                            .0;
-
-                        self.adt_ty(def_id, id, idx.into())
-                    }
-
-                    // TODO: Test this thoroughly
-                    DefKind::Ctor(ctor_of, _) => match ctor_of {
-                        CtorOf::Struct => {
-                            let def_id = self.get_tcx_mut().parent(def_id);
-
-                            self.adt_ty(def_id, def_id, FIRST_VARIANT)
-                        }
-
-                        CtorOf::Variant => {
-                            // Get the DefId of the variant
-                            let id = self.get_tcx_mut().parent(def_id);
-
-                            // Get the DefId of the enum holding this variant
-                            let def_id = self.get_tcx_mut().parent(id);
-                            let adt = self.get_tcx_mut().adt_def(def_id);
-
-                            let idx = adt
-                                .variants()
-                                .iter()
-                                .enumerate()
-                                .find(|(_, vdef)| vdef.def_id == id)
-                                .unwrap()
-                                .0;
-
-                            self.adt_ty(def_id, id, idx.into())
-                        }
-                    },
-
-                    // TODO: Implement actual logic
-                    DefKind::Static { .. } => self.ty_bottom(),
-
-                    // TODO: Implement actual logic
-                    DefKind::AssocConst | DefKind::Const | DefKind::ConstParam => self.ty_bottom(),
-
-                    DefKind::Union => {
-                        warn!("Silently skipping union usage");
-                        self.ty_bottom()
-                    }
-
-                    DefKind::TyAlias => {
-                        let ty = self.get_tcx_mut().type_of(def_id).skip_binder();
-                        let kind = ty.kind();
-
-                        match kind {
-                            ty::TyKind::Adt(adt_def, _) => {
-                                self.adt_ty(adt_def.did(), adt_def.did(), FIRST_VARIANT)
-                            }
-                            _ => todo!(),
-                        }
-                    }
-
-                    _ => todo!(),
-                }
-            }
-
-            Res::SelfCtor(alias_to) | Res::SelfTyAlias { alias_to, .. } => {
-                match self.get_tcx_mut().type_of(alias_to).skip_binder().kind() {
-                    ty::TyKind::Adt(adt_def, _) => {
-                        let did = adt_def.did();
-                        self.adt_ty(did, did, FIRST_VARIANT)
-                    }
-
-                    _ => todo!(),
-                }
-            }
-
-            _ => {
-                todo!()
-            }
-        };
-
-        expectation.check(*self.get_tcx_mut(), self.influence(ty), qpath.span())
-    }
-
-    /// Checks the type of a call expression.
-    fn check_expr_call(&mut self, fun: &Expr, args: &[Expr], _span: Span) -> Result<Ty<P>> {
-        let owner_id = fun.hir_id.owner;
-        let owner_def_kind = self.get_tcx().def_kind(owner_id);
-
-        if owner_def_kind.is_fn_like() {
-            let local_def_id = owner_id.to_def_id().as_local().unwrap();
-
-            if let ExprKind::Path(qpath) = fun.kind {
-                let typeck_results = self.get_tcx().typeck(local_def_id);
-
-                if let Res::Def(def_kind, def_id) = typeck_results.qpath_res(&qpath, fun.hir_id) {
-                    self.check_intrinsic_constraints(def_id, def_kind, args, typeck_results)?;
-                }
-            }
-        }
-
-        let fty = self.check_expr(fun, &Expectation::NoExpectation, false)?;
-
-        let ty = match fty.clone().kind() {
-            TyKind::Fn(tup_ty, arg_tys, ret_ty) => {
-                if let Some(tty) = tup_ty {
-                    if !self.ty_bottom().satisfies(&tty) {
-                        let msg = format!("cannot call from \"{}\"", self.get_crate_name_owned());
-                        self.get_tcx_mut().dcx().span_err(fun.span, msg);
-                    }
-                }
-
-                if args.len() != arg_tys.len() {
-                    warn!("arg ct doesnt match up");
-                }
-
-                for (ty, expr) in arg_tys.into_iter().zip(args) {
-                    let expectation = Expectation::ExpectHasType(ty);
-                    self.check_expr(expr, &expectation, false)?;
-                }
-
-                *ret_ty
-            }
-
-            TyKind::Adt(elements) => {
-                for (i, arg) in args.iter().enumerate() {
-                    let ty = elements[&i.to_string()].clone();
-                    let expectation = Expectation::ExpectHasType(ty);
-                    self.check_expr(arg, &expectation, false)?;
-                }
-
-                fty.clone()
-            }
-
-            _ => {
-                warn!("Cannot tell if expression is a function - {:?}", fun);
-                fty.clone()
-            }
-        };
-
-        Ok(ty.merge(fty))
-    }
-
-    /// Checks the type of a method call.
-    fn check_method_call(
-        &mut self,
-        hir_id: HirId,
-        receiver: &Expr,
-        args: &[Expr],
-        _span: Span,
-    ) -> Result<Ty<P>> {
-        let typeck_results = self.get_tcx_mut().typeck(hir_id.owner.def_id);
-        let (def_kind, def_id) = typeck_results.type_dependent_def(hir_id).unwrap();
-
-        match def_kind {
-            DefKind::AssocFn => {
-                // let args = vec![receiver];
-                let mut args_ = vec![receiver.clone()];
-                args_.extend_from_slice(args);
-
-                self.check_intrinsic_constraints(def_id, def_kind, args, typeck_results)?;
-
-                let fty = self.fn_ty(def_id);
-                // KEEP: I can use this to generate intrinsic annotations
-                // let s = serde_json::to_string(&fty).unwrap();
-                // debug!("{}", s);
-
-                match fty.kind() {
-                    TyKind::Fn(tup_ty, arg_tys, ret_ty) => {
-                        if let Some(tty) = tup_ty {
-                            if !self.ty_bottom().satisfies(&tty) {
-                                // TODO: Use the correct span
-                                let msg = format!("cannot call from \"{}\"", self.get_crate_name_owned());
-                                self.get_tcx_mut().dcx().span_err(receiver.span, msg);
-                            }
-                        }
-
-                        // We subtract one to account for the receiver
-                        if args.len() != arg_tys.len() - 1 {
-                            warn!("arg ct doesnt match up");
-                        }
-
-                        let args = std::iter::once(receiver).chain(args.iter());
-                        for (ty, expr) in arg_tys.into_iter().zip(args) {
-                            let expectation = Expectation::ExpectHasType(ty);
-                            self.check_expr(expr, &expectation, false)?;
-                        }
-
-                        Ok(*ret_ty)
-                    }
-
-                    _ => todo!(),
-                }
-            }
-
-            _ => todo!(),
-        }
-    }
-
-    /// Checks the type of an `if` expression.
-    fn check_expr_if(
-        &mut self,
-        guard: &Expr,
-        then_expr: &Expr,
-        else_expr: Option<&Expr>,
-        expectation: &Expectation<P>,
-    ) -> Result<Ty<P>> {
-        let ity = self.check_expr(guard, &Expectation::NoExpectation, false)?;
-
-        self.enter_scope(&ity);
-
-        let mut rty = self.check_expr(then_expr, expectation, false)?;
-
-        if let Some(else_expr) = else_expr {
-            rty = rty.merge(self.check_expr(else_expr, expectation, false)?);
-        }
-
-        self.exit_scope();
-        Ok(rty)
-    }
-
-    /// Checks the type of a `match` expression.
-    fn check_expr_match(
-        &mut self,
-        guard: &Expr,
-        arms: &[Arm],
-        source: MatchSource,
-        expectation: &Expectation<P>,
-    ) -> Result<Ty<P>> {
-        let ity = match source {
-            MatchSource::ForLoopDesugar => {
-                // The guard expression is a function call, and we want the argument
-                let ExprKind::Call(_, args) = guard.kind else {
-                    unreachable!()
-                };
-
-                self.check_expr(&args[0], &Expectation::NoExpectation, false)?
-            }
-
-            _ => self.check_expr(guard, &Expectation::NoExpectation, false)?,
-        };
-
-        self.enter_scope(&ity);
-
-        let mut result = self.ty_bottom();
-
-        for arm in arms {
-            self.process_pattern(arm.pat.kind, ity.clone(), arm.pat.hir_id);
-            result = result.merge(self.check_expr(arm.body, expectation, false)?)
-        }
-
-        self.exit_scope();
-        Ok(result)
-    }
-
-    /// Checks the type of a `let` expression. These typically appear as the guards of `if` expressions.
-    fn check_expr_let(&mut self, let_expr: &LetExpr, expectation: &Expectation<P>) -> Result<Ty<P>> {
-        let ty = self.check_expr(let_expr.init, expectation, false)?;
-
-        self.process_pattern(let_expr.pat.kind, ty.clone(), let_expr.pat.hir_id);
-
-        Ok(ty)
-    }
-
-    /// Checks the type of a binary expression.
-    fn check_expr_binary(&mut self, lhs: &Expr, rhs: &Expr, expectation: &Expectation<P>) -> Result<Ty<P>> {
-        let lty = self.check_expr(lhs, expectation, false)?;
-        let rty = self.check_expr(rhs, expectation, false)?;
-        let ty = lty.merge(rty);
-
-        Ok(ty)
-    }
-
-    /// Checks the type of a block.
-    fn check_expr_block(&mut self, block: &Block, expectation: &Expectation<P>) -> Result<Ty<P>> {
-        // The number of statements in this block;
-        let len = block.stmts.len();
-
-        match block.expr {
-            Some(expr) => {
-                for stmt in block.stmts {
-                    self.check_stmt(stmt, &Expectation::NoExpectation)?;
-                }
-
-                // This expression occurs at the very end without a semicolon
-                self.check_expr(expr, expectation, false)
-            }
-
-            None if !block.stmts.is_empty() => {
-                // Check all statements except the last one without expectation
-                for stmt in block.stmts[..len - 1].iter() {
-                    self.check_stmt(stmt, &Expectation::NoExpectation)?;
-                }
-
-                self.check_stmt(&block.stmts.last().unwrap(), expectation)
-            }
-
-            _ => Ok(self.ty_bottom()),
-        }
-    }
-
-    /// Checks the type of an assignment expression.
-    fn check_expr_assign(&mut self, dest: &Expr, expr: &Expr) -> Result<Ty<P>> {
-        let expected = self.check_expr(dest, &Expectation::NoExpectation, true)?;
-
-        let expectation = &Expectation::ExpectHasType(expected.clone());
-        self.check_expr(expr, expectation, false)
-    }
-
-    /// Checks the type of a struct expression.
-    fn check_expr_struct(&mut self, hir_id: HirId, qpath: &QPath, fields: &[ExprField]) -> Result<Ty<P>> {
-        let ty = match qpath {
-            QPath::LangItem(item, _) => match item {
-                LangItem::Range => {
-                    // NOTE: We handle ranges in a special manner for the time being
-                    let mut result = self.ty_bottom();
-
+    /// Recursively process a struct pattern, registering all identifiers with the locals map.
+    fn process_pattern_struct(&mut self, hir_id: HirId, qpath: &QPath, fields: &[PatField]) {
+        match self.check_expr_path(hir_id, qpath, None) {
+            Ok(ty) => match &ty.kind {
+                TypeKind::Rec(map) => {
                     for field in fields {
-                        result =
-                            result.merge(self.check_expr(field.expr, &Expectation::NoExpectation, false)?);
+                        let ty = self.extract(&map[&field.ident.to_string()].ty, &ty);
+                        self.process_pattern(field.pat.kind, ty, field.pat.hir_id);
                     }
-
-                    result
                 }
 
-                _ => {
-                    warn!("Language item silently ignored");
-                    self.ty_bottom()
+                TypeKind::Opaque => {
+                    for field in fields {
+                        let ty = self.top_type();
+                        self.process_pattern(field.pat.kind, ty, field.pat.hir_id);
+                    }
                 }
+
+                _ => todo!(),
             },
 
-            _ => self.check_expr_path(hir_id, qpath, &Expectation::NoExpectation)?,
-        };
-
-        match ty.kind() {
-            TyKind::Adt(tys) => {
-                for field in fields {
-                    let ty = tys[&field.ident.to_string()].clone();
-                    let expectation = Expectation::ExpectHasType(ty);
-                    self.check_expr(field.expr, &expectation, false)?;
-                }
-            }
-
-            TyKind::Opaque | TyKind::Infer => {
-                for field in fields {
-                    self.check_expr(field.expr, &Expectation::NoExpectation, false)?;
-                }
-            }
-
-            _ => todo!(),
-        }
-
-        Ok(ty)
-    }
-
-    /// Checks the type of an array expression.
-    fn check_expr_array(&mut self, exprs: &[Expr]) -> Result<Ty<P>> {
-        let mut result = self.ty_bottom();
-        let mut item = self.ty_bottom();
-
-        for expr in exprs {
-            item = item.merge(self.check_expr(expr, &Expectation::NoExpectation, false)?);
-        }
-
-        result.kind = TyKind::Array(Box::new(item));
-
-        Ok(result)
-    }
-
-    /// Checks the type of a tuple expression.
-    fn check_expr_tup(&mut self, exprs: &[Expr]) -> Result<Ty<P>> {
-        let mut result = self.ty_bottom();
-
-        let mut items = vec![];
-
-        for expr in exprs {
-            items.push(self.check_expr(expr, &Expectation::NoExpectation, false)?);
-        }
-
-        result.kind = TyKind::Tuple(items);
-        Ok(result)
-    }
-
-    /// Checks the type of a return expression.
-    fn check_expr_ret(&mut self, expr: Option<&Expr>, expectation: &Expectation<P>) -> Result<Ty<P>> {
-        match expr {
-            Some(expr) => Ok(self.check_expr(expr, expectation, false)?),
-            None => Ok(self.ty_bottom()),
-        }
-    }
-
-    /// Checks the type of a closure expression.
-    fn check_expr_closure(&mut self, closure: &Closure, expectation: &Expectation<P>) -> Result<Ty<P>> {
-        match expectation {
-            // TODO: Account for the argument tuple type
-            Expectation::ExpectHasType(Ty {
-                property,
-                kind: TyKind::Fn(_, args, ret),
-            }) => {
-                // First, make sure the number of parameters is correct
-                let count = closure.fn_decl.inputs.iter().count();
-
-                if count != args.len() {
-                    let msg = format!("expected {} parameter(s), found {count}", args.len());
-                    self.get_tcx_mut()
-                        .dcx()
-                        .span_err(closure.fn_arg_span.unwrap(), msg);
-                }
-
-                // Then, type check the body
-                let body = self.get_tcx_mut().hir_body(closure.body);
-
-                for (param, arg) in body.params.iter().zip(args.clone()) {
-                    // TODO: Use `process_pattern` instead
-                    self.get_locals_mut().insert(param.pat.hir_id, arg);
-                }
-
-                let expectation = Expectation::ExpectHasType(*ret.clone());
-                let ret = self.check_expr(&body.value, &expectation, false)?;
-
-                // Finally, return the expected type
-                Ok(Ty {
-                    property: property.clone(),
-                    kind: TyKind::Fn(None, args.to_vec(), Box::new(ret)),
-                })
-            }
-
-            _ => {
-                // Either there is no expectation or the expectation isn't a function
-                let count = closure.fn_decl.inputs.iter().count();
-
-                let args: Vec<Ty<P>> = (0..count).map(|_| self.ty_bottom()).collect();
-
-                // Then, type check the body
-                let body = self.get_tcx_mut().hir_body(closure.body);
-
-                for (param, arg) in body.params.iter().zip(args.clone()) {
-                    // TODO: Use `process_pattern` instead
-                    self.get_locals_mut().insert(param.pat.hir_id, arg);
-                }
-
-                let ret = self.check_expr(&body.value, &Expectation::NoExpectation, false)?;
-
-                let mut ty = self.ty_bottom();
-                ty.kind = TyKind::Fn(None, args, Box::new(ret));
-
-                Ok(ty)
+            Err(_) => {
+                warn!("Pattern struct processing failing silently");
             }
         }
     }
-
-    /// Checks the type of a projection.
-    fn check_expr_field(&mut self, object: &Expr, field: Ident) -> Result<Ty<P>> {
-        match self.check_expr(object, &Expectation::NoExpectation, false)?.kind {
-            TyKind::Adt(field_map) => {
-                if !field_map.contains_key(&field.to_string()) {
-                    let msg = format!("unknown field '{}'", field.name);
-                    self.get_tcx_mut().dcx().span_err(field.span, msg);
-                    Ok(self.ty_top())
-                } else {
-                    Ok(field_map[&field.to_string()].clone())
-                }
-            }
-
-            TyKind::Tuple(fields) => {
-                let index = field.name.as_str().parse::<usize>().unwrap();
-
-                if index >= fields.len() {
-                    let msg = format!("unknown field '{}'", field.name);
-                    self.get_tcx_mut().dcx().span_err(field.span, msg);
-                    Ok(self.ty_top())
-                } else {
-                    Ok(fields[index].clone())
-                }
-            }
-
-            TyKind::Opaque | TyKind::Infer => {
-                // For now, any field access with an unknown receiver will be universal
-                // However, in the future, I should refine my type checking to avoid this
-                Ok(self.ty_top())
-            }
-
-            _ => todo!(),
-        }
-    }
-
-    /// Checks the type of a statement.
-    fn check_stmt(&mut self, stmt: &Stmt, expectation: &Expectation<P>) -> Result<Ty<P>> {
-        // TODO: Think more about what type should be returned by a statement
-        match stmt.kind {
-            StmtKind::Let(local) => {
-                self.check_let_stmt(local)?;
-                Ok(self.ty_bottom())
-            }
-            StmtKind::Expr(expr) => self.check_expr(expr, expectation, false),
-            StmtKind::Semi(expr) => self.check_expr(expr, expectation, false),
-            StmtKind::Item(item_id) => {
-                let item = self.get_tcx_mut().hir_item(item_id);
-                self.check_item(item)?;
-                Ok(self.ty_bottom())
-            }
-        }
-    }
-
-    // ======== ATTRIBUTE PARSING ======== //
-
-    fn parse_attr(&self, attr: &Attribute) -> Result<TyAST<P>> {
-        let AttrKind::Normal(normal) = &attr.kind else {
-            unreachable!()
-        };
-
-        let psess = create_psess(self.get_tcx());
-
-        if let AttrArgs::Delimited(delim_args) = normal.args.clone() {
-            let mut parser = create_parser(&psess, delim_args.tokens);
-
-            parser
-                .parse_ty()
-                .map_err(|err| self.get_tcx().dcx().span_err(err.span.clone(), "failed to parse"))
-        } else {
-            panic!()
-        }
-    }
-
-    // OTHER //
-    fn check_intrinsic_constraints(
-        &mut self,
-        def_id: DefId,
-        def_kind: DefKind,
-        args: &[Expr],
-        typeck_results: &TypeckResults<'tcx>,
-    ) -> Result {
-        match def_kind {
-            DefKind::Fn | DefKind::AssocFn => {
-                let fn_sig = self.get_tcx_mut().fn_sig(def_id).skip_binder();
-
-                for (expected_ty, actual_expr) in fn_sig.inputs().iter().zip(args) {
-                    let expected_ty = expected_ty.skip_binder();
-                    let actual_ty = typeck_results.expr_ty(actual_expr);
-
-                    if let ty::Param(_) = expected_ty.kind() {
-                        for trait_data in self.get_trait_intrinsics() {
-                            let implements = impls_trait(
-                                expected_ty,
-                                &trait_data.name,
-                                &trait_data.args,
-                                self.get_tcx(),
-                                def_id,
-                            );
-
-                            let allowed_tys: Vec<ty::Ty<'_>> = trait_data
-                                .allowed
-                                .iter()
-                                .map(|name| {
-                                    let ty_symbol = Symbol::intern(name);
-                                    match self.get_tcx().get_diagnostic_item(ty_symbol) {
-                                        Some(def_id) => self.get_tcx().type_of(def_id).skip_binder(),
-                                        None => panic!("Type {name} is not a diagnostic item"),
-                                    }
-                                })
-                                .collect();
-
-                            if implements && !allowed_tys.contains(&actual_ty.peel_refs()) {
-                                let msg = format!("must be one of: {}", trait_data.allowed.join(", "));
-                                return Err(self.get_tcx_mut().dcx().span_err(actual_expr.span, msg));
-                            }
-                        }
-                    }
-                }
-            }
-
-            DefKind::Ctor(ctor_of, ctor_kind) => {
-                let name = self.get_tcx().def_path_str(def_id);
-            }
-
-            _ => {}
-        }
-
-        Ok(())
-    }
-}
-
-pub struct Checker<'tcx, P: Property> {
-    /// Contains the name of the crate we're checking.
-    crate_name: String,
-
-    /// Contains the attribute we are targeting as a sequence of symbols.
-    attr: Vec<Symbol>,
-
-    /// Contains type checking results for the entire crate.
-    tcx: TyCtxt<'tcx>,
-
-    /// Maps item `DefId`s to their properties.
-    items: HashMap<DefId, Ty<P>>,
-
-    /// Maps local `HirId`s to their properties.
-    locals: HashMap<HirId, Ty<P>>,
-
-    context: Vec<Ty<P>>,
-
-    pub type_intrinsics: HashMap<String, Ty<P>>,
-
-    trait_intrinsics: Vec<TraitData>,
-}
-
-impl<'tcx, P: Property + DeserializeOwned> Checker<'tcx, P> {
-    pub fn new(crate_name: String, tcx: TyCtxt<'tcx>) -> Self {
-        // Collect intrinsic annotations for this property
-        let path = P::intrinsics_path();
-        let map = fs::read_to_string(&path).unwrap();
-
-        let type_intrinsics: HashMap<String, Ty<P>> = serde_json::from_str(&map).unwrap();
-
-        // Collect all trait intrinsics
-        let path = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("../..")
-            .join("intrinsics")
-            .join("ad-hoc")
-            .join("traits")
-            .with_extension("json");
-
-        let map = fs::read_to_string(&path).unwrap();
-
-        let trait_intrinsics: Vec<TraitData> = serde_json::from_str(&map).unwrap();
-
-        Self {
-            crate_name: crate_name.clone(),
-            attr: P::attr(),
-            tcx,
-            items: HashMap::new(),
-            locals: HashMap::new(),
-            context: vec![Ty::new(P::bottom(crate_name), TyKind::Infer)],
-            type_intrinsics,
-            trait_intrinsics,
-        }
-    }
-}
-
-impl<'tcx, P: Property + Parse + DeserializeOwned> Check<'tcx, P> for Checker<'tcx, P> {
-    fn get_crate_name_owned(&self) -> String {
-        self.crate_name.clone()
-    }
-
-    fn get_type_intrinsics(&self) -> &HashMap<String, Ty<P>> {
-        &self.type_intrinsics
-    }
-
-    fn get_trait_intrinsics(&self) -> &Vec<TraitData> {
-        &self.trait_intrinsics
-    }
-
-    fn get_attr(&self) -> &[Symbol] {
-        &self.attr
-    }
-
-    fn get_tcx(&self) -> &TyCtxt<'tcx> {
-        &self.tcx
-    }
-
-    fn get_tcx_mut(&mut self) -> &mut TyCtxt<'tcx> {
-        &mut self.tcx
-    }
-
-    fn get_items(&self) -> &HashMap<DefId, Ty<P>> {
-        &self.items
-    }
-
-    fn get_items_mut(&mut self) -> &mut HashMap<DefId, Ty<P>> {
-        &mut self.items
-    }
-
-    fn get_locals(&self) -> &HashMap<HirId, Ty<P>> {
-        &self.locals
-    }
-
-    fn get_locals_mut(&mut self) -> &mut HashMap<HirId, Ty<P>> {
-        &mut self.locals
-    }
-
-    fn enter_scope(&mut self, ty: &Ty<P>) {
-        self.context.push(ty.clone())
-    }
-
-    fn exit_scope(&mut self) {
-        self.context.pop();
-    }
-
-    fn influence(&self, ty: Ty<P>) -> Ty<P> {
-        let mut result = ty;
-
-        for infl in self.context.iter().rev() {
-            result = infl.clone().influence(result);
-        }
-
-        result
-    }
-
-    fn ty_bottom(&self) -> Ty<P> {
-        self.influence(Ty::new(P::bottom(self.crate_name.clone()), TyKind::Infer))
-    }
-
-    fn ty_top(&self) -> Ty<P> {
-        Ty::new(P::top(), TyKind::Infer)
-    }
-}
-
-fn impls_trait<'a, 'tcx, T: IntoIterator<Item = &'a String>>(
-    ty: &ty::Ty<'tcx>,
-    trait_name: &str,
-    arg_ty_names: T,
-    tcx: &TyCtxt<'tcx>,
-    parent_did: DefId,
-) -> bool {
-    let trait_symbol = Symbol::intern(trait_name);
-    let trait_did = tcx
-        .get_diagnostic_item(trait_symbol)
-        .expect(&format!("Trait `{trait_name}` is not a diagnostic item"));
-
-    let arg_tys = arg_ty_names.into_iter().map(|name| {
-        let ty_symbol = Symbol::intern(&name);
-        let ty = match tcx.get_diagnostic_item(ty_symbol) {
-            Some(did) => tcx.type_of(did).skip_binder(),
-            None => panic!("Type `{trait_name}` is not a diagnostic item"),
-        };
-        GenericArg::from(ty)
-    });
-
-    let typing_env = TypingEnv::post_analysis(*tcx, parent_did);
-
-    implements_trait_with_env_from_iter(*tcx, typing_env, *ty, trait_did, None, arg_tys)
 }

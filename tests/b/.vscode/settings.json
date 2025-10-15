@@ -1,0 +1,10 @@
+{
+    "rust-analyzer.check.allTargets": false,
+    "prettifySymbolsMode.substitutions": [{
+        "language": "rust",
+        "substitutions": [
+        { "ugly": "->", "pretty": "→" },
+        { "ugly": "sub=", "pretty": "⊆" }
+        ]
+    }]
+}

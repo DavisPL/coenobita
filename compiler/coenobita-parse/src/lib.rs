@@ -9,14 +9,19 @@ extern crate rustc_parse;
 extern crate rustc_session;
 extern crate rustc_span;
 
+pub mod parse;
+pub(crate) mod token;
+
+use parse::CoenobitaParser;
+use token::*;
+
+use std::collections::{BTreeSet, HashMap};
 use std::io;
 use std::sync::Arc;
 
-use coenobita_middle::property::Property;
-use coenobita_middle::ty::Ty;
-use parse::{CoenobitaParser, Parse};
-use rustc_ast::token::Delimiter;
-use rustc_ast::token::TokenKind::{CloseDelim, OpenDelim};
+use coenobita_middle::set::Set;
+
+use rustc_ast::token::{LitKind, TokenKind};
 use rustc_ast::tokenstream::TokenStream;
 
 use rustc_data_structures::sync;
@@ -36,102 +41,213 @@ use rustc_session::parse::ParseSess;
 use rustc_span::source_map::SourceMap;
 use rustc_span::{BytePos, Span};
 
-use coenobita_ast::{TyAST, TyKindAST};
+pub struct Param {
+    pub left: Spanned<String>,
+    pub bound: Spanned<Set>,
+    pub right: HashMap<String, Span>,
+}
 
-pub mod parse;
-pub(crate) mod token;
+pub struct Spanned<T> {
+    pub value: T,
+    pub span: Span,
+}
 
-use token::*;
+impl<T> Spanned<T> {
+    fn new(value: T, span: Span) -> Self {
+        Spanned { value, span }
+    }
+}
+
+pub struct Input {
+    pub index: Spanned<usize>,
+    pub integrity: [Spanned<Set>; 3],
+    pub providers: Spanned<Set>,
+    pub variables: HashMap<String, Span>,
+}
+
+pub struct Field {
+    pub integrity: [Spanned<Set>; 3],
+    pub providers: Spanned<Set>,
+    pub variables: HashMap<String, Span>,
+}
+
+/// Used for `output` and `local` attributes
+pub struct Other {
+    pub integrity: [Spanned<Set>; 3],
+    pub variables: HashMap<String, Span>,
+}
 
 impl<'cnbt> CoenobitaParser<'cnbt> {
     pub fn new(parser: Parser<'cnbt>) -> Self {
-        CoenobitaParser { parser }
+        CoenobitaParser {
+            parser,
+            variables: HashMap::new(),
+        }
     }
 
-    pub fn parse_ty<P: Property + Parse>(&mut self) -> PResult<'cnbt, TyAST<P>> {
-        let start = self.start();
+    fn parse_other(&mut self) -> PResult<'cnbt, Other> {
+        let integrity = [self.parse_set()?, self.parse_set()?, self.parse_set()?];
 
-        Ok(TyAST {
-            inner: Ty::new(P::parse(self)?, self.parse_ty_kind()?.into()),
-            span: self.end(start),
+        Ok(Other {
+            integrity,
+            variables: self.variables.clone(),
         })
     }
 
-    pub fn parse_ty_kind<P: Property + Parse>(&mut self) -> PResult<'cnbt, TyKindAST<P>> {
-        if self.parser.eat_keyword(KW_FN) {
-            // We are parsing a function type
-            self.parser.expect(OPEN_PAREN)?;
+    pub fn parse_local(&mut self) -> PResult<'cnbt, Other> {
+        self.parse_other()
+    }
 
-            let mut args = vec![];
-            while self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                args.push(self.parse_ty()?);
+    pub fn parse_output(&mut self) -> PResult<'cnbt, Other> {
+        self.parse_other()
+    }
 
-                if self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                    self.parser.expect(COMMA)?;
+    pub fn parse_field(&mut self) -> PResult<'cnbt, Field> {
+        let integrity = [self.parse_set()?, self.parse_set()?, self.parse_set()?];
+        self.parser.expect(PIPE)?;
+        let providers = self.parse_set()?;
+
+        Ok(Field {
+            integrity,
+            providers,
+            variables: self.variables.clone(),
+        })
+    }
+
+    pub fn parse_input(&mut self) -> PResult<'cnbt, Input> {
+        let span = self.parser.token.span;
+
+        let index = match self.parser.token.kind {
+            TokenKind::Literal(lit) => match lit.kind {
+                LitKind::Integer => {
+                    let index: usize = lit.symbol.to_string().parse().map_err(|e| {
+                        self.parser
+                            .dcx()
+                            .struct_span_err(self.parser.token.span, format!("invalid index {}", lit.symbol))
+                    })?;
+
+                    self.parser.bump();
+
+                    index
                 }
+
+                _ => {
+                    return Err(self.parser.dcx().struct_span_err(
+                        self.parser.token.span,
+                        format!("expected nonzero integer, found {}", lit.symbol),
+                    ))
+                }
+            },
+
+            _ => {
+                return Err(self
+                    .parser
+                    .dcx()
+                    .struct_span_err(self.parser.token.span, format!("expected nonzero integer")))
+            }
+        };
+
+        let integrity = [self.parse_set()?, self.parse_set()?, self.parse_set()?];
+        self.parser.expect(PIPE)?;
+        let providers = self.parse_set()?;
+
+        Ok(Input {
+            index: Spanned::new(index, span),
+            integrity,
+            providers,
+            variables: self.variables.clone(),
+        })
+    }
+
+    pub fn parse_param(&mut self) -> PResult<'cnbt, Param> {
+        let var = self.parser.parse_ident()?;
+        self.parse_subset()?;
+        let bound = self.parse_set()?;
+
+        Ok(Param {
+            left: Spanned::new(var.to_string(), var.span),
+            bound,
+            right: self.variables.clone(),
+        })
+    }
+
+    pub fn parse_set(&mut self) -> PResult<'cnbt, Spanned<Set>> {
+        let start = self.start();
+
+        let left = if self.parser.eat(OPEN_BRACE) {
+            let mut origins = BTreeSet::new();
+
+            if let Ok(ident) = self.parser.parse_ident() {
+                origins.insert(ident.to_string());
             }
 
-            self.parser.expect(CLOSE_PAREN)?;
-            self.parser.expect(RARROW)?;
+            while !self.parser.eat(CLOSE_BRACE) {
+                self.parser.expect(COMMA)?;
 
-            Ok(TyKindAST::Fn(args, Box::new(self.parse_ty()?)))
-        } else if self.parser.eat_keyword(KW_STRUCT) {
-            // We are parsing a struct type
-            if self.parser.token.kind == OpenDelim(Delimiter::Brace) {
-                // We are parsing a `{ ... }` struct
-                self.parser.expect(OPEN_BRACE)?;
-
-                let mut fields = vec![];
-                while self.parser.token != CloseDelim(Delimiter::Brace) {
-                    let ident = self.parser.parse_ident()?;
-                    self.parser.expect(COLON)?;
-
-                    fields.push((ident, self.parse_ty()?));
-
-                    if self.parser.token != CloseDelim(Delimiter::Brace) {
-                        self.parser.expect(COMMA)?;
-                    }
+                if self.parser.eat(CLOSE_BRACE) {
+                    break;
                 }
 
-                self.parser.expect(CLOSE_BRACE)?;
-                Ok(TyKindAST::Struct(fields))
+                let next_origin = self.parser.parse_ident()?.to_string();
+                origins.insert(next_origin);
+            }
+
+            if origins.contains("*") {
+                Set::Universe
             } else {
-                // We are parsing a `( ... )` struct
-                self.parser.expect(OPEN_PAREN)?;
-
-                let mut elements = vec![];
-                while self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                    elements.push(self.parse_ty()?);
-
-                    if self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                        self.parser.expect(COMMA)?;
-                    }
-                }
-
-                self.parser.expect(CLOSE_PAREN)?;
-                Ok(TyKindAST::StructTuple(elements))
+                Set::Concrete(origins)
             }
-        } else if self.parser.eat(OPEN_PAREN) {
-            // We are parsing a tuple type
-            let mut elements = vec![];
-            while self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                elements.push(self.parse_ty()?);
-
-                if self.parser.token != CloseDelim(Delimiter::Parenthesis) {
-                    self.parser.expect(COMMA)?;
-                }
-            }
-
-            self.parser.expect(CLOSE_PAREN)?;
-            Ok(TyKindAST::Tuple(elements))
-        } else if self.parser.eat(OPEN_BRACKET) {
-            // We are parsing an array type
-            let element = self.parse_ty()?;
-            self.parser.expect(CLOSE_BRACKET)?;
-            Ok(TyKindAST::Array(Box::new(element)))
         } else {
-            Ok(TyKindAST::Opaque)
+            let ident = self.parser.parse_ident()?;
+
+            if !self.variables.contains_key(&ident.to_string()) {
+                self.variables.insert(ident.to_string(), ident.span.clone());
+            }
+
+            Set::Variable(ident.to_string())
+        };
+
+        if self.eat_union() {
+            let right = self.parse_set()?;
+            return Ok(Spanned::new(left.union(right.value), self.end(start)));
         }
+
+        Ok(Spanned::new(left, self.end(start)))
+    }
+
+    pub fn parse_subset(&mut self) -> PResult<'cnbt, ()> {
+        // Check for "sub" identifier
+        if let TokenKind::Ident(sym, _) = self.parser.token.kind {
+            if sym.to_string() == "sub" {
+                self.parser.bump();
+            } else {
+                return Err(self
+                    .parser
+                    .dcx()
+                    .struct_span_err(self.parser.token.span, format!("expected `sub`, found `{}`", sym)));
+            }
+        } else {
+            return Err(self.parser.dcx().struct_span_err(
+                self.parser.token.span,
+                format!("expected `sub`, found `{:?}`", self.parser.token.kind),
+            ));
+        }
+
+        // Expect the `=` token
+        self.parser.expect(EQUAL)?;
+
+        Ok(())
+    }
+
+    pub fn eat_union(&mut self) -> bool {
+        if let TokenKind::Ident(sym, _) = self.parser.token.kind {
+            if sym.to_string() == "U" {
+                self.parser.bump();
+                return true;
+            }
+        }
+
+        false
     }
 
     fn start(&mut self) -> BytePos {
