@@ -9,6 +9,7 @@ rustc_private = true
 [dependencies]
 coenobita-middle.workspace = true
 coenobita-parse.workspace = true
+coenobita-decl.workspace = true
 
 itertools.workspace = true
 log.workspace = true

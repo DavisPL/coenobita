@@ -25,6 +25,8 @@ use coenobita_parse::{create_parser, create_psess, Param};
 use coenobita_parse::{Field, Input, Other};
 
 use std::collections::{BTreeSet, HashMap};
+use std::fs;
+use std::path::Path;
 
 use itertools::Itertools;
 use log::{debug, warn};
@@ -63,10 +65,22 @@ pub struct Checker<'tcx> {
     icx: InfCtx,
 
     crate_name: String,
+
+    fn_decls: HashMap<String, Type>,
 }
 
 impl<'tcx> Checker<'tcx> {
     pub fn new(crate_name: String, tcx: TyCtxt<'tcx>) -> Self {
+        // Collect function declarations
+        let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../..")
+            .join("declarations")
+            .join("fn.d.rs");
+
+        // TODO: Handle parsing failures
+        let fn_decls_raw = fs::read_to_string(&path).unwrap();
+        let fn_decls = coenobita_decl::parse(&fn_decls_raw).unwrap();
+
         Checker {
             tcx,
 
@@ -88,6 +102,8 @@ impl<'tcx> Checker<'tcx> {
             icx: InfCtx::new(crate_name.clone()),
 
             crate_name,
+
+            fn_decls,
         }
     }
 
@@ -215,6 +231,12 @@ impl<'tcx> Checker<'tcx> {
 
     /// Given the `DefId` of a function, return its type.
     fn fn_ty(&mut self, def_id: DefId) -> Type {
+        let canonical_path = self.tcx.def_path_str(def_id);
+
+        if self.fn_decls.contains_key(&canonical_path) {
+            return self.fn_decls[&canonical_path].clone();
+        }
+
         if let Some(ty) = self.items.get(&def_id) {
             return ty.clone();
         }

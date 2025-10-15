@@ -1,0 +1,1 @@
+fn std::path::Path::new({root} {root} {root} | {root}) -> {root} {root} {root};
