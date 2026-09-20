@@ -21,7 +21,7 @@ use crate::cx::{Ctx, InfCtx};
 use coenobita_middle::set::{Set, SetCtx};
 use coenobita_middle::ty::{PassError, ProvType, SetVar, Type, TypeKind};
 use coenobita_parse::parse::CoenobitaParser;
-use coenobita_parse::{create_parser, create_psess, Param};
+use coenobita_parse::{create_parser, create_psess, Integrity, Param, Spanned};
 use coenobita_parse::{Field, Input, Other};
 
 use std::collections::{BTreeSet, HashMap};
@@ -37,12 +37,28 @@ use rustc_hir::def::{CtorOf, DefKind, Res};
 use rustc_hir::def_id::DefId;
 use rustc_hir::{
     Arm, AttrArgs, AttrKind, Attribute, Block, BodyId, Closure, Expr, ExprField, ExprKind, FnSig, HirId,
-    Item, ItemKind, LangItem, LetExpr, LetStmt, MatchSource, PatField, PatKind, QPath, Stmt, StmtKind,
+    ImplItem, ImplItemKind, Item, ItemKind, LangItem, LetExpr, LetStmt, MatchSource, PatField, PatKind, QPath, Stmt, StmtKind,
 };
 use rustc_middle::ty::{FieldDef, Ty, TyCtxt, TyKind};
 use rustc_span::{ErrorGuaranteed, Ident, Span, Symbol};
 
 pub type Result<T = ()> = std::result::Result<T, ErrorGuaranteed>;
+
+fn erase_generic_segments(path: &str) -> String {
+    let mut erased = String::with_capacity(path.len());
+    let mut depth = 0;
+
+    for ch in path.chars() {
+        match ch {
+            '<' => depth += 1,
+            '>' if depth > 0 => depth -= 1,
+            _ if depth == 0 => erased.push(ch),
+            _ => {}
+        }
+    }
+
+    erased.replace("::::", "::")
+}
 
 pub struct Checker<'tcx> {
     tcx: TyCtxt<'tcx>,
@@ -84,11 +100,11 @@ impl<'tcx> Checker<'tcx> {
         Checker {
             tcx,
 
-            param_attr: vec![Symbol::intern("coenobita"), Symbol::intern("parameter")],
-            output_attr: vec![Symbol::intern("coenobita"), Symbol::intern("output")],
-            input_attr: vec![Symbol::intern("coenobita"), Symbol::intern("input")],
-            local_attr: vec![Symbol::intern("coenobita"), Symbol::intern("local")],
-            field_attr: vec![Symbol::intern("coenobita"), Symbol::intern("field")],
+            param_attr: vec![Symbol::intern("cnbt"), Symbol::intern("parameter")],
+            output_attr: vec![Symbol::intern("cnbt"), Symbol::intern("output")],
+            input_attr: vec![Symbol::intern("cnbt"), Symbol::intern("input")],
+            local_attr: vec![Symbol::intern("cnbt"), Symbol::intern("local")],
+            field_attr: vec![Symbol::intern("cnbt"), Symbol::intern("field")],
 
             scx: SetCtx::new(),
 
@@ -112,9 +128,16 @@ impl<'tcx> Checker<'tcx> {
     fn check_item_fn_nonlocal(&mut self, def_id: DefId) -> Result {
         let n = self.tcx.fn_sig(def_id).skip_binder().inputs().iter().count();
 
-        let default = self.icx.influence(Type::fun(n));
+        let mut default = Type::fun(n);
+        let origin = self.origin_for_def(def_id);
+        let set = Set::Concrete(BTreeSet::from([origin]));
+        default.intrinsic = [set.clone(), set.clone(), set.clone()];
 
-        // TODO: Collect attributes
+        if let TypeKind::Fn(_, rty) = &mut default.kind {
+            rty.intrinsic = [set.clone(), set.clone(), set];
+        }
+
+        self.apply_fn_integrity_attrs(def_id, &mut default)?;
 
         self.items.insert(def_id, default);
 
@@ -189,6 +212,22 @@ impl<'tcx> Checker<'tcx> {
             }
         }
 
+        for attr in self.compat_attrs_by_path(def_id, "input") {
+            let Input {
+                index,
+                integrity,
+                providers,
+                variables,
+            } = self.parse_input(attr)?;
+
+            for ss in integrity {
+                self.pass(&mut params[index.value].ty, index.span, ss.value, &variables)?;
+
+                self.ensure_variables_exist(&providers.value, &variables)?;
+                params[index.value].providers = providers.value.clone();
+            }
+        }
+
         // TODO: Only collect one output annotation
         for attr in self.tcx.get_attrs_by_path(def_id, &self.output_attr) {
             let Other { integrity, variables } = self.parse_output(attr)?;
@@ -197,6 +236,29 @@ impl<'tcx> Checker<'tcx> {
                 self.ensure_variables_exist(&ss.value, &variables)?;
                 rty.intrinsic[i] = ss.value.clone();
             }
+        }
+
+        for attr in self.compat_attrs_by_path(def_id, "output") {
+            let Other { integrity, variables } = self.parse_output(attr)?;
+
+            for (i, ss) in integrity.iter().enumerate() {
+                self.ensure_variables_exist(&ss.value, &variables)?;
+                rty.intrinsic[i] = ss.value.clone();
+            }
+        }
+
+        let mut fty_from_public = Type {
+            kind: TypeKind::Fn(params.clone(), Box::new(rty.clone())),
+            var_to_idx: var_to_idx.clone(),
+            binder: binder.clone(),
+            binder_idx: 0,
+            intrinsic: [Set::Universe, Set::Universe, Set::Universe],
+            intrinsic_idx: 0,
+        };
+        self.apply_fn_integrity_attrs(def_id, &mut fty_from_public)?;
+        if let TypeKind::Fn(public_params, public_rty) = fty_from_public.kind {
+            params = public_params;
+            rty = *public_rty;
         }
 
         // Now that all the parameter types have their integrity triples filled, process the patterns
@@ -237,6 +299,11 @@ impl<'tcx> Checker<'tcx> {
             return self.fn_decls[&canonical_path].clone();
         }
 
+        let erased_path = erase_generic_segments(&canonical_path);
+        if self.fn_decls.contains_key(&erased_path) {
+            return self.fn_decls[&erased_path].clone();
+        }
+
         if let Some(ty) = self.items.get(&def_id) {
             return ty.clone();
         }
@@ -244,6 +311,15 @@ impl<'tcx> Checker<'tcx> {
         // We haven't processed the definition of this function yet
         let _ = self.check_item_fn_nonlocal(def_id);
         self.items.get(&def_id).unwrap().clone()
+    }
+
+    fn origin_for_def(&self, def_id: DefId) -> String {
+        self.tcx
+            .def_path_str(def_id)
+            .split("::")
+            .next()
+            .unwrap_or("*")
+            .to_string()
     }
 
     /// Given the parent and variant `DefId`s of an ADT (as well as its index), return its type.
@@ -346,6 +422,60 @@ impl<'tcx> Checker<'tcx> {
         }
     }
 
+    fn compat_attrs_by_path(&self, def_id: DefId, name: &str) -> Vec<&'tcx Attribute> {
+        let path = [Symbol::intern("coenobita"), Symbol::intern(name)];
+        self.tcx.get_attrs_by_path(def_id, &path).collect()
+    }
+
+    fn tool_attrs_by_path(&self, def_id: DefId, name: &str) -> Vec<&'tcx Attribute> {
+        let cnbt = [Symbol::intern("cnbt"), Symbol::intern(name)];
+        let coenobita = [Symbol::intern("coenobita"), Symbol::intern(name)];
+
+        self.tcx
+            .get_attrs_by_path(def_id, &cnbt)
+            .chain(self.tcx.get_attrs_by_path(def_id, &coenobita))
+            .collect()
+    }
+
+    fn attr_matches(&self, attr: &Attribute, name: &str) -> bool {
+        let cnbt = [Symbol::intern("cnbt"), Symbol::intern(name)];
+        let coenobita = [Symbol::intern("coenobita"), Symbol::intern(name)];
+
+        attr.path_matches(&cnbt) || attr.path_matches(&coenobita)
+    }
+
+    fn apply_fn_integrity_attrs(&self, def_id: DefId, fty: &mut Type) -> Result {
+        for attr in self.tool_attrs_by_path(def_id, "integrity") {
+            let Integrity::Fn {
+                intrinsic: _,
+                inputs,
+                output,
+                variables,
+            } = self.parse_integrity(attr)?
+            else {
+                continue;
+            };
+
+            let TypeKind::Fn(params, rty) = &mut fty.kind else {
+                continue;
+            };
+
+            for (param, integrity) in params.iter_mut().zip(inputs.iter()) {
+                for (i, ss) in integrity.iter().enumerate() {
+                    self.ensure_variables_exist(&ss.value, &variables)?;
+                    param.ty.intrinsic[i] = ss.value.clone();
+                }
+            }
+
+            for (i, ss) in output.iter().enumerate() {
+                self.ensure_variables_exist(&ss.value, &variables)?;
+                rty.intrinsic[i] = ss.value.clone();
+            }
+        }
+
+        Ok(())
+    }
+
     pub fn check_item(&mut self, item: &Item) -> Result {
         let def_id = item.owner_id.to_def_id();
 
@@ -367,6 +497,13 @@ impl<'tcx> Checker<'tcx> {
                 self.check_item_struct(def_id, &fields)
             }
 
+            _ => Ok(()),
+        }
+    }
+
+    pub fn check_impl_item(&mut self, item: &ImplItem) -> Result {
+        match item.kind {
+            ImplItemKind::Fn(sig, body) => self.check_item_fn(&sig, body),
             _ => Ok(()),
         }
     }
@@ -417,6 +554,39 @@ impl<'tcx> Checker<'tcx> {
 
                 self.ensure_variables_exist(&providers.value, &variables)?;
                 pty.providers = providers.value.clone();
+            }
+
+            for attr in self.compat_attrs_by_path(field.did, "field") {
+                let Field {
+                    integrity,
+                    providers,
+                    variables,
+                } = self.parse_field(attr)?;
+
+                for (i, ss) in integrity.iter().enumerate() {
+                    self.ensure_variables_exist(&ss.value, &variables)?;
+
+                    pty.ty.intrinsic[i] = ss.value.clone();
+                }
+
+                self.ensure_variables_exist(&providers.value, &variables)?;
+                pty.providers = providers.value.clone();
+            }
+
+            for attr in self.tool_attrs_by_path(field.did, "integrity") {
+                let integrity = self.parse_integrity(attr)?;
+
+                if let Integrity::Other(Other { integrity, variables }) = integrity {
+                    for (i, ss) in integrity.iter().enumerate() {
+                        self.ensure_variables_exist(&ss.value, &variables)?;
+                        pty.ty.intrinsic[i] = ss.value.clone();
+                    }
+                }
+            }
+
+            for attr in self.tool_attrs_by_path(field.did, "providers") {
+                let providers = self.parse_providers(attr)?;
+                pty.providers = providers.value;
             }
 
             fields.insert(field.name.to_string(), pty);
@@ -935,10 +1105,21 @@ impl<'tcx> Checker<'tcx> {
 
         match &ty.kind {
             TypeKind::Rec(tys) => {
+                let mut result = self.bottom_type();
+                let mut fields_ty = tys.clone();
+
                 for field in fields {
-                    let ty = tys[&field.ident.to_string()].clone().ty;
-                    self.check_expr(field.expr, Some(&ty), false)?;
+                    let name = field.ident.to_string();
+                    let expected = tys[&name].clone();
+                    let actual = self.check_expr(field.expr, Some(&expected.ty), false)?;
+
+                    if let Some(pty) = fields_ty.get_mut(&name) {
+                        pty.ty = actual;
+                    }
                 }
+
+                result.kind = TypeKind::Rec(fields_ty);
+                return Ok(result);
             }
 
             TypeKind::Opaque => {
@@ -993,7 +1174,46 @@ impl<'tcx> Checker<'tcx> {
 
     /// Checks the type of a closure expression.
     fn check_expr_closure(&mut self, closure: &Closure, expectation: Option<&Type>) -> Result<Type> {
-        todo!()
+        let body = self.tcx.hir_body(closure.body);
+
+        let mut params = Vec::new();
+        let rty = match expectation {
+            Some(Type {
+                kind: TypeKind::Fn(expected_params, expected_rty),
+                ..
+            }) => {
+                for (param, expected) in body.params.iter().zip(expected_params.iter()) {
+                    self.process_pattern(param.pat.kind, expected.ty.clone(), param.pat.hir_id);
+                }
+
+                self.check_expr(&body.value, Some(expected_rty), false)?;
+                params = expected_params.clone();
+                *expected_rty.clone()
+            }
+
+            _ => {
+                for param in body.params {
+                    let ty = self.top_type();
+                    self.process_pattern(param.pat.kind, ty.clone(), param.pat.hir_id);
+                    params.push(ProvType::new(ty));
+                }
+
+                self.check_expr(&body.value, None, false)?
+            }
+        };
+
+        let intrinsic = expectation
+            .map(|ty| ty.intrinsic.clone())
+            .unwrap_or_else(|| [Set::Universe, Set::Universe, Set::Universe]);
+
+        Ok(Type {
+            kind: TypeKind::Fn(params, Box::new(rty)),
+            binder: vec![],
+            var_to_idx: HashMap::new(),
+            binder_idx: 0,
+            intrinsic,
+            intrinsic_idx: 0,
+        })
     }
 
     /// Checks the type of a projection.
@@ -1050,11 +1270,11 @@ impl<'tcx> Checker<'tcx> {
     }
 
     fn check_let_stmt(&mut self, local: &LetStmt) -> Result {
-        let mut processed = false;
+        let init_expectation = self.local_integrity_expectation(local)?;
 
         // TODO: We need to use a type constructor that matches the left type
         let mut ty = if let Some(expr) = local.init {
-            self.check_expr(expr, None, false)?
+            self.check_expr(expr, init_expectation.as_ref(), false)?
         } else {
             self.top_type()
         };
@@ -1068,7 +1288,7 @@ impl<'tcx> Checker<'tcx> {
 
         // TODO: Only collect one such attribute
         for attr in self.tcx.hir().attrs(local.hir_id) {
-            if attr.path_matches(&self.local_attr) {
+            if self.attr_matches(attr, "local") {
                 let Other { integrity, variables } = self.parse_local(attr)?;
 
                 for (i, ss) in integrity.iter().enumerate() {
@@ -1090,7 +1310,136 @@ impl<'tcx> Checker<'tcx> {
             }
         }
 
+        for attr in self.tcx.hir().attrs(local.hir_id) {
+            if self.attr_matches(attr, "integrity") {
+                self.apply_local_integrity_attr(local, &mut ty, attr)?;
+            }
+        }
+
         self.process_pattern(local.pat.kind, ty, local.pat.hir_id);
+
+        Ok(())
+    }
+
+    fn local_integrity_expectation(&self, local: &LetStmt) -> Result<Option<Type>> {
+        for attr in self.tcx.hir().attrs(local.hir_id) {
+            if !self.attr_matches(attr, "integrity") {
+                continue;
+            }
+
+            match self.parse_integrity(attr)? {
+                Integrity::Fn {
+                    inputs,
+                    output,
+                    variables,
+                    ..
+                } => {
+                    let params = inputs
+                        .iter()
+                        .map(|integrity| {
+                            let mut ty = self.top_type();
+
+                            for (i, ss) in integrity.iter().enumerate() {
+                                self.ensure_variables_exist(&ss.value, &variables)?;
+                                ty.intrinsic[i] = ss.value.clone();
+                            }
+
+                            Ok(ProvType::new(ty))
+                        })
+                        .collect::<Result<Vec<_>>>()?;
+
+                    let mut rty = self.top_type();
+                    for (i, ss) in output.iter().enumerate() {
+                        self.ensure_variables_exist(&ss.value, &variables)?;
+                        rty.intrinsic[i] = ss.value.clone();
+                    }
+
+                    let mut ty = self.bottom_type();
+                    ty.kind = TypeKind::Fn(params, Box::new(rty));
+
+                    return Ok(Some(ty));
+                }
+
+                _ => {}
+            }
+        }
+
+        Ok(None)
+    }
+
+    fn apply_local_integrity_attr(&self, local: &LetStmt, ty: &mut Type, attr: &Attribute) -> Result {
+        match self.parse_integrity(attr)? {
+            Integrity::Other(Other { integrity, variables }) => {
+                for (i, ss) in integrity.iter().enumerate() {
+                    self.ensure_variables_exist(&ss.value, &variables)?;
+
+                    if !ty.intrinsic[i].subset(&self.scx, &ss.value) {
+                        let msg = format!(
+                            "value has incompatible integrity {} since {} ⊈ {}",
+                            ty.intrinsic.iter().join(" "),
+                            ty.intrinsic[i],
+                            ss.value
+                        );
+
+                        return Err(self.tcx.dcx().span_err(local.init.unwrap().span, msg));
+                    }
+
+                    ty.intrinsic[i] = ss.value.clone();
+                }
+            }
+
+            Integrity::Struct {
+                intrinsic,
+                fields,
+                variables,
+            } => {
+                for (i, ss) in intrinsic.iter().enumerate() {
+                    self.ensure_variables_exist(&ss.value, &variables)?;
+
+                    if !ty.intrinsic[i].subset(&self.scx, &ss.value) {
+                        let msg = format!(
+                            "value has incompatible integrity {} since {} ⊈ {}",
+                            ty.intrinsic.iter().join(" "),
+                            ty.intrinsic[i],
+                            ss.value
+                        );
+
+                        return Err(self.tcx.dcx().span_err(local.init.unwrap().span, msg));
+                    }
+
+                    ty.intrinsic[i] = ss.value.clone();
+                }
+
+                match &mut ty.kind {
+                    TypeKind::Rec(field_map) => {
+                        for (name, integrity) in fields {
+                            if let Some(pty) = field_map.get_mut(&name) {
+                                for (i, ss) in integrity.iter().enumerate() {
+                                    self.ensure_variables_exist(&ss.value, &variables)?;
+
+                                    if !pty.ty.intrinsic[i].subset(&self.scx, &ss.value) {
+                                        let msg = format!(
+                                            "value has incompatible integrity {} since {} ⊈ {}",
+                                            pty.ty.intrinsic.iter().join(" "),
+                                            pty.ty.intrinsic[i],
+                                            ss.value
+                                        );
+
+                                        return Err(self.tcx.dcx().span_err(local.init.unwrap().span, msg));
+                                    }
+
+                                    pty.ty.intrinsic[i] = ss.value.clone();
+                                }
+                            }
+                        }
+                    }
+
+                    _ => {}
+                }
+            }
+
+            Integrity::Fn { .. } => {}
+        }
 
         Ok(())
     }
@@ -1134,6 +1483,14 @@ impl<'tcx> Checker<'tcx> {
         self.parse(attr, |parser| parser.parse_param())
     }
 
+    fn parse_integrity(&self, attr: &Attribute) -> Result<Integrity> {
+        self.parse(attr, |parser| parser.parse_integrity())
+    }
+
+    fn parse_providers(&self, attr: &Attribute) -> Result<Spanned<Set>> {
+        self.parse(attr, |parser| parser.parse_set())
+    }
+
     // ======== PATTERNS ======== //
 
     fn process_pattern(&mut self, pat_kind: PatKind, ty: Type, hir_id: HirId) {
@@ -1150,7 +1507,7 @@ impl<'tcx> Checker<'tcx> {
 
             PatKind::Guard(pat, _) => self.process_pattern(pat.kind, ty, pat.hir_id),
 
-            PatKind::Struct(qpath, fields, _) => self.process_pattern_struct(hir_id, &qpath, fields),
+            PatKind::Struct(qpath, fields, _) => self.process_pattern_struct(hir_id, &qpath, fields, Some(ty)),
 
             PatKind::Box(pat) => self.process_pattern(pat.kind, ty, pat.hir_id),
             PatKind::Deref(pat) => self.process_pattern(pat.kind, ty, pat.hir_id),
@@ -1169,7 +1526,7 @@ impl<'tcx> Checker<'tcx> {
                     })
                     .collect();
 
-                self.process_pattern_struct(hir_id, &qpath, &fields);
+                self.process_pattern_struct(hir_id, &qpath, &fields, Some(ty));
             }
 
             PatKind::Tuple(pats, _) => match ty.kind {
@@ -1229,8 +1586,13 @@ impl<'tcx> Checker<'tcx> {
     }
 
     /// Recursively process a struct pattern, registering all identifiers with the locals map.
-    fn process_pattern_struct(&mut self, hir_id: HirId, qpath: &QPath, fields: &[PatField]) {
-        match self.check_expr_path(hir_id, qpath, None) {
+    fn process_pattern_struct(&mut self, hir_id: HirId, qpath: &QPath, fields: &[PatField], scrutinee_ty: Option<Type>) {
+        let ty = match scrutinee_ty {
+            Some(ty @ Type { kind: TypeKind::Rec(_), .. }) => Ok(ty),
+            _ => self.check_expr_path(hir_id, qpath, None),
+        };
+
+        match ty {
             Ok(ty) => match &ty.kind {
                 TypeKind::Rec(map) => {
                     for field in fields {

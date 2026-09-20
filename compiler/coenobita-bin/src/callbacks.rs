@@ -1,6 +1,6 @@
 use coenobita_check::Checker;
 use rustc_driver::{Callbacks, Compilation};
-use rustc_hir::{intravisit::Visitor, Item};
+use rustc_hir::{intravisit::Visitor, ImplItem, Item};
 use rustc_middle::{hir::nested_filter::OnlyBodies, ty::TyCtxt};
 
 pub struct CoenobitaCallbacks {
@@ -68,5 +68,9 @@ impl<'c, 'tcx> Visitor<'tcx> for CoenobitaVisitor<'c, 'tcx> {
     fn visit_item(&mut self, item: &'tcx Item<'tcx>) -> Self::Result {
         // Check integrity
         let _ = self.checker.check_item(item);
+    }
+
+    fn visit_impl_item(&mut self, item: &'tcx ImplItem<'tcx>) -> Self::Result {
+        let _ = self.checker.check_impl_item(item);
     }
 }

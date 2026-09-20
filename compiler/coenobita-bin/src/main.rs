@@ -49,6 +49,7 @@ fn main() {
 
     // Add some extra arguments
     args.push("-Zcrate-attr=feature(register_tool)".to_string());
+    args.push("-Zcrate-attr=register_tool(cnbt)".to_string());
     args.push("-Zcrate-attr=register_tool(coenobita)".to_string());
 
     // Create callbacks and run the compiler
@@ -57,6 +58,12 @@ fn main() {
 }
 
 fn crate_name<'a>(args: &'a [String]) -> Option<String> {
+    for arg in args {
+        if let Some(name) = arg.strip_prefix("--crate-name=") {
+            return Some(name.to_owned());
+        }
+    }
+
     for pair in args.windows(2) {
         if pair[0] == "--crate-name" {
             return Some(pair[1].clone());
@@ -67,14 +74,37 @@ fn crate_name<'a>(args: &'a [String]) -> Option<String> {
 }
 
 fn crate_type(args: &[String]) -> Option<String> {
-    args.windows(2)
-        .find_map(|pair| match [pair[0].as_str(), &pair[1]] {
-            ["--test", _] | [_, "--test"] => Some("root".to_owned()),
-            ["--crate-name", "std"] => Some("root".to_owned()),
-            ["--crate-type", "bin"] => Some("root".to_owned()),
-            ["--crate-type", _] => Some("lib".to_owned()),
-            _ => None,
-        })
+    let crate_name = crate_name(args);
+
+    if matches!(crate_name.as_deref(), Some("build_script_build")) || args.iter().any(|arg| arg == "--test") {
+        return Some("lib".to_owned());
+    }
+
+    if matches!(crate_name.as_deref(), Some("std")) {
+        return Some("root".to_owned());
+    }
+
+    for (i, arg) in args.iter().enumerate() {
+        let value = if arg == "--crate-type" {
+            args.get(i + 1).map(String::as_str)
+        } else {
+            arg.strip_prefix("--crate-type=")
+        };
+
+        if let Some(value) = value {
+            if value.split(',').any(|kind| kind == "bin") {
+                return Some("root".to_owned());
+            }
+
+            return Some("lib".to_owned());
+        }
+    }
+
+    if env::var_os("CARGO_BIN_NAME").is_some() || args.iter().any(|arg| arg.ends_with("/src/main.rs") || arg == "src/main.rs") {
+        return Some("root".to_owned());
+    }
+
+    None
 }
 
 #[allow(unused)]

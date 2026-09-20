@@ -21,7 +21,7 @@ use std::sync::Arc;
 
 use coenobita_middle::set::Set;
 
-use rustc_ast::token::{LitKind, TokenKind};
+use rustc_ast::token::{BinOpToken, Delimiter, LitKind, TokenKind};
 use rustc_ast::tokenstream::TokenStream;
 
 use rustc_data_structures::sync;
@@ -77,6 +77,21 @@ pub struct Other {
     pub variables: HashMap<String, Span>,
 }
 
+pub enum Integrity {
+    Fn {
+        intrinsic: [Spanned<Set>; 3],
+        inputs: Vec<[Spanned<Set>; 3]>,
+        output: [Spanned<Set>; 3],
+        variables: HashMap<String, Span>,
+    },
+    Struct {
+        intrinsic: [Spanned<Set>; 3],
+        fields: HashMap<String, [Spanned<Set>; 3]>,
+        variables: HashMap<String, Span>,
+    },
+    Other(Other),
+}
+
 impl<'cnbt> CoenobitaParser<'cnbt> {
     pub fn new(parser: Parser<'cnbt>) -> Self {
         CoenobitaParser {
@@ -86,7 +101,7 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
     }
 
     fn parse_other(&mut self) -> PResult<'cnbt, Other> {
-        let integrity = [self.parse_set()?, self.parse_set()?, self.parse_set()?];
+        let integrity = self.parse_integrity_sets()?;
 
         Ok(Other {
             integrity,
@@ -103,7 +118,7 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
     }
 
     pub fn parse_field(&mut self) -> PResult<'cnbt, Field> {
-        let integrity = [self.parse_set()?, self.parse_set()?, self.parse_set()?];
+        let integrity = self.parse_integrity_sets()?;
         self.parser.expect(PIPE)?;
         let providers = self.parse_set()?;
 
@@ -147,7 +162,7 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
             }
         };
 
-        let integrity = [self.parse_set()?, self.parse_set()?, self.parse_set()?];
+        let integrity = self.parse_integrity_sets()?;
         self.parser.expect(PIPE)?;
         let providers = self.parse_set()?;
 
@@ -171,25 +186,188 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
         })
     }
 
+    pub fn parse_integrity(&mut self) -> PResult<'cnbt, Integrity> {
+        let intrinsic = self.parse_integrity_sets()?;
+
+        if self.eat_ident("fn") {
+            self.expect_open_paren()?;
+            let mut inputs = Vec::new();
+
+            while !self.eat_close_paren() {
+                inputs.push(self.parse_integrity_sets()?);
+
+                if !self.parser.eat(COMMA) {
+                    self.expect_close_paren()?;
+                    break;
+                }
+            }
+
+            self.expect_arrow()?;
+            let output = self.parse_integrity_sets()?;
+
+            Ok(Integrity::Fn {
+                intrinsic,
+                inputs,
+                output,
+                variables: self.variables.clone(),
+            })
+        } else if self.eat_ident("struct") || matches!(self.parser.token.kind, TokenKind::OpenDelim(Delimiter::Parenthesis)) {
+            let mut fields = HashMap::new();
+
+            if self.parser.eat(OPEN_BRACE) {
+                while !self.parser.eat(CLOSE_BRACE) {
+                    let ident = self.parser.parse_ident()?;
+                    self.expect_colon()?;
+                    let integrity = self.parse_integrity_sets()?;
+                    fields.insert(ident.to_string(), integrity);
+
+                    if !self.parser.eat(COMMA) {
+                        self.parser.expect(CLOSE_BRACE)?;
+                        break;
+                    }
+                }
+            } else {
+                self.expect_open_paren()?;
+
+                let mut index = 0;
+                while !self.eat_close_paren() {
+                    let integrity = self.parse_integrity_sets()?;
+                    fields.insert(index.to_string(), integrity);
+                    index += 1;
+
+                    if !self.parser.eat(COMMA) {
+                        self.expect_close_paren()?;
+                        break;
+                    }
+                }
+            }
+
+            Ok(Integrity::Struct {
+                intrinsic,
+                fields,
+                variables: self.variables.clone(),
+            })
+        } else {
+            Ok(Integrity::Other(Other {
+                integrity: intrinsic,
+                variables: self.variables.clone(),
+            }))
+        }
+    }
+
+    fn parse_integrity_sets(&mut self) -> PResult<'cnbt, [Spanned<Set>; 3]> {
+        let first = self.parse_set()?;
+        let second = self.parse_set()?;
+
+        if self.next_starts_set() {
+            let third = self.parse_set()?;
+            Ok([first, second, third])
+        } else {
+            Ok([
+                Spanned::new(first.value.clone(), first.span),
+                first,
+                second,
+            ])
+        }
+    }
+
+    fn next_starts_set(&self) -> bool {
+        match self.parser.token.kind {
+            TokenKind::OpenDelim(Delimiter::Brace) => true,
+            TokenKind::Ident(sym, _) => !matches!(sym.as_str(), "fn" | "struct" | "U"),
+            _ => false,
+        }
+    }
+
+    fn eat_ident(&mut self, expected: &str) -> bool {
+        if let TokenKind::Ident(sym, _) = self.parser.token.kind {
+            if sym.to_string() == expected {
+                self.parser.bump();
+                return true;
+            }
+        }
+
+        false
+    }
+
+    fn expect_arrow(&mut self) -> PResult<'cnbt, ()> {
+        match self.parser.token.kind {
+            TokenKind::RArrow => {
+                self.parser.bump();
+                Ok(())
+            }
+            _ => Err(self
+                .parser
+                .dcx()
+                .struct_span_err(self.parser.token.span, "expected `->`")),
+        }
+    }
+
+    fn expect_open_paren(&mut self) -> PResult<'cnbt, ()> {
+        match self.parser.token.kind {
+            TokenKind::OpenDelim(Delimiter::Parenthesis) => {
+                self.parser.bump();
+                Ok(())
+            }
+            _ => Err(self
+                .parser
+                .dcx()
+                .struct_span_err(self.parser.token.span, "expected `(`")),
+        }
+    }
+
+    fn eat_close_paren(&mut self) -> bool {
+        match self.parser.token.kind {
+            TokenKind::CloseDelim(Delimiter::Parenthesis) => {
+                self.parser.bump();
+                true
+            }
+            _ => false,
+        }
+    }
+
+    fn expect_close_paren(&mut self) -> PResult<'cnbt, ()> {
+        if self.eat_close_paren() {
+            Ok(())
+        } else {
+            Err(self
+                .parser
+                .dcx()
+                .struct_span_err(self.parser.token.span, "expected `)`"))
+        }
+    }
+
+    fn expect_colon(&mut self) -> PResult<'cnbt, ()> {
+        match self.parser.token.kind {
+            TokenKind::Colon => {
+                self.parser.bump();
+                Ok(())
+            }
+            _ => Err(self
+                .parser
+                .dcx()
+                .struct_span_err(self.parser.token.span, "expected `:`")),
+        }
+    }
+
     pub fn parse_set(&mut self) -> PResult<'cnbt, Spanned<Set>> {
         let start = self.start();
 
         let left = if self.parser.eat(OPEN_BRACE) {
             let mut origins = BTreeSet::new();
 
-            if let Ok(ident) = self.parser.parse_ident() {
-                origins.insert(ident.to_string());
-            }
+            if !self.parser.eat(CLOSE_BRACE) {
+                origins.insert(self.parse_origin()?);
 
-            while !self.parser.eat(CLOSE_BRACE) {
-                self.parser.expect(COMMA)?;
+                while !self.parser.eat(CLOSE_BRACE) {
+                    self.parser.expect(COMMA)?;
 
-                if self.parser.eat(CLOSE_BRACE) {
-                    break;
+                    if self.parser.eat(CLOSE_BRACE) {
+                        break;
+                    }
+
+                    origins.insert(self.parse_origin()?);
                 }
-
-                let next_origin = self.parser.parse_ident()?.to_string();
-                origins.insert(next_origin);
             }
 
             if origins.contains("*") {
@@ -213,6 +391,20 @@ impl<'cnbt> CoenobitaParser<'cnbt> {
         }
 
         Ok(Spanned::new(left, self.end(start)))
+    }
+
+    fn parse_origin(&mut self) -> PResult<'cnbt, String> {
+        match self.parser.token.kind {
+            TokenKind::BinOp(BinOpToken::Star) => {
+                self.parser.bump();
+                Ok("*".to_string())
+            }
+            TokenKind::Ident(_, _) => Ok(self.parser.parse_ident()?.to_string()),
+            _ => Err(self
+                .parser
+                .dcx()
+                .struct_span_err(self.parser.token.span, "expected origin identifier or `*`")),
+        }
     }
 
     pub fn parse_subset(&mut self) -> PResult<'cnbt, ()> {

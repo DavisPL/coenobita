@@ -196,7 +196,8 @@ impl Type {
 
     pub fn satisfies(&self, scx: &SetCtx, other: &Type) -> bool {
         let kind = match (&self.kind, &other.kind) {
-            (TypeKind::Opaque, TypeKind::Opaque) => true,
+            (_, TypeKind::Opaque) => true,
+            (TypeKind::Opaque, _) => false,
             (TypeKind::Fn(ps1, r1), TypeKind::Fn(ps2, r2)) => {
                 for (p1, p2) in ps1.iter().zip(ps2.iter()) {
                     if !p1.ty.satisfies(scx, &p2.ty) {
@@ -204,7 +205,7 @@ impl Type {
                     }
                 }
 
-                r2.satisfies(scx, &r1)
+                r1.satisfies(scx, &r2)
             }
 
             (TypeKind::Rec(f1), TypeKind::Rec(f2)) => {
@@ -218,6 +219,20 @@ impl Type {
                         }
 
                         None => return false,
+                    }
+                }
+
+                true
+            }
+
+            (TypeKind::Tuple(e1), TypeKind::Tuple(e2)) => {
+                if e1.len() != e2.len() {
+                    return false;
+                }
+
+                for (pty1, pty2) in e1.iter().zip(e2.iter()) {
+                    if !pty1.ty.satisfies(scx, &pty2.ty) {
+                        return false;
                     }
                 }
 
