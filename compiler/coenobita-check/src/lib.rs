@@ -30,6 +30,7 @@ use std::path::Path;
 
 use itertools::Itertools;
 use log::{debug, warn};
+use serde::Deserialize;
 
 use rustc_abi::{VariantIdx, FIRST_VARIANT};
 use rustc_errors::PResult;
@@ -39,10 +40,19 @@ use rustc_hir::{
     Arm, AttrArgs, AttrKind, Attribute, Block, BodyId, Closure, Expr, ExprField, ExprKind, FnSig, HirId,
     ImplItem, ImplItemKind, Item, ItemKind, LangItem, LetExpr, LetStmt, MatchSource, PatField, PatKind, QPath, Stmt, StmtKind,
 };
-use rustc_middle::ty::{FieldDef, Ty, TyCtxt, TyKind};
+use rustc_middle::ty::inherent::IntoKind;
+use rustc_middle::ty::{ClauseKind, FieldDef, GenericArgKind, Ty, TyCtxt, TyKind};
 use rustc_span::{ErrorGuaranteed, Ident, Span, Symbol};
 
 pub type Result<T = ()> = std::result::Result<T, ErrorGuaranteed>;
+
+#[derive(Debug, Deserialize)]
+struct AdHocTraitPolicy {
+    name: String,
+    args: Vec<String>,
+    allowed: Vec<String>,
+    denied: Vec<String>,
+}
 
 fn erase_generic_segments(path: &str) -> String {
     let mut erased = String::with_capacity(path.len());
@@ -83,6 +93,8 @@ pub struct Checker<'tcx> {
     crate_name: String,
 
     fn_decls: HashMap<String, Type>,
+
+    trait_policies: Vec<AdHocTraitPolicy>,
 }
 
 impl<'tcx> Checker<'tcx> {
@@ -96,6 +108,8 @@ impl<'tcx> Checker<'tcx> {
         // TODO: Handle parsing failures
         let fn_decls_raw = fs::read_to_string(&path).unwrap();
         let fn_decls = coenobita_decl::parse(&fn_decls_raw).unwrap();
+
+        let trait_policies = Self::load_trait_policies();
 
         Checker {
             tcx,
@@ -120,6 +134,29 @@ impl<'tcx> Checker<'tcx> {
             crate_name,
 
             fn_decls,
+
+            trait_policies,
+        }
+    }
+
+    fn load_trait_policies() -> Vec<AdHocTraitPolicy> {
+        let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../..")
+            .join("intrinsics")
+            .join("ad-hoc")
+            .join("traits.json");
+
+        let Ok(raw) = fs::read_to_string(&path) else {
+            warn!("Could not read ad-hoc trait policy file at {}", path.display());
+            return Vec::new();
+        };
+
+        match serde_json::from_str(&raw) {
+            Ok(policies) => policies,
+            Err(err) => {
+                warn!("Could not parse ad-hoc trait policy file at {}: {err}", path.display());
+                Vec::new()
+            }
         }
     }
 
@@ -827,7 +864,11 @@ impl<'tcx> Checker<'tcx> {
     }
 
     /// Checks the type of a call expression.
-    fn check_expr_call(&mut self, fun: &Expr, args: &[Expr], _span: Span) -> Result<Type> {
+    fn check_expr_call(&mut self, fun: &Expr, args: &[Expr], span: Span) -> Result<Type> {
+        if self.is_trust_call(fun) {
+            return self.check_expr_trust(args, span);
+        }
+
         let owner_id = fun.hir_id.owner;
         let owner_def_kind = self.tcx.def_kind(owner_id);
 
@@ -837,7 +878,9 @@ impl<'tcx> Checker<'tcx> {
             if let ExprKind::Path(qpath) = fun.kind {
                 let typeck_results = self.tcx.typeck(local_def_id);
 
-                if let Res::Def(def_kind, def_id) = typeck_results.qpath_res(&qpath, fun.hir_id) {
+                if let Res::Def(_def_kind, def_id) = typeck_results.qpath_res(&qpath, fun.hir_id) {
+                    self.check_ad_hoc_trait_constraints(def_id, args, fun.hir_id)?;
+
                     // TODO: Check intrinsic constraints
                     // self.check_intrinsic_constraints(def_id, def_kind, args, typeck_results)?;
                 }
@@ -927,6 +970,139 @@ impl<'tcx> Checker<'tcx> {
         };
 
         ty = self.extract(&ty, &fty);
+
+        Ok(ty)
+    }
+
+    fn check_ad_hoc_trait_constraints(&self, def_id: DefId, args: &[Expr], fun_hir_id: HirId) -> Result {
+        if self.trait_policies.is_empty() {
+            return Ok(());
+        }
+
+        let typeck_results = self.tcx.typeck(fun_hir_id.owner.to_def_id().as_local().unwrap());
+        let generic_args = typeck_results.node_args(fun_hir_id);
+        let generics = self.tcx.generics_of(def_id);
+        let predicates = self.tcx.predicates_of(def_id);
+
+        for (clause, _) in predicates.predicates {
+            let ClauseKind::Trait(trait_predicate) = clause.kind().skip_binder() else {
+                continue;
+            };
+
+            let trait_ref = trait_predicate.trait_ref;
+            let trait_name = self.short_def_name(trait_ref.def_id);
+
+            let Some(policy) = self.trait_policies.iter().find(|policy| {
+                policy.name == trait_name
+                    && policy.args
+                        == trait_ref
+                            .args
+                            .iter()
+                            .skip(1)
+                            .filter_map(|arg| match arg.kind() {
+                                GenericArgKind::Type(ty) => Some(self.short_ty_name(ty)),
+                                _ => None,
+                            })
+                            .collect::<Vec<_>>()
+            }) else {
+                continue;
+            };
+
+            let self_ty = trait_ref.self_ty();
+            let TyKind::Param(param_ty) = self_ty.kind() else {
+                continue;
+            };
+
+            let Some(param) = generics.own_params.iter().find(|param| param.name == param_ty.name) else {
+                continue;
+            };
+
+            let Some(generic_arg) = generic_args.get(param.index as usize) else {
+                continue;
+            };
+
+            let GenericArgKind::Type(actual_ty) = generic_arg.kind() else {
+                continue;
+            };
+
+            let actual_name = self.short_ty_name(actual_ty);
+            if policy.denied.iter().any(|denied| denied == &actual_name)
+                || !policy.allowed.iter().any(|allowed| allowed == &actual_name)
+            {
+                let span = args
+                    .get(param.index as usize)
+                    .map(|arg| arg.span)
+                    .unwrap_or_else(|| self.tcx.def_span(def_id));
+                let expected = format!("{}<{}>", policy.name, policy.args.iter().join(", "));
+                let allowed = policy
+                    .allowed
+                    .iter()
+                    .map(|ty| format!("'{ty}'"))
+                    .join(", ");
+
+                let mut err = self.tcx.dcx().struct_span_err(
+                    span,
+                    format!(
+                        "cannot accept type '{actual_name}' for '{expected}' due to capability safety policy"
+                    ),
+                );
+                err.help(format!("allowed types are {allowed}"));
+                return Err(err.emit());
+            }
+        }
+
+        Ok(())
+    }
+
+    fn short_def_name(&self, def_id: DefId) -> String {
+        self.tcx
+            .def_path_str(def_id)
+            .rsplit("::")
+            .next()
+            .unwrap_or("*")
+            .to_string()
+    }
+
+    fn short_ty_name(&self, ty: Ty<'tcx>) -> String {
+        match ty.kind() {
+            TyKind::Adt(adt_def, _) => self.short_def_name(adt_def.did()),
+            TyKind::Ref(_, inner, _) => self.short_ty_name(*inner),
+            TyKind::Str => "str".to_string(),
+            TyKind::Param(param) => param.name.to_string(),
+            _ => format!("{ty}"),
+        }
+    }
+
+    fn is_trust_call(&self, fun: &Expr) -> bool {
+        let ExprKind::Path(qpath) = fun.kind else {
+            return false;
+        };
+
+        let local_def_id = fun.hir_id.owner.to_def_id().as_local().unwrap();
+        let typeck_results = self.tcx.typeck(local_def_id);
+
+        let Res::Def(_, def_id) = typeck_results.qpath_res(&qpath, fun.hir_id) else {
+            return false;
+        };
+
+        erase_generic_segments(&self.tcx.def_path_str(def_id)) == "coenobita::__trust"
+    }
+
+    fn check_expr_trust(&mut self, args: &[Expr], span: Span) -> Result<Type> {
+        if self.crate_name != "root" {
+            return Err(self
+                .tcx
+                .dcx()
+                .span_err(span, "'trust' may only be invoked by the root crate"));
+        }
+
+        let Some(expr) = args.first() else {
+            return Ok(self.top_type());
+        };
+
+        let mut ty = self.check_expr(expr, None, false)?;
+        let origin = Set::Concrete(BTreeSet::from([self.crate_name.clone()]));
+        ty.intrinsic = [origin.clone(), origin.clone(), origin];
 
         Ok(ty)
     }
