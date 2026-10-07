@@ -166,17 +166,90 @@ impl<'tcx> Checker<'tcx> {
         let n = self.tcx.fn_sig(def_id).skip_binder().inputs().iter().count();
 
         let mut default = Type::fun(n);
-        let origin = self.origin_for_def(def_id);
-        let set = Set::Concrete(BTreeSet::from([origin]));
-        default.intrinsic = [set.clone(), set.clone(), set.clone()];
 
-        if let TypeKind::Fn(_, rty) = &mut default.kind {
-            rty.intrinsic = [set.clone(), set.clone(), set];
+        if self.has_fn_annotation(def_id) {
+            let origin = self.origin_for_def(def_id);
+            let set = Set::Concrete(BTreeSet::from([origin]));
+            default.intrinsic = [set.clone(), set.clone(), set];
         }
 
+        self.apply_fn_input_output_attrs(def_id, &mut default)?;
         self.apply_fn_integrity_attrs(def_id, &mut default)?;
 
         self.items.insert(def_id, default);
+
+        Ok(())
+    }
+
+    fn has_fn_annotation(&self, def_id: DefId) -> bool {
+        !self.tool_attrs_by_path(def_id, "input").is_empty()
+            || !self.tool_attrs_by_path(def_id, "output").is_empty()
+            || !self.tool_attrs_by_path(def_id, "integrity").is_empty()
+    }
+
+    fn origin_for_def(&self, def_id: DefId) -> String {
+        self.tcx
+            .def_path_str(def_id)
+            .split("::")
+            .next()
+            .unwrap_or("*")
+            .to_string()
+    }
+
+    fn apply_fn_input_output_attrs(&self, def_id: DefId, fty: &mut Type) -> Result {
+        let TypeKind::Fn(params, rty) = &mut fty.kind else {
+            return Ok(());
+        };
+
+        for attr in self.tool_attrs_by_path(def_id, "input") {
+            let Input {
+                index,
+                integrity,
+                providers,
+                variables,
+            } = self.parse_input(attr)?;
+
+            for ss in integrity {
+                self.pass(&mut params[index.value].ty, index.span, ss.value, &variables)?;
+
+                self.ensure_variables_exist(&providers.value, &variables)?;
+                params[index.value].providers = providers.value.clone();
+            }
+        }
+
+        for attr in self.compat_attrs_by_path(def_id, "input") {
+            let Input {
+                index,
+                integrity,
+                providers,
+                variables,
+            } = self.parse_input(attr)?;
+
+            for ss in integrity {
+                self.pass(&mut params[index.value].ty, index.span, ss.value, &variables)?;
+
+                self.ensure_variables_exist(&providers.value, &variables)?;
+                params[index.value].providers = providers.value.clone();
+            }
+        }
+
+        for attr in self.tool_attrs_by_path(def_id, "output") {
+            let Other { integrity, variables } = self.parse_output(attr)?;
+
+            for (i, ss) in integrity.iter().enumerate() {
+                self.ensure_variables_exist(&ss.value, &variables)?;
+                rty.intrinsic[i] = ss.value.clone();
+            }
+        }
+
+        for attr in self.compat_attrs_by_path(def_id, "output") {
+            let Other { integrity, variables } = self.parse_output(attr)?;
+
+            for (i, ss) in integrity.iter().enumerate() {
+                self.ensure_variables_exist(&ss.value, &variables)?;
+                rty.intrinsic[i] = ss.value.clone();
+            }
+        }
 
         Ok(())
     }
@@ -350,15 +423,6 @@ impl<'tcx> Checker<'tcx> {
         self.items.get(&def_id).unwrap().clone()
     }
 
-    fn origin_for_def(&self, def_id: DefId) -> String {
-        self.tcx
-            .def_path_str(def_id)
-            .split("::")
-            .next()
-            .unwrap_or("*")
-            .to_string()
-    }
-
     /// Given the parent and variant `DefId`s of an ADT (as well as its index), return its type.
     fn adt_ty(&mut self, def_id_parent: DefId, def_id_variant: DefId, index: VariantIdx) -> Type {
         if let Some(ty) = self.get_type_constr(def_id_variant) {
@@ -392,6 +456,24 @@ impl<'tcx> Checker<'tcx> {
         ty.intrinsic = [set.clone(), set.clone(), set];
 
         self.icx.influence(ty)
+    }
+
+    fn current_provider_set(&self) -> Set {
+        Set::Concrete(BTreeSet::from([self.crate_name.clone()]))
+    }
+
+    fn created_value_type(&self, mut ty: Type) -> Type {
+        ty.intrinsic = self.bottom_type().intrinsic;
+        ty
+    }
+
+    fn ensure_provider_allowed(&self, span: Span, actual: &Set, expected: &Set) -> Result {
+        if actual.subset(&self.scx, expected) {
+            Ok(())
+        } else {
+            let msg = format!("expected provider {} but found {}", expected, actual);
+            Err(self.tcx.dcx().span_err(span, msg))
+        }
     }
 
     fn set_type_constr(&mut self, def_id: DefId, ty: Type) {
@@ -781,7 +863,8 @@ impl<'tcx> Checker<'tcx> {
                         CtorOf::Struct => {
                             let def_id = self.tcx.parent(def_id);
 
-                            self.adt_ty(def_id, def_id, FIRST_VARIANT)
+                            let ty = self.adt_ty(def_id, def_id, FIRST_VARIANT);
+                            self.created_value_type(ty)
                         }
 
                         CtorOf::Variant => {
@@ -800,7 +883,8 @@ impl<'tcx> Checker<'tcx> {
                                 .unwrap()
                                 .0;
 
-                            self.adt_ty(def_id, id, idx.into())
+                            let ty = self.adt_ty(def_id, id, idx.into());
+                            self.created_value_type(ty)
                         }
                     },
 
@@ -835,7 +919,8 @@ impl<'tcx> Checker<'tcx> {
                 match self.tcx.type_of(alias_to).skip_binder().kind() {
                     TyKind::Adt(adt_def, _) => {
                         let did = adt_def.did();
-                        self.adt_ty(did, did, FIRST_VARIANT)
+                        let ty = self.adt_ty(did, did, FIRST_VARIANT);
+                        self.created_value_type(ty)
                     }
 
                     _ => todo!(),
@@ -938,17 +1023,8 @@ impl<'tcx> Checker<'tcx> {
                         return Err(self.tcx.dcx().span_err(expr.span, msg));
                     }
 
-                    // TODO: Construct this set once and access via helper method
-                    if !Set::Concrete(BTreeSet::from([self.crate_name.clone()]))
-                        .subset(&self.scx, &expected.providers)
-                    {
-                        let msg = format!(
-                            "origin {} absent from set of valid providers {}",
-                            self.crate_name, expected.providers
-                        );
-
-                        return Err(self.tcx.dcx().span_err(expr.span, msg));
-                    }
+                    let actual_provider = self.current_provider_set();
+                    self.ensure_provider_allowed(expr.span, &actual_provider, &expected.providers)?;
                 }
 
                 *rty
@@ -956,8 +1032,9 @@ impl<'tcx> Checker<'tcx> {
 
             TypeKind::Rec(elements) => {
                 for (i, arg) in args.iter().enumerate() {
-                    let ty = elements[&i.to_string()].clone().ty;
-                    self.check_expr(arg, Some(&ty), false)?;
+                    let expected = elements[&i.to_string()].clone();
+                    let actual = self.check_expr(arg, Some(&expected.ty), false)?;
+                    self.ensure_provider_allowed(arg.span, &actual.intrinsic[0], &expected.providers)?;
                 }
 
                 fty.clone()
@@ -1120,6 +1197,10 @@ impl<'tcx> Checker<'tcx> {
         }
 
         res
+    }
+
+    fn is_unconstrained_field_type(&self, ty: &Type) -> bool {
+        ty.intrinsic.iter().all(|set| matches!(set, Set::Universe))
     }
 
     /// Checks the type of a method call.
@@ -1288,6 +1369,12 @@ impl<'tcx> Checker<'tcx> {
                     let name = field.ident.to_string();
                     let expected = tys[&name].clone();
                     let actual = self.check_expr(field.expr, Some(&expected.ty), false)?;
+                    self.ensure_provider_allowed(field.expr.span, &actual.intrinsic[0], &expected.providers)?;
+
+                    if !self.is_unconstrained_field_type(&expected.ty) {
+                        result.intrinsic[1] = result.intrinsic[1].clone().union(expected.ty.intrinsic[1].clone());
+                        result.intrinsic[2] = result.intrinsic[2].clone().union(expected.ty.intrinsic[2].clone());
+                    }
 
                     if let Some(pty) = fields_ty.get_mut(&name) {
                         pty.ty = actual;
